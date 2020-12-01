@@ -4,9 +4,9 @@
 class Shooting
 {
 protected:
-	projectile curr_projectile;
+	Projectile curr_projectile;
 
 public:
 	void fire();
-	void set_projectile(projectile);
+	void set_projectile(Projectile);
 };
