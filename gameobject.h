@@ -1,6 +1,5 @@
 #pragma once
 #include "drawing.h"
-#include "projectile.h"
 
 class GameObject : public Drawing
 {
