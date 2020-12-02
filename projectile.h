@@ -1,10 +1,13 @@
 #pragma once
 #include "gameobject.h"
+#include "Path.h"
 
-class Projectile : public GameObject
-{
+//Superclass for all projectiles
+class Projectile : public GameObject{
 public:
-	virtual void update();
-	virtual void hit();
-	virtual void destroy();
+	Projectile(float xpos, float ypos, float size, std::string * sprites,int vel,int damage) :
+		GameObject(xpos, ypos, size, sprites, 1, vel, damage, 1)
+	{};
+	virtual void update() override;
+
 };

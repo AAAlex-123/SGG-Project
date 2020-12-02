@@ -10,5 +10,4 @@ private:
 public:
 	virtual void update() override;
 	virtual void hit() override;
-	virtual void destroy() override;
 };

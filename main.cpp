@@ -1,10 +1,10 @@
-#include "main.h"
 #include "game_data.h"
+#include "drawing.h"
+#include "graphics.h"
+#include "constants.h"
 // #include everything lmao.h
 #include <iostream>
 
-// global variables
-graphics::Brush br;
 
 // sgg functions
 void update(float ms)
@@ -27,7 +27,7 @@ void update(float ms)
 		gd->game_state = ((game_states::CREDITS * graphics::getKeyState(graphics::scancode_t::SCANCODE_C)) + (gd->game_state * !graphics::getKeyState(graphics::scancode_t::SCANCODE_C)));
 		gd->game_state = ((game_states::HELP * graphics::getKeyState(graphics::scancode_t::SCANCODE_H)) + (gd->game_state * !graphics::getKeyState(graphics::scancode_t::SCANCODE_H)));
 		gd->game_state = ((game_states::EXIT * graphics::getKeyState(graphics::scancode_t::SCANCODE_E)) + (gd->game_state * !graphics::getKeyState(graphics::scancode_t::SCANCODE_E)));
-		
+
 		// ...
 
 		break;
@@ -55,9 +55,9 @@ void update(float ms)
 	}
 	case game_states::OPTIONS: {
 		gd->game_state = ((game_states::MENU * graphics::getKeyState(graphics::scancode_t::SCANCODE_B)) + (gd->game_state * !graphics::getKeyState(graphics::scancode_t::SCANCODE_B)));
-		
+
 		// ...
-		
+
 		break;
 	}
 
