@@ -2,21 +2,21 @@
 #include <string>
 
 //Interface to allow uniform access to all drawable objects
-class Drawing{
+class Drawing {
 
 public:
 	std::string* sprites;
 
-	float x, y, size;
-	//amount of sprite strings in the array
-	int frames;
+	float x, y, radius;
 
-	Drawing(float xpos, float ypos, float size, std::string* sprites, int frames) :
-		x(xpos),
-		y(ypos),
+	//amount of sprite strings in the array
+	int sprite_no;
+
+	Drawing(float xpos, float ypos, float radius, std::string* sprites, int sprite_no) :
+		x(xpos), y(ypos),
 		sprites(sprites),
-		size(size),
-		frames(frames)
+		radius(radius),
+		sprite_no(sprite_no)
 	{};
 
 	virtual void draw() const = 0;
