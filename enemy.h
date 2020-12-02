@@ -1,13 +1,13 @@
 #pragma once
-#include "gameobject.h"
-#include "shooting.h"
-#include "projectile.h"
+#include "entity.h"
 
-class Enemy : public GameObject, public Shooting
-{
-private:
-
+class Enemy : public Entity {
 public:
-	virtual void update() override;
-	virtual void hit() override;
+	Enemy(float xpos, float ypos, float radius, std::string* sprites,
+		int sprite_no, int vel, int damage, int health) :
+		Entity(xpos, ypos, radius, sprites, sprite_no, vel, damage, health)
+	{
+		// set_projectile(new Projectile);
+		// set_path(new Path);
+	}
 };
