@@ -1,17 +1,20 @@
-#include "game_data.h"
-#include "drawing.h"
 #include "graphics.h"
+#include "scancodes.h"
+#include "drawing.h"
+#include "game_data.h"
 #include "constants.h"
 #include "visual_effect.h"
-// #include everything lmao.h
 #include <iostream>
 
-
+// TEST
 VisualEffect ve(250.0f, 250.0f, 0.0f, 50.0f,
-	new std::string[6] {
-		"assets\\s1f1.png", "assets\\s1f2.png", "assets\\s1f3.png",
-		"assets\\s1f4.png", "assets\\s1f5.png", "assets\\s1f6.png",
-	}, 6, 10.0f, 1.0f);
+	new std::string[6]{
+		"assets\\s1f1.png", "assets\\s1f2.png",
+		"assets\\s1f3.png", "assets\\s1f4.png",
+		"assets\\s1f5.png", "assets\\s1f6.png",
+	}, 6, 30.0f, 1.0f);
+
+// END TEST
 
 // sgg functions
 void update(float ms)
@@ -22,8 +25,11 @@ void update(float ms)
 	switch (gd->game_state)
 	{
 	case game_states::TEST: {
+		
+		gd->game_state = ((game_states::MENU * graphics::getKeyState(graphics::scancode_t::SCANCODE_B)) + (gd->game_state * !graphics::getKeyState(graphics::scancode_t::SCANCODE_B)));
+
 		if (!ve)
-			ve.update(ms);
+			ve.updateFrame();
 		break;
 	}
 	case game_states::MENU: {
