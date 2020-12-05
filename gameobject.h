@@ -11,12 +11,11 @@ protected:
 	Path* movement;
 
 public:
-	GameObject(float xpos, float ypos, float radius, std::string* sprites,
+	GameObject(float xpos, float ypos, float angle, float radius, std::string* sprites,
 		int sprite_no, int vel, int damage, int health, Path*);
 
-	// Routines called by the update(), draw() main functions
-	virtual void update() = 0;
-	virtual void draw() const = 0;
+	// Routine called by the update() main functions
+	virtual void update(float ms) = 0;
 
 	// Behavior when hit by another object
 	void hit(GameObject& o2);
