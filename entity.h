@@ -4,13 +4,14 @@
 #include "Path.h"
 
 class Entity : public GameObject {
-protected:
+private:
 	int curr_projectile;
+	Entity(float xpos, float ypos, float angle, float radius, std::string* sprites,
+		int vel, int damage, int health, Path* p, int proj_type);
+	friend class GObjFactory; //allow creation of projectiles only to the factory
 
 public:
-	Entity(float xpos, float ypos, float angle, float radius, std::string* sprites,
-         int vel, int damage, int health, Path*, int proj_type);
-
+	
 	virtual void update(float ms) override;
 
 	// fires
