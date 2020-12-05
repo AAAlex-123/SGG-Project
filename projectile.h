@@ -4,9 +4,13 @@
 
 class Projectile : public GameObject {
 public:
-	Projectile(float xpos, float ypos, float radius, std::string* sprites, int vel, int damage, Path*);
 
-	virtual void update() override;
+	const static int STANDARD = 1;
+	//...
 
-	virtual void draw() const override;
+
+	Projectile(float xpos, float ypos, float angle, float radius, std::string* sprites, int vel, int damage, Path*);
+
+	virtual void update(float ms) override;
+
 };
