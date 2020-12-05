@@ -5,15 +5,18 @@
 
 class Entity : public GameObject {
 protected:
-	Projectile* curr_projectile;
+	int curr_projectile;
 
 public:
 	Entity(float xpos, float ypos, float angle, float radius, std::string* sprites,
-		int sprite_no, int vel, int damage, int health, Path*, Projectile*);
+         int vel, int damage, int health, Path*, int proj_type);
 
-	// updates
 	virtual void update(float ms) override;
 
 	// fires
-	void fire() const;
+	Projectile& fire() const;
+
+	void setProjectile(int proj_type);
+
+	virtual ~Entity();
 };
