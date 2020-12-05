@@ -13,6 +13,7 @@ const float CANVAS_HEIGHT = 600.0f;
 // enum
 enum game_states
 {
+	TEST = -1,
 	CREDITS = 0,
 	MENU = 1,
 	GAME = 2,
