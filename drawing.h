@@ -1,23 +1,25 @@
 #pragma once
+#include "graphics.h"
 #include <string>
 
-//Interface to allow uniform access to all drawable objects
+//Interface to allow uniform access to all drawable objects. Includes a standard drawing method all classes need to use.
 class Drawing {
 
+private:
+	graphics::Brush br;
+
 public:
-	std::string* sprites;
+	const std::string* const sprites;
 
-	float x, y, radius;
+	float x, y, angle;
+	const float radius;
+	int curr_sprite;
 
-	//amount of sprite strings in the array
-	int sprite_no;
+	Drawing(float xpos, float ypos,float angle, float radius, const std::string* sprites);
 
-	Drawing(float xpos, float ypos, float radius, std::string* sprites, int sprite_no) :
-		x(xpos), y(ypos),
-		sprites(sprites),
-		radius(radius),
-		sprite_no(sprite_no)
-	{};
+	void draw();
 
-	virtual void draw() const = 0;
+	virtual ~Drawing() { 
+		delete& x, y, radius, angle, sprites;
+	};
 };
