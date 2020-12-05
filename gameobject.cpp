@@ -1,6 +1,5 @@
 #include "gameobject.h"
 
-
 GameObject::GameObject(float xpos, float ypos, float agnle, float radius, const std::string* sprites, int vel, int damage, int health, Path* p) :
 	Drawing(xpos, ypos, angle, radius, sprites, 1),
 	vel(vel), damage(damage), health(health), isDead(false), movement(p)

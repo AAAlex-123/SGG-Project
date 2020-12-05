@@ -8,9 +8,10 @@ protected:
 	int curr_projectile;
 
 public:
-	Entity(float xpos, float ypos, float angle, float radius, std::string* sprites, int vel, int damage, int health, Path*, int proj_type);
+	Entity(float xpos, float ypos, float angle, float radius, std::string* sprites,
+         int vel, int damage, int health, Path*, int proj_type);
 
-	virtual void update() override;
+	virtual void update(float ms) override;
 
 	// fires
 	Projectile& fire() const;

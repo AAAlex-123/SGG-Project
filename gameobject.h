@@ -17,7 +17,7 @@ public:
 	GameObject(float xpos, float ypos, float angle, float radius, const std::string* sprites, int vel, int damage, int health, Path*);
 
 	// Routines called by the update(), draw() main functions
-	virtual void update() = 0;
+	virtual void update(float ms) = 0;
 	const virtual std::string* setNewFrame(float ms) const override;
 
 	// Behavior when hit by another object

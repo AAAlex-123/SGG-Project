@@ -5,7 +5,7 @@ Entity::Entity(float xpos, float ypos, float angle, float radius,std::string* sp
 	curr_projectile(proj_type)
 {}
 
-void Entity::update()
+void Entity::update(float ms)
 {
 	//do stuff lol
 }
