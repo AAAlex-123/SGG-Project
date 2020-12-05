@@ -9,19 +9,19 @@ class Drawing {
 private:
 	//Clients should override this method to make their object drawable 
 	const virtual std::string* setNewFrame(float ms) const = 0;
-  graphics::Brush br;
+	graphics::Brush br;
 
 public:
-	const std::string* sprites;
+	const std::string* const sprites;
 
 	float x, y, angle, const radius;
 	int curr_sprite;
 
 	Drawing(float xpos, float ypos,float angle, float radius, const std::string* sprites);
 
-	void draw() const;
+	void draw();
 
 	virtual ~Drawing() { 
-		delete& x,y,radius,angle,sprites;
+		delete& x, y, radius, angle, sprites;
 	};
 };
