@@ -5,12 +5,12 @@
 class EntityFactory
 {
 public:
-	Entity* createPlayer(float xpos, float ypos, float radius, std::string* sprites,
+	Entity& createPlayer(float xpos, float ypos, float angle, float radius, std::string* sprites,
 		int sprite_no, int vel, int damage, int health, Path*, Projectile*);
 
-	Entity* createEnemy1(float xpos, float ypos, float radius, std::string* sprites,
+	Entity& createEnemy1(float xpos, float ypos, float angle, float radius, std::string* sprites,
 		int sprite_no, int vel, int damage, int health, Path*, Projectile*);
 
-	Entity* createEnemy2(float xpos, float ypos, float radius, std::string* sprites,
+	Entity& createEnemy2(float xpos, float ypos, float angle, float radius, std::string* sprites,
 		int sprite_no, int vel, int damage, int health, Path*, Projectile*);
 };
