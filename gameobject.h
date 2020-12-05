@@ -1,13 +1,12 @@
 #pragma once
 #include "drawing.h"
 #include "Path.h"
-#include "graphics.h"
 
 // Superclass for all interactive objects in the game
 class GameObject : public Drawing {
 
 protected:
-	int const vel, const damage;
+	const int vel, damage;
 	int health;
 	bool isDead; //replace with bool op
 
@@ -18,7 +17,6 @@ public:
 
 	// Routines called by the update(), draw() main functions
 	virtual void update(float ms) = 0;
-	const virtual std::string* setNewFrame(float ms) const override;
 
 	// Behavior when hit by another object
 	void hit(GameObject& o2);

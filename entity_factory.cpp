@@ -1,6 +1,6 @@
 #include "entity_factory.h"
 
-
+/*
 Entity& EntityFactory::createPlayer(float xpos, float ypos, float angle, float radius, std::string* sprites,
 	int sprite_no, int vel, int damage, int health, Path*, Projectile*)
 {
@@ -18,3 +18,4 @@ Entity& EntityFactory::createEnemy2(float xpos, float ypos, float angle, float r
 {
 	return 0;
 }
+*/

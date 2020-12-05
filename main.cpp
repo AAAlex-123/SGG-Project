@@ -1,10 +1,20 @@
-#include "game_data.h"
-#include "drawing.h"
 #include "graphics.h"
+#include "scancodes.h"
+#include "drawing.h"
+#include "game_data.h"
 #include "constants.h"
-// #include everything lmao.h
+#include "visual_effect.h"
 #include <iostream>
 
+// TEST
+VisualEffect ve(250.0f, 250.0f, 0.0f, 50.0f,
+	new std::string[6]{
+		"assets\\s1f1.png", "assets\\s1f2.png",
+		"assets\\s1f3.png", "assets\\s1f4.png",
+		"assets\\s1f5.png", "assets\\s1f6.png",
+	}, 6, 30.0f, 1.0f);
+
+// END TEST
 
 // sgg functions
 void update(float ms)
@@ -14,6 +24,14 @@ void update(float ms)
 	gd->fps = (int)(1000.0f / ms);
 	switch (gd->game_state)
 	{
+	case game_states::TEST: {
+		
+		gd->game_state = ((game_states::MENU * graphics::getKeyState(graphics::scancode_t::SCANCODE_B)) + (gd->game_state * !graphics::getKeyState(graphics::scancode_t::SCANCODE_B)));
+
+		if (!ve)
+			ve.updateFrame();
+		break;
+	}
 	case game_states::MENU: {
 		if (graphics::getKeyState(graphics::scancode_t::SCANCODE_S))
 		{
@@ -27,6 +45,7 @@ void update(float ms)
 		gd->game_state = ((game_states::CREDITS * graphics::getKeyState(graphics::scancode_t::SCANCODE_C)) + (gd->game_state * !graphics::getKeyState(graphics::scancode_t::SCANCODE_C)));
 		gd->game_state = ((game_states::HELP * graphics::getKeyState(graphics::scancode_t::SCANCODE_H)) + (gd->game_state * !graphics::getKeyState(graphics::scancode_t::SCANCODE_H)));
 		gd->game_state = ((game_states::EXIT * graphics::getKeyState(graphics::scancode_t::SCANCODE_E)) + (gd->game_state * !graphics::getKeyState(graphics::scancode_t::SCANCODE_E)));
+		gd->game_state = ((game_states::TEST * graphics::getKeyState(graphics::scancode_t::SCANCODE_T)) + (gd->game_state * !graphics::getKeyState(graphics::scancode_t::SCANCODE_T)));
 
 		// ...
 
@@ -60,7 +79,6 @@ void update(float ms)
 
 		break;
 	}
-
 	case game_states::EXIT: {
 		graphics::destroyWindow();
 		exit(0);
@@ -87,6 +105,10 @@ void draw()
 	graphics::drawText(CANVAS_WIDTH / 150, 2 * CANVAS_HEIGHT / 20, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 35, "FPS: " + std::to_string(gd->fps), br);
 	switch (gd->game_state)
 	{
+	case game_states::TEST: {
+		ve.draw();
+		break;
+	}
 	case game_states::MENU: {
 		setColor(br, new float[3]{ 0.0f, 0.0f, 1.0f });
 		graphics::drawRect(CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2, CANVAS_WIDTH, CANVAS_HEIGHT, br);

@@ -1,7 +1,7 @@
 #include "gameobject.h"
 
 GameObject::GameObject(float xpos, float ypos, float agnle, float radius, const std::string* sprites, int vel, int damage, int health, Path* p) :
-	Drawing(xpos, ypos, angle, radius, sprites, 1),
+	Drawing(xpos, ypos, angle, radius, sprites),
 	vel(vel), damage(damage), health(health), isDead(false), movement(p)
 { ; }
 
@@ -17,11 +17,7 @@ bool GameObject::collides(GameObject& o2) const
 		< (this->radius - o2.radius) * (this->radius - o2.radius));
 }
 
-const std::string* GameObject::setNewFrame(float ms)const {
-	return this->sprites;
-}
 GameObject::~GameObject() {
 	delete& vel, damage, health;
 	delete movement;
 }
-

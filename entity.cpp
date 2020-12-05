@@ -14,10 +14,12 @@ void Entity::setProjectile(int proj_type) {
 	this->curr_projectile = proj_type;
 }
 
+/*
 Projectile& Entity::fire() const
 {
 	//return Factory.create(this.proj_type)
 }
+*/
 
 Entity::~Entity() {
 	delete& curr_projectile;
