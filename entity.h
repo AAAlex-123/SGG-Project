@@ -14,6 +14,8 @@ private:
 
 public:
 
+	virtual void update(float ms) override;
+
 	// fires
 	Projectile& fire() const;
 
