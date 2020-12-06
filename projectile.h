@@ -9,7 +9,7 @@ public:
 	//...
 
 
-	Projectile(float xpos, float ypos, float angle, float radius, std::string* sprites, int vel, int damage, Path*);
+	Projectile(float xpos, float ypos, float angle, float vel, float radius, std::string* sprites, Path*, int damage);
 
 	virtual void update(float ms) override;
 
