@@ -4,7 +4,11 @@
 #include "game_data.h"
 #include "constants.h"
 #include "visual_effect.h"
+#include "entity.h"
+#include "GObjFactory.h"
 #include <iostream>
+
+const float PI = 3.14159265359f;
 
 // TEST
 VisualEffect ve(250.0f, 250.0f, 0.0f, 0.0f, 50.0f,
