@@ -8,9 +8,9 @@ private:
 	const int sprite_no;
 
 public:
-	VisualEffect(float xpos, float ypos, float angle, float radius, std::string* sprites,
+	VisualEffect(float xpos, float ypos, float angle, float vel, float radius, std::string* sprites,
 		int sprite_no, float duration, float fps) :
-		Drawing(xpos, ypos, angle, radius, sprites),
+		Drawing(xpos, ypos, angle, vel, radius, sprites, new StaticPath),
 		sprite_no(sprite_no), duration(duration), spf(1 / fps), elapsed(0), total_elapsed(0)
 	{}
 
