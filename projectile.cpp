@@ -1,8 +1,8 @@
 #include "projectile.h"
 
-Projectile::Projectile(float xpos, float ypos, float angle, float radius, std::string* sprites, int vel, int damage, Path* p) :
-	GameObject(xpos, ypos, angle, radius, sprites, vel, damage, 1, p)
-  {}
+Projectile::Projectile(float xpos, float ypos, float angle, float vel, float radius, std::string* sprites, Path* p, int damage) :
+	GameObject(xpos, ypos, angle, vel, radius, sprites, p, damage, 1)
+{}
 
 void Projectile::update(float ms) 
 {
