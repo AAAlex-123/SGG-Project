@@ -3,6 +3,7 @@
 #include "projectile.h"
 #include "Path.h"
 
+//Interface for all interactive objects that can spawn other objects. Built using composition.
 class Entity : public GameObject {
 private:
 	int curr_projectile;
@@ -11,8 +12,6 @@ private:
 	friend class GObjFactory; //allow creation of projectiles only to the factory
 
 public:
-	
-	virtual void update(float ms) override;
 
 	// fires
 	Projectile& fire() const;
