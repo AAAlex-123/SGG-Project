@@ -4,9 +4,3 @@ Projectile::Projectile(float xpos, float ypos, float angle, float vel, float rad
 	GameObject(xpos, ypos, angle, vel, radius, sprites, p, damage, 1)
 {}
 
-void Projectile::update(float ms) 
-{
-	;
-	// movement->move(this->x, this->y, this->vel);
-	// if collides(GameObject&), do something
-}

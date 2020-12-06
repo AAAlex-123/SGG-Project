@@ -3,15 +3,16 @@
 #include "projectile.h"
 #include "Path.h"
 
+//Interface for all interactive objects that can spawn other objects. Built using composition.
 class Entity : public GameObject {
-protected:
+private:
 	int curr_projectile;
-
-public:
 	Entity(float xpos, float ypos, float angle, float vel, float radius, std::string* sprites, Path*,
 			int damage, int health, int proj_type);
+  
+	friend class GObjFactory; //allow creation of projectiles only to the factory
 
-	virtual void update(float ms) override;
+public:
 
 	// fires
 	Projectile& fire() const;

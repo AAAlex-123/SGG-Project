@@ -17,6 +17,11 @@ bool GameObject::collides(GameObject& o2) const
 		< (this->radius - o2.radius) * (this->radius - o2.radius));
 }
 
+
+void GameObject::update(float ms) {
+	this->movement->move(this->x, this->y, this->vel);
+}
+
 GameObject::~GameObject() {
 	delete& vel, damage, health;
 	delete movement;

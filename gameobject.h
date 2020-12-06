@@ -13,7 +13,7 @@ public:
 	GameObject(float xpos, float ypos, float angle, float vel, float radius, const std::string* sprites, Path*, int damage, int health);
 
 	// Routines called by the update(), draw() main functions
-	virtual void update(float ms) = 0;
+	virtual void update(float ms);
 
 	// Behavior when hit by another object
 	void hit(GameObject& o2);
