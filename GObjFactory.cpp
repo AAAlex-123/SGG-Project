@@ -2,32 +2,35 @@
 #include "Path.h"
 using namespace std;
 
+
+string asset_path = "assets\\";
+
 Entity& GObjFactory::createPlayer(float x, float y, float angle) {
-	return *(new Entity(x, y, angle, std_size * 2, new string("pl_sprt"), std_speed / 2, 5, 1, new PlayerPath(), GObjFactory::STANDARD_BULLET));
+	return *(new Entity(x, y, angle, std_size * 2, new string(asset_path+"player1.png"), std_speed / 2, 5, 1, new PlayerPath(), GObjFactory::STANDARD_BULLET));
 }
 
 Entity& GObjFactory::createEnemy1(float x,float y,float angle) {
-	return *(new Entity(x,y,angle,std_size,new string("sprt1"),std_speed,5,1,new StraightPath(),GObjFactory::STANDARD_BULLET));
+	return *(new Entity(x,y,angle,std_size,new string(asset_path + "plane1.png"),std_speed,5,1,new StraightPath(),GObjFactory::STANDARD_BULLET));
 }
 
 Entity& GObjFactory::createEnemy2(float x, float y, float angle) {
-	return *(new Entity(x, y, angle, std_size, new string("sprt2"), std_speed, 5, 1, new SwigglyPath(), GObjFactory::LIGHT_BULLET));
+	return *(new Entity(x, y, angle, std_size, new string(asset_path + "plane2.png"), std_speed, 5, 1, new SwigglyPath(), GObjFactory::LIGHT_BULLET));
 }
 
 Entity& GObjFactory::createEnemy3(float x, float y, float angle) {
-	return *(new Entity(x, y, angle, std_size*3, new string("sprt1"), std_speed/2, 5, 1, new StraightPath(), GObjFactory::INCEND_BULLET));
+	return *(new Entity(x, y, angle, std_size*3, new string(asset_path + "plane3.png"), std_speed/2, 5, 1, new StraightPath(), GObjFactory::INCEND_BULLET));
 }
 
 Projectile& GObjFactory::createStdB(float x, float y, float angle) {
-	return *(new Projectile(x, y, angle,(float) std_size / 2, string("bullet1"), std_speed * 2, 2, new StraightPath()));
+	return *(new Projectile(x, y, angle,(float) std_size / 2, string(asset_path + "bullet1.png"), std_speed * 2, 2, new StraightPath()));
 }
 
 Projectile& GObjFactory::createLB(float x, float y, float angle) {
-	return *(new Projectile(x, y, angle, std_size/2, string("bullet2"), std_speed*3, 1, new StraightPath()));
+	return *(new Projectile(x, y, angle, std_size/2, string(asset_path + "bullet2.png"), std_speed*3, 1, new StraightPath()));
 }
 
 Projectile& GObjFactory::createIncB(float x, float y, float angle) {
-	return *(new Projectile(x, y, angle, std_size / 2, string("bullet3"), std_speed * 2, 4, new StraightPath()));
+	return *(new Projectile(x, y, angle, std_size / 2, string(asset_path + "bullet3.png"), std_speed * 2, 4, new StraightPath()));
 }
 
 Entity& GObjFactory::createEntity(int type, float x, float y, float angle) {
