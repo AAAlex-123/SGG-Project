@@ -7,8 +7,9 @@
 class Entity : public GameObject {
 private:
 	int curr_projectile;
-	Entity(float xpos, float ypos, float angle, float radius, std::string* sprites,
-		int vel, int damage, int health, Path* p, int proj_type);
+	Entity(float xpos, float ypos, float angle, float vel, float radius, std::string* sprites, Path*,
+			int damage, int health, int proj_type);
+  
 	friend class GObjFactory; //allow creation of projectiles only to the factory
 
 public:

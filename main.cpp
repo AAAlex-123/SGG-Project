@@ -7,12 +7,18 @@
 #include <iostream>
 
 // TEST
-VisualEffect ve(250.0f, 250.0f, 0.0f, 50.0f,
+VisualEffect ve(250.0f, 250.0f, 0.0f, 0.0f, 50.0f,
 	new std::string[6]{
 		"assets\\s1f1.png", "assets\\s1f2.png",
 		"assets\\s1f3.png", "assets\\s1f4.png",
 		"assets\\s1f5.png", "assets\\s1f6.png",
 	}, 6, 30.0f, 1.0f);
+
+Entity erotate = GObjFactory::createEntity(GObjFactory::ENEMY_3, 250.0f, 250.0f, 0.0f);
+Entity eaccel = GObjFactory::createEntity(GObjFactory::ENEMY_2, 250.0f, 250.0f, -PI / 2.0f);
+Entity enormal = GObjFactory::createEntity(GObjFactory::ENEMY_1, 250.0f, 250.0f, -PI);
+Entity eplayer = GObjFactory::createEntity(GObjFactory::PLAYER, 250.0f, 250.0f, -PI / 2.0f, PI/4.0f,
+	key::SCANCODE_W, key::SCANCODE_S, key::SCANCODE_A, key::SCANCODE_D, key::SCANCODE_Q, key::SCANCODE_E);
 
 // END TEST
 
@@ -27,9 +33,10 @@ void update(float ms)
 	case game_states::TEST: {
 		
 		gd->game_state = ((game_states::MENU * graphics::getKeyState(graphics::scancode_t::SCANCODE_B)) + (gd->game_state * !graphics::getKeyState(graphics::scancode_t::SCANCODE_B)));
-
-		if (!ve)
-			ve.updateFrame();
+		erotate.update(ms);
+		eaccel.update(ms);
+		enormal.update(ms);
+		eplayer.update(ms);
 		break;
 	}
 	case game_states::MENU: {
@@ -106,7 +113,10 @@ void draw()
 	switch (gd->game_state)
 	{
 	case game_states::TEST: {
-		ve.draw();
+		erotate.draw();
+		eaccel.draw();
+		enormal.draw();
+		eplayer.draw();
 		break;
 	}
 	case game_states::MENU: {

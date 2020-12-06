@@ -1,9 +1,9 @@
 #include "gameobject.h"
 
-GameObject::GameObject(float xpos, float ypos, float agnle, float radius, const std::string* sprites, int vel, int damage, int health, Path* p) :
-	Drawing(xpos, ypos, angle, radius, sprites),
-	vel(vel), damage(damage), health(health), isDead(false), movement(p)
-{ ; }
+GameObject::GameObject(float xpos, float ypos, float angle, float vel, float radius, const std::string* sprites, Path* p, int damage, int health) :
+	Drawing(xpos, ypos, angle, vel, radius, sprites, p),
+	damage(damage), health(health), isDead(false)
+{}
 
 void GameObject::hit(GameObject& o2)
 {
