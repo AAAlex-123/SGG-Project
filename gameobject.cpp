@@ -25,5 +25,5 @@ void GameObject::update(float ms)
 
 GameObject::~GameObject()
 {
-	delete movement;
+	delete movement,sprites;
 }
