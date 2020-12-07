@@ -33,10 +33,8 @@ Projectile& GObjFactory::createIncB(float x, float y, float angle) {
 	return *(new Projectile(x, y, angle, std_speed * 2, (float)std_size / 2, new string(asset_path + "bullet3.png"), new AcceleratingPath(50.0f, new Path()), 4));
 }
 
-Entity& GObjFactory::createEntity(int type, float x, float y, float angle, float dangle, Keyset keyset)
-{
-	switch (type)
-	{
+Entity& GObjFactory::createEntity(int type, float x, float y, float angle, float dangle, Keyset keyset){
+	switch (type){
 	case GObjFactory::PLAYER: return createPlayer(x, y, angle, dangle, keyset);
 	case GObjFactory::ENEMY_1: return createEnemy1(x, y, angle);
 	case GObjFactory::ENEMY_2: return createEnemy2(x, y, angle);
@@ -45,10 +43,8 @@ Entity& GObjFactory::createEntity(int type, float x, float y, float angle, float
 	}
 }
 
-Projectile& GObjFactory::createProjectile(int type, float x, float y, float angle)
-{
-	switch (type)
-	{
+Projectile& GObjFactory::createProjectile(int type, float x, float y, float angle){
+	switch (type){
 	case GObjFactory::STANDARD_BULLET: return createStdB(x, y, angle);
 	case GObjFactory::LIGHT_BULLET: return createLB(x, y, angle);
 	case GObjFactory::INCEND_BULLET: return createIncB(x, y, angle);
