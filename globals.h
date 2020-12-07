@@ -10,3 +10,6 @@ struct Keyset
 	Keyset(key up, key down, key left, key right, key rleft, key rright)
 		: up(up), down(down), left(left), right(right), rleft(rleft), rright(rright) {}
 };
+
+float get_canvas_height();
+float get_canvas_width();
