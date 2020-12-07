@@ -2,8 +2,7 @@
 #include "drawing.h"
 
 // Superclass for all interactive objects in the game
-class GameObject : public Drawing
-{
+class GameObject : public Drawing{
 protected:
 	const int damage;
 	int health;
