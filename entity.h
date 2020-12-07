@@ -3,8 +3,7 @@
 #include "projectile.h"
 
 //Interface for all interactive objects that can spawn other objects. Built using composition.
-class Entity : public GameObject
-{
+class Entity : public GameObject{
 private:
 	int curr_projectile;
 	Entity(float xpos, float ypos, float angle, float vel, float radius, std::string* sprites, Path*,
