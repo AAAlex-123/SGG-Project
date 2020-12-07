@@ -4,8 +4,8 @@ using namespace std;
 
 string asset_path = "assets\\";
 
-Entity& GObjFactory::createPlayer(float x, float y, float angle, Keyset keyset) {
-  return *(new Entity(x, y, angle, (float)std_speed*5, (float)std_size, new string(asset_path+"player1.png"), new KeyboardPath(dangle, keyset), 5, 1, GObjFactory::STANDARD_BULLET));
+Entity& GObjFactory::createPlayer(float x, float y, float angle,float dangle, Keyset keyset) {
+  return *(new Entity(x, y, angle,(float)std_speed*5, (float)std_size, new string(asset_path+"player1.png"), new KeyboardPath(dangle, keyset), 5, 1, GObjFactory::STANDARD_BULLET));
 }
 
 Entity& GObjFactory::createEnemy1(float x,float y,float angle) {
