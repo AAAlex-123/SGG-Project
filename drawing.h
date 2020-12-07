@@ -24,7 +24,5 @@ public:
 
 	void draw();
 
-	virtual ~Drawing() { 
-		delete& x, y, radius, angle, sprites;
-	};
+	virtual ~Drawing() {}
 };
