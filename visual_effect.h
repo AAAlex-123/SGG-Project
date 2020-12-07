@@ -30,4 +30,8 @@ public:
 		curr_sprite = (((curr_sprite + 1) % sprite_no) * (elapsed > spf)) + (curr_sprite * !(elapsed > spf));
 		elapsed = (0.0f * (elapsed > spf)) + (elapsed * !(elapsed > spf));
 	}
+	
+	virtual ~VisualEffect(){
+		delete[] sprites; 
+	}
 };

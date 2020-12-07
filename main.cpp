@@ -1,12 +1,18 @@
 #include "graphics.h"
 #include "scancodes.h"
-#include "drawing.h"
-#include "game_data.h"
+#include "globals.h"
 #include "constants.h"
+#include "game_data.h"
+#include "drawing.h"
 #include "visual_effect.h"
+#include "entity.h"
+#include "GObjFactory.h"
 #include <iostream>
 
 // TEST
+Keyset wasdqe(key::SCANCODE_W, key::SCANCODE_S, key::SCANCODE_A, key::SCANCODE_D, key::SCANCODE_Q, key::SCANCODE_E);
+Keyset tfghry(key::SCANCODE_T, key::SCANCODE_G, key::SCANCODE_F, key::SCANCODE_H, key::SCANCODE_R, key::SCANCODE_Y);
+
 VisualEffect ve(250.0f, 250.0f, 0.0f, 0.0f, 50.0f,
 	new std::string[6]{
 		"assets\\s1f1.png", "assets\\s1f2.png",
@@ -17,9 +23,7 @@ VisualEffect ve(250.0f, 250.0f, 0.0f, 0.0f, 50.0f,
 Entity erotate = GObjFactory::createEntity(GObjFactory::ENEMY_3, 250.0f, 250.0f, 0.0f);
 Entity eaccel = GObjFactory::createEntity(GObjFactory::ENEMY_2, 250.0f, 250.0f, -PI / 2.0f);
 Entity enormal = GObjFactory::createEntity(GObjFactory::ENEMY_1, 250.0f, 250.0f, -PI);
-Entity eplayer = GObjFactory::createEntity(GObjFactory::PLAYER, 250.0f, 250.0f, -PI / 2.0f, PI/4.0f,
-	key::SCANCODE_W, key::SCANCODE_S, key::SCANCODE_A, key::SCANCODE_D, key::SCANCODE_Q, key::SCANCODE_E);
-
+Entity eplayer = GObjFactory::createEntity(GObjFactory::PLAYER, 250.0f, 250.0f, -PI / 2.0f, PI/4.0f, wasdqe);
 // END TEST
 
 // sgg functions
