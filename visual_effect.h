@@ -14,13 +14,13 @@ public:
 		sprite_no(sprite_no), duration(duration), spf(1 / fps), elapsed(0), total_elapsed(0)
 	{}
 
-	// true if the object should be destroyed
-	operator bool() const
+	// Returns false if the object is not alive; i.e. it must be destroyed
+	virtual operator bool() const override
 	{
-		return total_elapsed > duration;
+		return total_elapsed < duration;
 	}
 
-	// changes the current sprite according to elapsed time
+	// Changes the current sprite based on the elapsed time
 	void updateFrame()
 	{
 		float ms = graphics::getDeltaTime();
@@ -31,7 +31,8 @@ public:
 		elapsed = (0.0f * (elapsed > spf)) + (elapsed * !(elapsed > spf));
 	}
 	
-	virtual ~VisualEffect(){
+	virtual ~VisualEffect()
+	{
 		delete[] sprites; 
 	}
 };
