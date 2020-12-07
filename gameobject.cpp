@@ -18,11 +18,12 @@ bool GameObject::collides(GameObject& o2) const
 }
 
 
-void GameObject::update(float ms) {
-	this->movement->move(this->x, this->y, this->vel);
+void GameObject::update(float ms)
+{
+	this->movement->move(this->x, this->y, this->angle, this->vel, ms);
 }
 
-GameObject::~GameObject() {
-	delete& vel, damage, health;
-	delete movement;
+GameObject::~GameObject()
+{
+	delete movement,sprites;
 }

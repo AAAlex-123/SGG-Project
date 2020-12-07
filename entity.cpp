@@ -11,16 +11,15 @@ void Entity::update(float ms)
 	movement->move(this->x, this->y, this->angle, this->vel, ms);
 }
 
-void Entity::setProjectile(int proj_type) {
+void Entity::setProjectile(int proj_type)
+{
 	this->curr_projectile = proj_type;
 }
 
 
-Projectile& Entity::fire() const{
+Projectile& Entity::fire() const
+{
 	return GObjFactory::createProjectile(this->curr_projectile,this->y+this->radius+2,this->y,this->angle);
 }
 
-
-Entity::~Entity() {
-	delete& curr_projectile;
-}
+Entity::~Entity() {}
