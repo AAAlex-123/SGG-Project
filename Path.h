@@ -1,15 +1,12 @@
 #pragma once
-#include "graphics.h"
-#include "scancodes.h"
-#include <cmath>
+#include "globals.h"
 
 typedef graphics::scancode_t key;
 
 //Interface for all Path classes
 //Path is a Decorated Strategy changing its parent class' position, angle and velocity
-class Path {
-protected:
-	const float PI = 3.14159265359f;
+class Path
+{
 public:
 	Path() {}
 	virtual void move(float& x, float& y, float& angle, float& vel, float ms);
@@ -19,7 +16,8 @@ public:
 class AcceleratingPath : public Path
 {
 public:
-	AcceleratingPath(Path* p, float dvel) : _path(p), dvel(dvel) {}
+	AcceleratingPath(float dvel, Path* p) : dvel(dvel), _path(p)
+	{}
 	virtual void move(float& x, float& y, float& angle, float& vel, float ms) override;
 
 private:
@@ -32,7 +30,8 @@ private:
 class RotatingPath : public Path
 {
 public:
-	RotatingPath(Path* p, float dangle) : _path(p), dangle(dangle) {}
+	RotatingPath(float dangle, Path* p) : dangle(dangle), _path(p)
+	{}
 	virtual void move(float& x, float& y, float& angle, float& vel, float ms) override;
 
 private:
@@ -45,20 +44,21 @@ private:
 class KeyboardPath : public Path
 {
 public:
-	KeyboardPath(float dangle, key u, key d, key l, key r, key rl, key rr)
-		: dangle(dangle), u(u), d(d), l(l), r(r), rl(rl), rr(rr) {}
+	KeyboardPath(float dangle, Keyset keyset) : dangle(dangle), keyset(keyset)
+	{}
 	virtual void move(float& x, float& y, float& angle, float& vel, float ms);
 
 private:
 	// % of a full rotation per second
 	const float dangle;
-	const key u, d, l, r, rl, rr;
+	const Keyset keyset;
 };
 
 // Standalone Path that has no movement
 class StaticPath : public Path
 {
 public:
-	StaticPath() : Path() {}
+	StaticPath() : Path()
+	{}
 	virtual void move(float& x, float& y, float& angle, float& vel, float ms) override;
 };
