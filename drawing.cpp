@@ -14,3 +14,8 @@ void Drawing::draw()
 	graphics::setOrientation(angle / (2 * PI) * 360);
 	graphics::drawRect(this->x, this->y, this->radius * 2, this->radius * 2, br);
 }
+
+Drawing::~Drawing()
+{
+	delete movement, sprites;
+}
