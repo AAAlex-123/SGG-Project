@@ -12,5 +12,5 @@ private:
 	virtual void update(float ms) override;
 	friend class GObjFactory; //allow creation of projectiles only to the factory
 public:
-	~Projectile();
+	virtual ~Projectile();
 };
