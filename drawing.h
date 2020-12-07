@@ -5,7 +5,8 @@
 #include <string>
 
 //Interface to allow uniform access to all drawable objects. Includes a standard drawing method all classes need to use.
-class Drawing{
+class Drawing
+{
 private:
 	graphics::Brush br;
 
