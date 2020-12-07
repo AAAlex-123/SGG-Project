@@ -1,9 +1,6 @@
 #pragma once
 #include "graphics.h"
 
-// global variables
-graphics::Brush br;
-
 // constants
 const short WINDOW_WIDTH = 1200;
 const short WINDOW_HEIGHT = 600;
