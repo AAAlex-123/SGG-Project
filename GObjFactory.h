@@ -5,8 +5,10 @@
 
 class GObjFactory {
 private:
+	const static std::string asset_path;
 	const static int std_size = 30;
 	const static int std_speed = 35;
+  
 	static Entity& createEnemy1(float x, float y, float angle);
 	static Entity& createEnemy2(float x, float y, float angle);
 	static Entity& createEnemy3(float x, float y, float angle);
