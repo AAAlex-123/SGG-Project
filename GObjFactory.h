@@ -3,7 +3,8 @@
 #include "projectile.h"
 #include "globals.h"
 
-class GObjFactory {
+class GObjFactory
+{
 private:
 	const static std::string asset_path;
 	const static int std_size = 30;
