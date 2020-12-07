@@ -1,6 +1,7 @@
 #pragma once
 #include "graphics.h"
-#include "path.h"
+#include "globals.h"
+#include "Path.h"
 #include <string>
 
 //Interface to allow uniform access to all drawable objects. Includes a standard drawing method all classes need to use.
@@ -8,7 +9,6 @@ class Drawing {
 
 private:
 	graphics::Brush br;
-	const float PI = 3.14159265359f;
 
 protected:
 	const std::string* const sprites;
