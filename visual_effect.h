@@ -31,5 +31,7 @@ public:
 		elapsed = (0.0f * (elapsed > spf)) + (elapsed * !(elapsed > spf));
 	}
 	
-	virtual ~VisualEffect();
+	virtual ~VisualEffect(){
+		delete[] sprites; 
+	}
 };
