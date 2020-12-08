@@ -2,25 +2,28 @@
 #include "graphics.h"
 #include <cmath>
 
-void Path::move(float& x, float& y, float& angle, float& vel, float ms)
+bool Path::move(float& x, float& y, float& angle, float& vel, float ms)
 {
 	x -= vel * (float)sin(angle) * (ms / 1000.0f);
 	y -= vel * (float)cos(angle) * (ms / 1000.0f);
+	return false;
 }
 
-void AcceleratingPath::move(float& x, float& y, float& angle, float& vel, float ms)
+bool AcceleratingPath::move(float& x, float& y, float& angle, float& vel, float ms)
 {
 	vel += dvel * (ms / 1000.0f);
 	_path->move(x, y, angle, vel, ms);
+	return false;
 }
 
-void RotatingPath::move(float& x, float& y, float& angle, float& vel, float ms)
+bool RotatingPath::move(float& x, float& y, float& angle, float& vel, float ms)
 {
 	angle += dangle * 2 * PI * (ms / 1000.0f);
 	_path->move(x, y, angle, vel, ms);
+	return false;
 }
 
-void KeyboardPath::move(float& x, float& y, float& angle, float& vel, float ms)
+bool KeyboardPath::move(float& x, float& y, float& angle, float& vel, float ms)
 {
 	// angle
 	if (graphics::getKeyState(keyset.rleft)) angle += dangle * 2 * PI * (ms / 1000.0f);
@@ -43,7 +46,19 @@ void KeyboardPath::move(float& x, float& y, float& angle, float& vel, float ms)
 		x += vel * (float)sin(angle + PI / 2) * (ms / 1000.0f);
 		y += vel * (float)cos(angle + PI / 2) * (ms / 1000.0f);
 	}
+	
+	return graphics::getKeyState(keyset.fire);
 }
 
-void StaticPath::move(float& x, float& y, float& angle, float& vel, float ms)
-{}
+bool FiringPath::move(float& x, float& y, float& angle, float& vel, float ms)
+{
+	elapsed += (ms / 1000.0f);
+	float e = elapsed;
+	elapsed = (0 * (elapsed >= period)) + (elapsed * (elapsed < period));
+
+	_path->move(x, y, angle, vel, ms);
+
+	return e >= period;
+}
+
+bool StaticPath::move(float& x, float& y, float& angle, float& vel, float ms) { return false; }

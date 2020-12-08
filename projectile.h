@@ -9,7 +9,6 @@ private:
 	friend class GObjFactory; //allow creation of projectiles only to the factory
 
 public:
-	// Routine called by the update() main function; updated the object's state
 	virtual void update(float ms) override;
 	
 	virtual ~Projectile();

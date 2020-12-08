@@ -5,8 +5,7 @@
 #include <string>
 
 //Interface to allow uniform access to all drawable objects. Includes a standard drawing method all classes need to use.
-class Drawing
-{
+class Drawing {
 private:
 	graphics::Brush br;
 
@@ -22,6 +21,8 @@ protected:
 public:
 	Drawing(float xpos, float ypos, float angle, float vel, float radius, const std::string* sprites, Path*);
 
+	// Updates the entities state (movement etc.)
+	virtual void update(float) = 0;
 	// Draws the object at [x, y] with `angle` orientation with its `curr_sprite`
 	virtual void draw() final;
 

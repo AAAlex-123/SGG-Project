@@ -8,14 +8,12 @@ Drawing::Drawing(float xpos, float ypos, float angle, float vel, float radius, c
 	movement(movement)
 {}
 
-void Drawing::draw()
-{
+void Drawing::draw() {
 	br.texture = sprites[curr_sprite];
 	graphics::setOrientation(angle / (2 * PI) * 360);
 	graphics::drawRect(this->x, this->y, this->radius * 2, this->radius * 2, br);
 }
 
-Drawing::~Drawing()
-{
+Drawing::~Drawing() {
 	delete movement, sprites;
 }
