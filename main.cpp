@@ -8,22 +8,29 @@
 #include "entity.h"
 #include "GObjFactory.h"
 #include <iostream>
+#include <vector>
+
+// global variables in main
+graphics::Brush br;
 
 // TEST
-Keyset wasdqe(key::SCANCODE_W, key::SCANCODE_S, key::SCANCODE_A, key::SCANCODE_D, key::SCANCODE_Q, key::SCANCODE_E);
-Keyset tfghry(key::SCANCODE_T, key::SCANCODE_G, key::SCANCODE_F, key::SCANCODE_H, key::SCANCODE_R, key::SCANCODE_Y);
+std::vector<GameObject*> govec;
 
-VisualEffect ve(250.0f, 250.0f, 0.0f, 0.0f, 50.0f,
-	new std::string[6]{
-		"assets\\s1f1.png", "assets\\s1f2.png",
-		"assets\\s1f3.png", "assets\\s1f4.png",
-		"assets\\s1f5.png", "assets\\s1f6.png",
-	}, 6, 30.0f, 1.0f);
+Keyset wasdqex(key::SCANCODE_W, key::SCANCODE_S, key::SCANCODE_A, key::SCANCODE_D, key::SCANCODE_Q, key::SCANCODE_E, key::SCANCODE_X);
+Keyset tfghryb(key::SCANCODE_T, key::SCANCODE_G, key::SCANCODE_F, key::SCANCODE_H, key::SCANCODE_R, key::SCANCODE_Y, key::SCANCODE_B);
 
-Entity erotate = GObjFactory::createEntity(GObjFactory::ENEMY_3, 250.0f, 250.0f, 0.0f);
-Entity eaccel = GObjFactory::createEntity(GObjFactory::ENEMY_2, 250.0f, 250.0f, -PI / 2.0f);
-Entity enormal = GObjFactory::createEntity(GObjFactory::ENEMY_1, 250.0f, 250.0f, -PI);
-Entity eplayer = GObjFactory::createEntity(GObjFactory::PLAYER, 250.0f, 250.0f, -PI / 2.0f, PI/4.0f, wasdqe);
+VisualEffect ve(600.0f, 400.0f, 0.0f, 0.0f, 50.0f,
+	new std::string[7] {
+		"assets\\expl1.png", "assets\\expl2.png",
+		"assets\\expl3.png", "assets\\expl4.png",
+		"assets\\expl5.png", "assets\\expl6.png",
+		"assets\\expl7.png",
+	}, 7, 20.0f, 10.f);
+
+Entity eaccel = GObjFactory::createEntity(GObjFactory::ENEMY_1, 200.0f, 250.0f, -PI / 2.0f);
+Entity erotate = GObjFactory::createEntity(GObjFactory::ENEMY_2, 500.0f, 250.0f, 0);
+Entity enormal = GObjFactory::createEntity(GObjFactory::ENEMY_3, 800.0f, 250.0f, PI / 2.0f);
+Entity eplayer = GObjFactory::createEntity(GObjFactory::PLAYER, 1000.0f, 250.0f, PI / 2.0f, PI/4.0f, wasdqex);
 // END TEST
 
 // sgg functions
@@ -37,10 +44,15 @@ void update(float ms)
 	case game_states::TEST: {
 		
 		gd->game_state = ((game_states::MENU * graphics::getKeyState(graphics::scancode_t::SCANCODE_B)) + (gd->game_state * !graphics::getKeyState(graphics::scancode_t::SCANCODE_B)));
-		erotate.update(ms);
-		eaccel.update(ms);
-		enormal.update(ms);
-		eplayer.update(ms);
+
+		ve.update(ms);
+
+		for (int i = 0; i < govec.size(); ++i)
+			govec[i]->update(ms);
+
+		if (eplayer.hasFired())
+			govec.push_back(&eplayer.getProjectile());
+
 		break;
 	}
 	case game_states::MENU: {
@@ -117,10 +129,9 @@ void draw()
 	switch (gd->game_state)
 	{
 	case game_states::TEST: {
-		erotate.draw();
-		eaccel.draw();
-		enormal.draw();
-		eplayer.draw();
+		ve.draw();
+		for (int i = 0; i < govec.size(); ++i)
+			govec[i]->draw();
 		break;
 	}
 	case game_states::MENU: {
@@ -233,6 +244,11 @@ void initialize()
 
 	graphics::setUserData(gd);
 
+	govec.push_back(&eaccel);
+	govec.push_back(&erotate);
+	govec.push_back(&enormal);
+	govec.push_back(&eplayer);
+
 	// ...
 }
 
@@ -242,49 +258,3 @@ void initialize()
 // nothing to see below here
 float get_canvas_width() { return CANVAS_WIDTH; }
 float get_canvas_height() { return CANVAS_HEIGHT; }
-
-void setColor(graphics::Brush& br, const float* rgb)
-{
-	br.fill_color[0] = rgb[0];
-	br.fill_color[1] = rgb[1];
-	br.fill_color[2] = rgb[2];
-	br.outline_color[0] = rgb[0];
-	br.outline_color[1] = rgb[1];
-	br.outline_color[2] = rgb[2];
-}
-
-void setColor(graphics::Brush& br, char c)
-{
-	switch (c) {
-	case 'R':
-		setColor(br, new float[3]{ 1.0f, 0.0f, 0.0f });
-		break;
-	case 'G':
-		setColor(br, new float[3]{ 0.0f, 1.0f, 0.0f });
-		break;
-	case 'B':
-		setColor(br, new float[3]{ 0.0f, 0.0f, 1.0f });
-		break;
-	case 'P':
-		setColor(br, new float[3]{ 1.0f, 0.0f, 1.0f });
-		break;
-	case 'Y':
-		setColor(br, new float[3]{ 1.0f, 1.0f, 0.0f });
-		break;
-	case 'O':
-		setColor(br, new float[3]{ 1.0f, 0.5f, 0.0f });
-		break;
-	case 'N':
-		setColor(br, new float[3]{ 0.6f, 0.2f, 0.2f });
-		break;
-	case 'W':
-		setColor(br, new float[3]{ 1.0f, 1.0f, 1.0f });
-		break;
-	case 'A':
-		setColor(br, new float[3]{ 0.5f, 0.5f, 0.5f });
-		break;
-	case 'L':
-		setColor(br, new float[3]{ 0.0f, 0.0f, 0.0f });
-		break;
-	}
-}

@@ -7,7 +7,7 @@ class GObjFactory {
 private:
 	const static std::string asset_path;
 	const static int std_size = 30;
-	const static int std_speed = 35;
+	const static int std_speed = 120;
   
 	static Entity& createEnemy1(float x, float y, float angle);
 	static Entity& createEnemy2(float x, float y, float angle);
@@ -23,6 +23,6 @@ public:
 	const static int PLAYER = 0, ENEMY_1 = 1, ENEMY_2 = 2, ENEMY_3 = 3;
 
 	static Entity& createEntity(int type, float x, float y, float angle, float dangle = 0.0f,
-			Keyset keyset = Keyset(key::SCANCODE_Z, key::SCANCODE_Z, key::SCANCODE_Z, key::SCANCODE_Z, key::SCANCODE_Z, key::SCANCODE_Z));
+			Keyset keyset = Keyset(key::SCANCODE_Z, key::SCANCODE_Z, key::SCANCODE_Z, key::SCANCODE_Z, key::SCANCODE_Z, key::SCANCODE_Z, key::SCANCODE_Z));
 	static Projectile& createProjectile(int type, float x, float y, float angle);
 };
