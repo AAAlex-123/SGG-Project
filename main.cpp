@@ -13,20 +13,21 @@
 graphics::Brush br;
 
 // TEST
-Keyset wasdqe(key::SCANCODE_W, key::SCANCODE_S, key::SCANCODE_A, key::SCANCODE_D, key::SCANCODE_Q, key::SCANCODE_E);
-Keyset tfghry(key::SCANCODE_T, key::SCANCODE_G, key::SCANCODE_F, key::SCANCODE_H, key::SCANCODE_R, key::SCANCODE_Y);
+Keyset wasdqex(key::SCANCODE_W, key::SCANCODE_S, key::SCANCODE_A, key::SCANCODE_D, key::SCANCODE_Q, key::SCANCODE_E, key::SCANCODE_X);
+Keyset tfghryb(key::SCANCODE_T, key::SCANCODE_G, key::SCANCODE_F, key::SCANCODE_H, key::SCANCODE_R, key::SCANCODE_Y, key::SCANCODE_B);
 
-VisualEffect ve(250.0f, 250.0f, 0.0f, 0.0f, 50.0f,
-	new std::string[6]{
-		"assets\\s1f1.png", "assets\\s1f2.png",
-		"assets\\s1f3.png", "assets\\s1f4.png",
-		"assets\\s1f5.png", "assets\\s1f6.png",
-	}, 6, 30.0f, 1.0f);
+VisualEffect ve(600.0f, 400.0f, 0.0f, 0.0f, 50.0f,
+	new std::string[7] {
+		"assets\\expl1.png", "assets\\expl2.png",
+		"assets\\expl3.png", "assets\\expl4.png",
+		"assets\\expl5.png", "assets\\expl6.png",
+		"assets\\expl7.png",
+	}, 7, 20.0f, 10.f);
 
-Entity erotate = GObjFactory::createEntity(GObjFactory::ENEMY_3, 250.0f, 250.0f, 0.0f);
-Entity eaccel = GObjFactory::createEntity(GObjFactory::ENEMY_2, 250.0f, 250.0f, -PI / 2.0f);
-Entity enormal = GObjFactory::createEntity(GObjFactory::ENEMY_1, 250.0f, 250.0f, -PI);
-Entity eplayer = GObjFactory::createEntity(GObjFactory::PLAYER, 250.0f, 250.0f, -PI / 2.0f, PI/4.0f, wasdqe);
+Entity eaccel = GObjFactory::createEntity(GObjFactory::ENEMY_1, 200.0f, 250.0f, -PI / 2.0f);
+Entity erotate = GObjFactory::createEntity(GObjFactory::ENEMY_2, 500.0f, 250.0f, 0);
+Entity enormal = GObjFactory::createEntity(GObjFactory::ENEMY_3, 800.0f, 250.0f, PI / 2.0f);
+Entity eplayer = GObjFactory::createEntity(GObjFactory::PLAYER, 1000.0f, 250.0f, PI / 2.0f, PI/4.0f, wasdqex);
 // END TEST
 
 // sgg functions
@@ -40,6 +41,7 @@ void update(float ms)
 	case game_states::TEST: {
 		
 		gd->game_state = ((game_states::MENU * graphics::getKeyState(graphics::scancode_t::SCANCODE_B)) + (gd->game_state * !graphics::getKeyState(graphics::scancode_t::SCANCODE_B)));
+		ve.update(ms);
 		erotate.update(ms);
 		eaccel.update(ms);
 		enormal.update(ms);
@@ -120,6 +122,7 @@ void draw()
 	switch (gd->game_state)
 	{
 	case game_states::TEST: {
+		ve.draw();
 		erotate.draw();
 		eaccel.draw();
 		enormal.draw();
