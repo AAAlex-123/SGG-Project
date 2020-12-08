@@ -1,8 +1,7 @@
 #pragma once
 #include "drawing.h"
 
-class VisualEffect : public Drawing
-{
+class VisualEffect : public Drawing {
 private:
 	float duration, spf, elapsed, total_elapsed;
 	const int sprite_no;
@@ -15,15 +14,14 @@ public:
 	{}
 
 	// Returns false if the object is not alive; i.e. it must be destroyed
-	virtual operator bool() const override
-	{
+	virtual operator bool() const override {
 		return total_elapsed < duration;
 	}
 
-	// Changes the current sprite based on the elapsed time
-	void updateFrame()
-	{
-		float ms = graphics::getDeltaTime();
+	// Moved the effect and changes the current sprite based on the elapsed time
+	void update(float ms) {
+		this->movement->move(x, y, angle, vel, ms);
+
 		total_elapsed += ms / 1000.0f;
 		elapsed += ms / 1000.0f;
 
@@ -31,8 +29,7 @@ public:
 		elapsed = (0.0f * (elapsed > spf)) + (elapsed * !(elapsed > spf));
 	}
 	
-	virtual ~VisualEffect()
-	{
+	virtual ~VisualEffect() {
 		delete[] sprites; 
 	}
 };
