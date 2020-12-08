@@ -8,11 +8,14 @@
 #include "entity.h"
 #include "GObjFactory.h"
 #include <iostream>
+#include <vector>
 
 // global variables in main
 graphics::Brush br;
 
 // TEST
+std::vector<GameObject*> govec;
+
 Keyset wasdqex(key::SCANCODE_W, key::SCANCODE_S, key::SCANCODE_A, key::SCANCODE_D, key::SCANCODE_Q, key::SCANCODE_E, key::SCANCODE_X);
 Keyset tfghryb(key::SCANCODE_T, key::SCANCODE_G, key::SCANCODE_F, key::SCANCODE_H, key::SCANCODE_R, key::SCANCODE_Y, key::SCANCODE_B);
 
@@ -41,11 +44,15 @@ void update(float ms)
 	case game_states::TEST: {
 		
 		gd->game_state = ((game_states::MENU * graphics::getKeyState(graphics::scancode_t::SCANCODE_B)) + (gd->game_state * !graphics::getKeyState(graphics::scancode_t::SCANCODE_B)));
+
 		ve.update(ms);
-		erotate.update(ms);
-		eaccel.update(ms);
-		enormal.update(ms);
-		eplayer.update(ms);
+
+		for (int i = 0; i < govec.size(); ++i)
+			govec[i]->update(ms);
+
+		if (eplayer.hasFired())
+			govec.push_back(&eplayer.getProjectile());
+
 		break;
 	}
 	case game_states::MENU: {
@@ -123,10 +130,8 @@ void draw()
 	{
 	case game_states::TEST: {
 		ve.draw();
-		erotate.draw();
-		eaccel.draw();
-		enormal.draw();
-		eplayer.draw();
+		for (int i = 0; i < govec.size(); ++i)
+			govec[i]->draw();
 		break;
 	}
 	case game_states::MENU: {
@@ -238,6 +243,11 @@ void initialize()
 	game_data* gd = new game_data();
 
 	graphics::setUserData(gd);
+
+	govec.push_back(&eaccel);
+	govec.push_back(&erotate);
+	govec.push_back(&enormal);
+	govec.push_back(&eplayer);
 
 	// ...
 }
