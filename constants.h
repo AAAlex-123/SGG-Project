@@ -10,7 +10,8 @@ const float CANVAS_HEIGHT = 600.0f;
 // enum
 enum game_states
 {
-	TEST = -1,
+	TEST = -2,
+	LOAD = -1,
 	CREDITS = 0,
 	MENU = 1,
 	GAME = 2,
@@ -22,13 +23,14 @@ enum game_states
 
 // function declarations
 void initialize();
+bool load_assets_from_file(const std::string& asset_path);
 // ...
 
 void setColor(graphics::Brush&, const float*);
 void setColor(graphics::Brush&, char c);
 
 // assets
-const std::string asset_path = "assets\\";
+const std::string asset_path = ".\\assets\\";
 const std::string font = asset_path + "orange juice 2.0.ttf"; // pog
 
 // key short names
