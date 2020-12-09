@@ -23,7 +23,7 @@ enum game_states
 
 // function declarations
 void initialize();
-bool load_assets_from_file(const std::string& asset_path);
+bool load_images_from_file(const std::string& image_path);
 // ...
 
 void setColor(graphics::Brush&, const float*);
@@ -32,6 +32,7 @@ void setColor(graphics::Brush&, char c);
 // assets
 const std::string asset_path = ".\\assets\\";
 const std::string font = asset_path + "orange juice 2.0.ttf"; // pog
+const std::string image_path = ".\\assets\\";
 
 // key short names
 const graphics::scancode_t K_UP = graphics::scancode_t::SCANCODE_UP;
@@ -42,7 +43,6 @@ const graphics::scancode_t K_W = graphics::scancode_t::SCANCODE_W;
 const graphics::scancode_t K_A = graphics::scancode_t::SCANCODE_A;
 const graphics::scancode_t K_S = graphics::scancode_t::SCANCODE_S;
 const graphics::scancode_t K_D = graphics::scancode_t::SCANCODE_D;
-
 
 void setColor(graphics::Brush& br, const float* rgb)
 {
