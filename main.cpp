@@ -9,6 +9,8 @@
 #include "GObjFactory.h"
 #include <iostream>
 #include <vector>
+#include <fstream>
+#include <regex>
 
 // global variables in main
 graphics::Brush br;
@@ -52,6 +54,19 @@ void update(float ms)
 
 		if (eplayer.hasFired())
 			govec.push_back(&eplayer.getProjectile());
+
+		break;
+	}
+	case game_states::LOAD: {
+		gd->el += ms;
+
+		if (gd->el > (1/(gd->sps)) * 1000.0f)
+		{
+			gd->el = 0.0f;
+
+			if (++(gd->curr_asset) == gd->assets.size())
+				gd->game_state = game_states::MENU;
+		}
 
 		break;
 	}
@@ -132,6 +147,19 @@ void draw()
 		ve.draw();
 		for (int i = 0; i < govec.size(); ++i)
 			govec[i]->draw();
+		break;
+	}
+	case game_states::LOAD: {
+		setColor(br, 'W');
+
+		std::string curr_asset = asset_path + gd->assets[gd->curr_asset];
+
+		br.texture = curr_asset;
+		graphics::drawRect(CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2, CANVAS_HEIGHT / 4, CANVAS_HEIGHT / 4, br);
+
+		br.texture = "";
+		graphics::drawText(CANVAS_WIDTH / 50, 4 * CANVAS_HEIGHT / 5, CANVAS_HEIGHT / 8, "Loading:   " + curr_asset, br);
+		
 		break;
 	}
 	case game_states::MENU: {
@@ -227,9 +255,6 @@ int main(int argc, char** argv)
 	graphics::setDrawFunction(draw);
 	graphics::setUpdateFunction(update);
 
-	if (!graphics::setFont(font))
-		std::cerr << "Unable to load font from: " << font << std::endl;
-
 	initialize();
 
 	graphics::startMessageLoop();
@@ -241,9 +266,18 @@ int main(int argc, char** argv)
 void initialize()
 {
 	game_data* gd = new game_data();
+	gd->game_state = game_states::LOAD;
 
 	graphics::setUserData(gd);
 
+	// load stuff
+	if (!graphics::setFont(font))
+		std::cerr << "Unable to load font from: " << font << std::endl;
+
+	if (!load_assets_from_file(asset_path))
+		std::cerr << "Unable to load assets from: " << asset_path << std::endl;
+
+	// these should not be here, they should be initialized from file
 	govec.push_back(&eaccel);
 	govec.push_back(&erotate);
 	govec.push_back(&enormal);
@@ -252,9 +286,41 @@ void initialize()
 	// ...
 }
 
-// void reset() { ; }
-// ...
+// true == success
+bool load_assets_from_file(const std::string& asset_path)
+{
+	game_data* gd = (game_data*)graphics::getUserData();
+
+	std::string temp_file_name = "_mytemp.txt";
+
+	// create temp file and stream to that temp file
+	system(("dir " + asset_path + " > " + temp_file_name).c_str());
+	std::ifstream in(temp_file_name);
+
+	if (!in)
+	{
+		std::cerr << "Error opening file " << temp_file_name << std::endl;
+		return false;
+	}
+
+	// get all assets from file
+	std::string contents((std::istreambuf_iterator<char>(in)), std::istreambuf_iterator<char>());
+	std::smatch match;
+	std::regex r("(\\w+\\.png)");
+
+	while (std::regex_search(contents, match, r))
+	{
+		gd->assets.push_back(match[1].str());
+		contents = match.suffix();
+	}
+
+	// close stream, delete file
+	in.close();
+	remove(temp_file_name.c_str());
+
+	return true;
+}
 
 // nothing to see below here
-float get_canvas_width() { return CANVAS_WIDTH; }
-float get_canvas_height() { return CANVAS_HEIGHT; }
+float canvas_width() { return CANVAS_WIDTH; }
+float canvas_height() { return CANVAS_HEIGHT; }
