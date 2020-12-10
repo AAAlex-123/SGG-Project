@@ -1,5 +1,6 @@
 #include "GObjFactory.h"
 #include "Path.h"
+#include <iostream>
 
 using namespace std;
 
@@ -39,7 +40,9 @@ Entity& GObjFactory::createEntity(int type, float x, float y, float angle, float
 	case GObjFactory::ENEMY_1: return createEnemy1(x, y, angle);
 	case GObjFactory::ENEMY_2: return createEnemy2(x, y, angle);
 	case GObjFactory::ENEMY_3: return createEnemy3(x, y, angle);
-	//default throw exception
+	default: 
+		return createEnemy1(x, y, angle);
+		std::cerr << "Invalid constant, creating enemy1 as placeholder" << std::endl;
 	}
 }
 
@@ -48,6 +51,8 @@ Projectile& GObjFactory::createProjectile(int type, float x, float y, float angl
 	case GObjFactory::STANDARD_BULLET: return createStdB(x, y, angle);
 	case GObjFactory::LIGHT_BULLET: return createLB(x, y, angle);
 	case GObjFactory::INCEND_BULLET: return createIncB(x, y, angle);
-	//default throw exception
+	default: 
+		return createStdB(x, y, angle);
+		std::cerr << "Invalid constant, creating standard bullet as placeholder" << std::endl;
 	}
 }
