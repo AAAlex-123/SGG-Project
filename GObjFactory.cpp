@@ -41,8 +41,8 @@ Entity& GObjFactory::createEntity(int type, float x, float y, float angle, float
 	case GObjFactory::ENEMY_2: return createEnemy2(x, y, angle);
 	case GObjFactory::ENEMY_3: return createEnemy3(x, y, angle);
 	default: 
-		return createEnemy1(x, y, angle);
 		std::cerr << "Invalid constant, creating enemy1 as placeholder" << std::endl;
+		return createEnemy1(x, y, angle);
 	}
 }
 
@@ -52,7 +52,7 @@ Projectile& GObjFactory::createProjectile(int type, float x, float y, float angl
 	case GObjFactory::LIGHT_BULLET: return createLB(x, y, angle);
 	case GObjFactory::INCEND_BULLET: return createIncB(x, y, angle);
 	default: 
-		return createStdB(x, y, angle);
 		std::cerr << "Invalid constant, creating standard bullet as placeholder" << std::endl;
+		return createStdB(x, y, angle);
 	}
 }
