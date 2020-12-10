@@ -11,15 +11,15 @@ Entity& GObjFactory::createPlayer(float x, float y, float angle, float dangle, K
 }
 
 Entity& GObjFactory::createEnemy1(float x,float y,float angle) {
-	return *(new Entity(x, y, angle, std_speed, std_size, new string(asset_path + "plane1.png"), new FiringPath(1.0f, new AcceleratingPath(150.0f, new Path())), 5, 1, GObjFactory::STANDARD_BULLET));
+	return *(new Entity(x, y, angle, std_speed, std_size, new string(asset_path + "plane1.png"), new FiringPath(0.5f, new AcceleratingPath(150.0f, new Path())), 5, 1, GObjFactory::STANDARD_BULLET));
 }
 
 Entity& GObjFactory::createEnemy2(float x, float y, float angle) {
-	return *(new Entity(x, y, angle, std_speed, std_size, new string(asset_path + "plane2.png"), new FiringPath(3.0f, new RotatingPath(1.0f / 4, new Path())), 5, 1, GObjFactory::INCEND_BULLET));
+	return *(new Entity(x, y, angle, std_speed, std_size, new string(asset_path + "plane2.png"), new FiringPath(1.0f, new RotatingPath(1.0f / 4, new Path())), 5, 1, GObjFactory::INCEND_BULLET));
 }
 
 Entity& GObjFactory::createEnemy3(float x, float y, float angle) {
-	return *(new Entity(x, y, angle, std_speed, std_size, new string(asset_path + "plane3.png"), new FiringPath(2.0f, new Path()), 5, 1, GObjFactory::LIGHT_BULLET));
+	return *(new Entity(x, y, angle, std_speed, std_size, new string(asset_path + "plane3.png"), new FiringPath(1.0f, new Path()), 5, 1, GObjFactory::LIGHT_BULLET));
 }
 
 Projectile& GObjFactory::createStdB(float x, float y, float angle) {
