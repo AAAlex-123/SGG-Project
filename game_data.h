@@ -1,5 +1,7 @@
 #pragma once
 #include <vector>
+#include <unordered_map>
+#include "level.h"
 
 class game_data
 {
@@ -14,11 +16,16 @@ public:
 	int curr_img;
 	std::vector<std::string> images;
 
+	// levels		   id of level
+	std::unordered_map<int, Level> levels;
+	int curr_active_level, curr_selected_level;
+
 	// other stuff
 
 	// constructor
 	game_data() : fps(0), game_state(0),
-		el(0.0f), sps(1.0f), curr_img(0), images()
+		el(0.0f), sps(3.0f), curr_img(0), images(),
+		levels(), curr_active_level(-1), curr_selected_level(-1)
 	{
 		// initialize collections here
 		;
