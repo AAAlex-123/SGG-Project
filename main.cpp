@@ -1,14 +1,6 @@
 #include "graphics.h"
-#include "scancodes.h"
-#include "globals.h"
 #include "constants.h"
-#include "game_data.h"
-#include "drawing.h"
-#include "visual_effect.h"
-#include "entity.h"
-#include "GObjFactory.h"
-#include <iostream>
-#include <vector>
+#include <vector> //used in line 9+ ,debug
 
 // global variables in main
 graphics::Brush br;
@@ -36,7 +28,7 @@ Entity eplayer = GObjFactory::createEntity(GObjFactory::PLAYER, 1000.0f, 250.0f,
 // sgg functions
 void update(float ms)
 {
-	game_data* gd = (game_data*)graphics::getUserData();
+	GameData* gd = reinterpret_cast<GameData*> (graphics::getUserData());
 
 	gd->fps = (int)(1000.0f / ms);
 	switch (gd->game_state)
@@ -75,16 +67,68 @@ void update(float ms)
 		break;
 	}
 	case game_states::GAME: {
-		/*cars[i]->update(
-			graphics::getKeyState(cars[i]->k_up),
-			graphics::getKeyState(cars[i]->k_down),
-			graphics::getKeyState(cars[i]->k_left),
-			graphics::getKeyState(cars[i]->k_right),
-			ms / 1000.0f,
-			gd->t->get_unit_size()
-		);*/
+		//Because of the way C++ handles templates we can't define a list containing all the other lists
+		//without using dynamic_cast for every object, so we have to handle every list 'manually'
 
-		// ...
+	//update
+		for (Drawing* dr : gd->enemyLs) 
+			dr->update(ms);
+
+		for (Drawing* dr : gd->enemyProjLs)
+			dr->update(ms);
+
+		for (Drawing* dr : gd->playerProjLs)
+			dr->update(ms);
+
+		for (Drawing* dr : gd->effectsLs)
+			dr->update(ms);		
+
+	//check collisions
+
+		//Enemy proj -> player
+		for (GameObject* en_proj : gd->enemyProjLs)
+			for (GameObject* player : gd->playerLs)
+				en_proj->collides(player);
+
+		//Player proj -> enemy
+		for (GameObject* pl_proj : gd->playerProjLs)
+			for (GameObject* enemy : gd->enemyLs)
+				pl_proj->collides(enemy);
+
+		//Enemy -> player (ram)
+		for (GameObject* player : gd->playerLs)
+			for (GameObject* enemy : gd->enemyLs)
+				player->collides(enemy);
+
+	//fire
+		for (Entity* player : gd->playerLs)
+			;//fire...		
+		for (Entity* enemy : gd->enemyLs)
+			;//fire...		<- common function?
+
+	//spawn
+		//if (toBeSpawned()) gd->spawnNextEnemy
+
+	//delete
+		for (Drawing* dr : gd->enemyLs)
+			if(!dr)
+				//remove obj from list
+				//delete			<- common function?
+
+		for (Drawing* dr : gd->enemyProjLs)
+			if (!dr)
+				//remove obj from list
+				//delete
+
+		for (Drawing* dr : gd->playerProjLs)
+			if (!dr)
+				//remove obj from list
+				//delete
+
+		for (Drawing* dr : gd->effectsLs)
+			if (!dr)
+				//remove obj from list
+				//delete
 
 		break;
 	}
@@ -120,7 +164,7 @@ void update(float ms)
 
 void draw()
 {
-	game_data* gd = (game_data*)graphics::getUserData();
+	GameData* gd = reinterpret_cast<GameData*> (graphics::getUserData());
 
 	br.texture = "";
 	graphics::resetPose();
@@ -240,9 +284,9 @@ int main(int argc, char** argv)
 // function definitions
 void initialize()
 {
-	game_data* gd = new game_data();
+	GameData* gd = new GameData();
 
-	graphics::setUserData(gd);
+	graphics::setUserData((void*)gd);
 
 	govec.push_back(&eaccel);
 	govec.push_back(&erotate);
