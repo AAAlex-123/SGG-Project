@@ -9,9 +9,11 @@ void GameObject::hit(const GameObject& o2) {
 	this->health -= o2.damage;
 }
 
-bool GameObject::collides(const GameObject& o2) const {
-	return ((((o2.x - this->x) * (o2.x - this->x)) + ((o2.y - this->y) * (o2.y - this->y)))
-		< (this->radius - o2.radius) * (this->radius - o2.radius));
+void GameObject::collides(GameObject* o2) {
+	if ((((o2->x - this->x) * (o2->x - this->x)) + ((o2->y - this->y) * (o2->y - this->y))) < (this->radius - o2->radius) * (this->radius - o2->radius)) {
+		hit(*(o2));
+		o2->hit(*this);
+	}
 }
 
 void GameObject::update(float ms) {

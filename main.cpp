@@ -1,14 +1,6 @@
 #include "graphics.h"
-#include "scancodes.h"
-#include "globals.h"
 #include "constants.h"
-#include "game_data.h"
-#include "drawing.h"
-#include "visual_effect.h"
-#include "entity.h"
-#include "GObjFactory.h"
-#include <iostream>
-#include <vector>
+#include <vector> //used in line 9+ ,debug
 
 // global variables in main
 graphics::Brush br;
@@ -38,7 +30,7 @@ Entity eplayer = GObjFactory::createEntity(GObjFactory::PLAYER, 1000.0f, 250.0f,
 // sgg functions
 void update(float ms)
 {
-	game_data* gd = (game_data*)graphics::getUserData();
+	GameData* gd = reinterpret_cast<GameData*> (graphics::getUserData());
 
 	gd->fps = (int)(1000.0f / ms);
 	switch (gd->game_state)
@@ -222,7 +214,7 @@ case game_states::GAME: {
 
 void draw()
 {
-	game_data* gd = (game_data*)graphics::getUserData();
+	GameData* gd = reinterpret_cast<GameData*> (graphics::getUserData());
 
 	br.texture = "";
 	graphics::resetPose();
@@ -382,10 +374,10 @@ int main(int argc, char** argv)
 // function definitions
 void initialize()
 {
-	game_data* gd = new game_data();
+	GameData* gd = new GameData();
 	gd->game_state = game_states::LOAD;
 
-	graphics::setUserData(gd);
+	graphics::setUserData((void*)gd);
 
 	// load stuffx
 	if (!graphics::setFont(font))
