@@ -1,4 +1,4 @@
-#include "constants.h"
+#include "globals.h"
 #include <fstream>
 #include <regex>
 #include <iostream>
@@ -6,7 +6,6 @@
 #include "game_data.h"
 #include "graphics.h"
 #include "level.h"
-#include "GObjFactory.h"
 
 bool load_images_from_file(const std::string& image_path)
 {
@@ -38,62 +37,6 @@ bool load_images_from_file(const std::string& image_path)
 	// close stream, delete file
 	in.close();
 	remove(temp_file_name.c_str());
-
-	return true;
-}
-
-bool load_levels_from_file(const std::string& levels_path)
-{
-	game_data* gd = (game_data*)graphics::getUserData();
-
-	// create stream to levels_path
-	std::ifstream in(levels_path);
-
-	if (!in)
-	{
-		std::cerr << "Error opening file '" << levels_path << "'" << std::endl;
-		return false;
-	}
-
-	// get all lines from file
-	std::string contents((std::istreambuf_iterator<char>(in)), std::istreambuf_iterator<char>());
-	std::smatch match;
-
-	//0 straight enemies going down
-	std::string sr1("(\\d) ([\\w ]+)");
-
-	//4, 3, 100.0, 50.0, PI
-	std::string sr2("(.+?), (\\d+), (.+?), (.+?), (.+)");
-
-	std::regex r1, r2;
-
-	int curr_level = 0, line = 0;
-
-	while (true)
-	{
-		r1 = std::regex(std::to_string(line) + "   " + sr1);
-		r2 = std::regex(std::to_string(line) + "   " + sr2);
-
-		// new level
-		if (std::regex_search(contents, match, r1))
-		{
-			curr_level = stoi(match[1].str());
-			gd->levels[curr_level] = Level(curr_level, match[2].str());
-		}
-
-		// new enemy
-		else if (std::regex_search(contents, match, r2))
-		{
-			gd->levels[curr_level].add_enemy(stof(match[1].str()), &GObjFactory::createEntity(stoi(match[2].str()), stof(match[3].str()), stof(match[4].str()), stof(match[5].str()) * PI / 180));
-		}
-
-		else { break; }
-		++line;
-		contents = match.suffix();
-	}
-
-	// close stream
-	in.close();
 
 	return true;
 }
