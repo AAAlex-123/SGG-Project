@@ -62,7 +62,6 @@ void update(float ms)
 
 		for (int i = 0; i < pvec.size(); ++i)
 			pvec[i]->update(ms);
-
 		if (eplayer.hasFired())
 			pvec.push_back(&eplayer.getProjectile());
 
@@ -336,15 +335,12 @@ void initialize()
 
 	graphics::setUserData(gd);
 
-	// load stuff
+	// load stuffx
 	if (!graphics::setFont(font))
 		std::cerr << "Unable to load font from: " << font << std::endl;
 
 	if (!load_images_from_file(image_path))
 		std::cerr << "Unable to load images from: " << image_path << std::endl;
-
-	if (!load_levels_from_file(level_path))
-		std::cerr << "Unable to load levels from: " << level_path << std::endl;
 
 	// ...
 }
