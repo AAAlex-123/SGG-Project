@@ -1,5 +1,15 @@
 #pragma once
-#include "graphics.h"
+#include "scancodes.h"
+#include "globals.h"
+#include "drawing.h"
+#include "visual_effect.h"
+#include "entity.h"
+#include "GObjFactory.h"
+#include <iostream>
+#include <list>
+
+
+using namespace std;
 
 // constants
 const short WINDOW_WIDTH = 1200;
@@ -87,3 +97,26 @@ void setColor(graphics::Brush& br, char c)
 		break;
 	}
 }
+
+//game data
+struct GameData {
+	list<Entity *> enemyLs; 
+	list<Entity*> playerLs; //uniform access to either 1 or 2 players
+	list<Projectile *> enemyProjLs;
+	list<Projectile*> playerProjLs;
+	list<VisualEffect *> effectsLs;
+	list<Entity *> enemyQueue;
+
+	int fps;
+	int game_state;
+
+
+	void spawnNextEnemy() { //its ok for this one to be in-line
+		if (!this->enemyQueue.empty()) {
+			enemyLs.push_back(enemyQueue.front());
+			enemyQueue.pop_front();
+		}
+		else
+			cerr << "Queue is empty!" << endl; //debug
+	}
+};
