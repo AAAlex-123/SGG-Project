@@ -46,3 +46,26 @@ const graphics::scancode_t K_W = graphics::scancode_t::SCANCODE_W;
 const graphics::scancode_t K_A = graphics::scancode_t::SCANCODE_A;
 const graphics::scancode_t K_S = graphics::scancode_t::SCANCODE_S;
 const graphics::scancode_t K_D = graphics::scancode_t::SCANCODE_D;
+
+//game data
+struct GameData {
+	list<Entity *> enemyLs; 
+	list<Entity*> playerLs; //uniform access to either 1 or 2 players
+	list<Projectile *> enemyProjLs;
+	list<Projectile*> playerProjLs;
+	list<VisualEffect *> effectsLs;
+	list<Entity *> enemyQueue;
+
+	int fps;
+	int game_state;
+
+
+	void spawnNextEnemy() { //its ok for this one to be in-line
+		if (!this->enemyQueue.empty()) {
+			enemyLs.push_back(enemyQueue.front());
+			enemyQueue.pop_front();
+		}
+		else
+			cerr << "Queue is empty!" << endl; //debug
+	}
+};
