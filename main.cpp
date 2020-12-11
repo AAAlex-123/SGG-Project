@@ -1,7 +1,7 @@
 #include "graphics.h"
 #include "constants.h"
 #include "GObjFactory.h"
-#include "GameData.h"
+#include "game_data.h"
 #include <iostream>
 #include <vector> //used in line 9+ ,debug
 
