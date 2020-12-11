@@ -1,59 +1,53 @@
 #include "game_data.h"
-#include <fstream>
-#include <regex>
-#include <iostream>
-#include "GObjFactory.h"
 
-bool game_data::load_levels_from_file(const std::string& levels_path)
-{
-	// create stream to levels_path
-	std::ifstream in(levels_path);
-
-	if (!in)
-	{
-		std::cerr << "Error opening file '" << levels_path << "'" << std::endl;
-		return false;
+template <class T>
+void GameData::update(float ms, list<T*>* ls) {
+	for (Drawing* dr : ls) {
+		dr->update(ms);
+		dr->draw();
 	}
+}
 
-	// get all lines from file
-	std::string contents((std::istreambuf_iterator<char>(in)), std::istreambuf_iterator<char>());
-	std::smatch match;
+template <class T1,class T2>
+void GameData::checkCollisions(list<T1*>* ls1, list<T2*>* ls2) {
+	for (GameObject* o1 : ls1)
+		for (GameObject* o2 : ls2)
+			o1->collides(o2);
+}
 
-	//0 straight enemies going down
-	std::string sr1("(\\d) ([\\w ]+)");
+template <class T>
+void GameData::fire(list<T*>* ls) const{
+	bool isPlayer = false;
+	for (Entity* en : ls) {
+		//check if projectile was launched by a player
+		for (Entity* pl : playerLs) 
+			if (pl == en) return true;
+		
+		if (en->hasFired && isPlayer)
+			playerProjLs->push_back(en->getProjectile());
+		else if (en->hasFired && !isPlayer)
+			enemyProjLs->push_back(en->getProjectile());
 
-	//4, 3, 100.0, 50.0, PI
-	std::string sr2("(.+?), (\\d+), (.+?), (.+?), (.+)");
-
-	std::regex r1, r2;
-
-	int curr_level = 0, line = 0;
-
-	while (true)
-	{
-		r1 = std::regex(std::to_string(line) + "   " + sr1);
-		r2 = std::regex(std::to_string(line) + "   " + sr2);
-
-		// new level
-		if (std::regex_search(contents, match, r1))
-		{
-			curr_level = stoi(match[1].str());
-			this->levels[curr_level] = Level(curr_level, match[2].str());
-		}
-
-		// new enemy
-		else if (std::regex_search(contents, match, r2))
-		{
-			this->levels[curr_level].add_enemy(stof(match[1].str()), &GObjFactory::createEntity(stoi(match[2].str()), stof(match[3].str()), stof(match[4].str()), stof(match[5].str()) * PI / 180));
-		}
-
-		else { break; }
-		++line;
-		contents = match.suffix();
 	}
+}
 
-	// close stream
-	in.close();
+template <class T>
+void GameData::checkAndDelete(list<T*>* ls) {
+	for (iter = ls.begin(); iter != ls.end(); ++iter) {
+		if (!*iter) {
+			delete *iter;
+			iter = ls->erase(iter);
+		}
+	}
+}
 
-	return true;
+
+
+GameData::~GameData() {
+		delete[] enemyLs; delete enemyLs;
+		delete[] playerLs; delete playerLs;
+		delete[] enemyProjLs; delete enemyProjLs;
+		delete[] playerProjLs; delete playerProjLs;
+		delete[] effectsLs; delete effectsLs;
+		delete[] enemyQueue; delete enemyQueue;
 }
