@@ -4,10 +4,14 @@
 #include "visual_effect.h"
 #include <list>
 
+// lmao imagine using using
 using namespace std;
 
 struct GameData {
+private:
+	bool load_levels_from_file(const std::string& levels_path);
 
+public:
 	list<Entity*>* enemyLs = new list<Entity*>;
 	list<Entity*>* playerLs = new list<Entity*>; //uniform access to either 1 or 2 players
 	list<Projectile*>* enemyProjLs = new list<Projectile*>;
@@ -15,10 +19,24 @@ struct GameData {
 	list<VisualEffect*>* effectsLs = new list<VisualEffect*>;
 	list<Entity*>* enemyQueue = new list<Entity*>;
 
+	// general
 	int fps;
 	int game_state;
+	
+	// loading
+	float el;
+	const float sps;
+	int curr_img;
+	std::vector<std::string> images;
 
-	//void spawn();
+	// levels
+	std::unordered_map<int, Level> levels;
+	int curr_active_level, curr_selected_level;
+
+	// spawn will go in the levels
+	
+	// constructor because why not
+	GameData();
 	
 	//Updates all objects within the list. Template class must be derived from Drawing.
 	template<class T>
