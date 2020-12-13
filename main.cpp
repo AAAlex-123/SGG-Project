@@ -3,7 +3,7 @@
 #include "GObjFactory.h"
 #include "game_data.h"
 #include <iostream>
-#include <vector> //used in line 9+ ,debug
+#include <vector> //used in line 9+, debug
 
 // global variables in main
 graphics::Brush br;
@@ -37,16 +37,22 @@ void update(float ms)
 	switch (gd->game_state)
 	{
 	case game_states::TEST: {
-		
 		gd->game_state = ((game_states::MENU * graphics::getKeyState(graphics::scancode_t::SCANCODE_B)) + (gd->game_state * !graphics::getKeyState(graphics::scancode_t::SCANCODE_B)));
 
-		ve.update(ms);
+		// ...
+		
+		break;
+	}
+	case game_states::LOAD: {
+		gd->el += ms;
 
-		for (int i = 0; i < govec.size(); ++i)
-			govec[i]->update(ms);
+		if (gd->el > (1 / (gd->sps)) * 1000.0f)
+		{
+			gd->el = 0.0f;
+			++(gd->curr_img);
+		}
 
-		if (eplayer.hasFired())
-			govec.push_back(&eplayer.getProjectile());
+		gd->game_state = ((game_states::MENU * (gd->curr_img == gd->images.size())) + (gd->game_state * !(gd->curr_img == gd->images.size())));
 
 		break;
 	}
@@ -77,6 +83,9 @@ void update(float ms)
 		gd->update(ms, gd->playerLs);
 		gd->update(ms, gd->playerProjLs);
 		gd->update(ms, gd->effectsLs);
+		/*
+		gd->levels[gd->curr_selected_level].update(ms);
+		*/
 
 	//check collisions
 		gd->checkCollisions(gd->enemyProjLs, gd->playerLs);
@@ -88,7 +97,12 @@ void update(float ms)
 		gd->fire(gd->enemyLs);
 
 	//spawn
-		//if (toBeSpawned()) gd->spawn()
+		/*
+		if (gd->levels[gd->curr_selected_level].can_spawn()) {
+			// Level::spawn() returns a pointer to a new enemy
+			gd->enemyLs->push_back(&gd->levels[gd->curr_selected_level].spawn());
+		}
+		*/
 
 	//delete
 		gd->checkAndDelete(gd->enemyLs);
@@ -109,7 +123,32 @@ void update(float ms)
 	case game_states::OPTIONS: {
 		gd->game_state = ((game_states::MENU * graphics::getKeyState(graphics::scancode_t::SCANCODE_B)) + (gd->game_state * !graphics::getKeyState(graphics::scancode_t::SCANCODE_B)));
 
+		gd->game_state = ((game_states::OP_LEVEL * graphics::getKeyState(graphics::scancode_t::SCANCODE_L)) + (gd->game_state * !graphics::getKeyState(graphics::scancode_t::SCANCODE_L)));
+
 		// ...
+
+		break;
+	}
+	case game_states::OP_LEVEL: {
+		gd->game_state = ((game_states::OPTIONS * graphics::getKeyState(graphics::scancode_t::SCANCODE_B)) + (gd->game_state * !graphics::getKeyState(graphics::scancode_t::SCANCODE_B)));
+
+
+		gd->curr_active_level = (0 * graphics::getKeyState(graphics::scancode_t::SCANCODE_0)) + (gd->curr_active_level * !graphics::getKeyState(graphics::scancode_t::SCANCODE_0));
+		gd->curr_active_level = (1 * graphics::getKeyState(graphics::scancode_t::SCANCODE_1)) + (gd->curr_active_level * !graphics::getKeyState(graphics::scancode_t::SCANCODE_1));
+		gd->curr_active_level = (2 * graphics::getKeyState(graphics::scancode_t::SCANCODE_2)) + (gd->curr_active_level * !graphics::getKeyState(graphics::scancode_t::SCANCODE_2));
+		gd->curr_active_level = (3 * graphics::getKeyState(graphics::scancode_t::SCANCODE_3)) + (gd->curr_active_level * !graphics::getKeyState(graphics::scancode_t::SCANCODE_3));
+		gd->curr_active_level = (4 * graphics::getKeyState(graphics::scancode_t::SCANCODE_4)) + (gd->curr_active_level * !graphics::getKeyState(graphics::scancode_t::SCANCODE_4));
+		gd->curr_active_level = (5 * graphics::getKeyState(graphics::scancode_t::SCANCODE_5)) + (gd->curr_active_level * !graphics::getKeyState(graphics::scancode_t::SCANCODE_5));
+		gd->curr_active_level = (6 * graphics::getKeyState(graphics::scancode_t::SCANCODE_6)) + (gd->curr_active_level * !graphics::getKeyState(graphics::scancode_t::SCANCODE_6));
+		gd->curr_active_level = (7 * graphics::getKeyState(graphics::scancode_t::SCANCODE_7)) + (gd->curr_active_level * !graphics::getKeyState(graphics::scancode_t::SCANCODE_7));
+		gd->curr_active_level = (8 * graphics::getKeyState(graphics::scancode_t::SCANCODE_8)) + (gd->curr_active_level * !graphics::getKeyState(graphics::scancode_t::SCANCODE_8));
+		gd->curr_active_level = (9 * graphics::getKeyState(graphics::scancode_t::SCANCODE_9)) + (gd->curr_active_level * !graphics::getKeyState(graphics::scancode_t::SCANCODE_9));
+
+		gd->curr_selected_level = (gd->curr_active_level * graphics::getKeyState(graphics::scancode_t::SCANCODE_S)) + (gd->curr_selected_level * !graphics::getKeyState(graphics::scancode_t::SCANCODE_S));
+
+
+		gd->curr_active_level = (-1 * graphics::getKeyState(graphics::scancode_t::SCANCODE_D)) + (gd->curr_active_level * !graphics::getKeyState(graphics::scancode_t::SCANCODE_D));
+		gd->curr_selected_level = (-1 * graphics::getKeyState(graphics::scancode_t::SCANCODE_D)) + (gd->curr_selected_level * !graphics::getKeyState(graphics::scancode_t::SCANCODE_D));
 
 		break;
 	}
@@ -123,8 +162,10 @@ void update(float ms)
 		break;
 	}
 	default: {
-		std::cerr << "Invalid game state" << std::endl;
-		gd->game_state = game_states::EXIT;
+		// instead of that, make the window show the invalid state
+
+		// std::cerr << "Invalid game state" << std::endl;
+		// gd->game_state = game_states::EXIT;
 	}
 	}
 }
@@ -140,9 +181,24 @@ void draw()
 	switch (gd->game_state)
 	{
 	case game_states::TEST: {
-		ve.draw();
-		for (int i = 0; i < govec.size(); ++i)
-			govec[i]->draw();
+		
+		// ...
+		
+		break;
+	}
+	case game_states::LOAD: {
+		setColor(br, 'W');
+
+		if (gd->images.empty())
+			return;
+		std::string curr_image = image_path + gd->images[gd->curr_img];
+
+		br.texture = curr_image;
+		graphics::drawRect(CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2, CANVAS_HEIGHT / 4, CANVAS_HEIGHT / 4, br);
+
+		br.texture = "";
+		graphics::drawText(CANVAS_WIDTH / 50, 4 * CANVAS_HEIGHT / 5, CANVAS_HEIGHT / 8, "Loading:   " + curr_image, br);
+		
 		break;
 	}
 	case game_states::MENU: {
@@ -188,8 +244,34 @@ void draw()
 		setColor(br, new float[3]{ 0.0f, 0.0f, 0.0f });
 
 		graphics::drawText(CANVAS_WIDTH / 100, CANVAS_HEIGHT / 20, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 30, "<<< go Back", br);
+		graphics::drawText(CANVAS_WIDTH / 3, CANVAS_HEIGHT / 7, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 15, "Level select", br);
 
 		// ...
+		break;
+	}
+	case game_states::OP_LEVEL: {
+		setColor(br, new float[3]{ 0.0f, 0.0f, 1.0f });
+		graphics::drawRect(CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2, CANVAS_WIDTH, CANVAS_HEIGHT, br);
+
+		setColor(br, new float[3]{ 0.0f, 0.0f, 0.0f });
+
+		graphics::drawText(CANVAS_WIDTH / 100, CANVAS_HEIGHT / 20, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 30, "<<< go Back", br);
+
+		gd->curr_active_level == -1
+			? graphics::drawText(CANVAS_WIDTH / 11, 1.7f * CANVAS_HEIGHT / 10, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 20, "use  the  numbers  to  select  a  track", br)
+			: graphics::drawText(CANVAS_WIDTH / 8, 1.7f * CANVAS_HEIGHT / 10, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 30, "Select  this  track  or  Deselect  all  tracks", br);
+
+		for (int i = 0; i < gd->levels.size(); ++i)
+		{
+			if (gd->curr_selected_level == gd->levels[i].id())
+				setColor(br, 'O');
+			else if (gd->curr_active_level == gd->levels[i].id())
+				setColor(br, new float[3]{ 1.0f, 1.0f, 1.0f });
+			else
+				setColor(br, new float[3]{ 0.0f, 0.0f, 0.0f });
+			graphics::drawText(CANVAS_WIDTH / 20, (2.5f + 0.5f * i) * CANVAS_HEIGHT / 10, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 28, gd->levels[i].info(), br);
+		}
+
 		break;
 	}
 	case game_states::HELP: {
@@ -228,7 +310,8 @@ void draw()
 		break;
 	}
 	default: {
-		std::cerr << "Invalid game state" << std::endl;
+		graphics::drawText(40 * CANVAS_WIDTH / 100, 1 * CANVAS_HEIGHT / 7, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 15, "Invalid game state", br);
+		graphics::drawText(20 * CANVAS_WIDTH / 100, 1 * CANVAS_HEIGHT / 7, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 15, "Please exit and inform the develompers", br);
 	}
 	}
 }
@@ -243,9 +326,6 @@ int main(int argc, char** argv)
 	graphics::setDrawFunction(draw);
 	graphics::setUpdateFunction(update);
 
-	if (!graphics::setFont(font))
-		std::cerr << "Unable to load font from: " << font << std::endl;
-
 	initialize();
 
 	graphics::startMessageLoop();
@@ -257,20 +337,20 @@ int main(int argc, char** argv)
 void initialize()
 {
 	GameData* gd = new GameData();
+	gd->game_state = game_states::LOAD;
 
 	graphics::setUserData((void*)gd);
 
-	govec.push_back(&eaccel);
-	govec.push_back(&erotate);
-	govec.push_back(&enormal);
-	govec.push_back(&eplayer);
+	// load stuff
+	if (!graphics::setFont(font))
+		std::cerr << "Unable to load font from: " << font << std::endl;
+
+	if (!load_images_from_file(image_path))
+		std::cerr << "Unable to load images from: " << image_path << std::endl;
 
 	// ...
 }
 
-// void reset() { ; }
-// ...
-
 // nothing to see below here
-float get_canvas_width() { return CANVAS_WIDTH; }
-float get_canvas_height() { return CANVAS_HEIGHT; }
+float canvas_width() { return CANVAS_WIDTH; }
+float canvas_height() { return CANVAS_HEIGHT; }
