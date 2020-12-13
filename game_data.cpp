@@ -12,7 +12,7 @@ GameData::GameData() : fps(0), game_state(0),
 	;
 }
 
-bool game_data::load_levels_from_file(const std::string& levels_path) {
+bool GameData::load_levels_from_file(const std::string& levels_path) {
 	// create stream to levels_path
 	std::ifstream in(levels_path);
 
