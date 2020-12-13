@@ -1,19 +1,20 @@
 #include "graphics.h"
 #include "constants.h"
+#include "GObjFactory.h"
+#include "game_data.h"
+#include <iostream>
 #include <vector> //used in line 9+ ,debug
 
 // global variables in main
 graphics::Brush br;
 
 // TEST
-std::vector<Drawing*> govec;
-std::vector<Entity*> evec;
-std::vector<Drawing*> pvec;
+std::vector<GameObject*> govec;
 
 Keyset wasdqex(key::SCANCODE_W, key::SCANCODE_S, key::SCANCODE_A, key::SCANCODE_D, key::SCANCODE_Q, key::SCANCODE_E, key::SCANCODE_X);
-//Keyset tfghryb(key::SCANCODE_T, key::SCANCODE_G, key::SCANCODE_F, key::SCANCODE_H, key::SCANCODE_R, key::SCANCODE_Y, key::SCANCODE_B);
+Keyset tfghryb(key::SCANCODE_T, key::SCANCODE_G, key::SCANCODE_F, key::SCANCODE_H, key::SCANCODE_R, key::SCANCODE_Y, key::SCANCODE_B);
 
-/*VisualEffect ve(600.0f, 400.0f, 0.0f, 0.0f, 50.0f,
+VisualEffect ve(600.0f, 400.0f, 0.0f, 0.0f, 50.0f,
 	new std::string[7] {
 		"assets\\expl1.png", "assets\\expl2.png",
 		"assets\\expl3.png", "assets\\expl4.png",
@@ -23,7 +24,7 @@ Keyset wasdqex(key::SCANCODE_W, key::SCANCODE_S, key::SCANCODE_A, key::SCANCODE_
 
 Entity eaccel = GObjFactory::createEntity(GObjFactory::ENEMY_1, 200.0f, 250.0f, -PI / 2.0f);
 Entity erotate = GObjFactory::createEntity(GObjFactory::ENEMY_2, 500.0f, 250.0f, 0);
-Entity enormal = GObjFactory::createEntity(GObjFactory::ENEMY_3, 800.0f, 250.0f, PI / 2.0f);*/
+Entity enormal = GObjFactory::createEntity(GObjFactory::ENEMY_3, 800.0f, 250.0f, PI / 2.0f);
 Entity eplayer = GObjFactory::createEntity(GObjFactory::PLAYER, 1000.0f, 250.0f, PI / 2.0f, PI/4.0f, wasdqex);
 // END TEST
 
@@ -36,39 +37,16 @@ void update(float ms)
 	switch (gd->game_state)
 	{
 	case game_states::TEST: {
+		
 		gd->game_state = ((game_states::MENU * graphics::getKeyState(graphics::scancode_t::SCANCODE_B)) + (gd->game_state * !graphics::getKeyState(graphics::scancode_t::SCANCODE_B)));
 
-		eplayer.update(ms);
+		ve.update(ms);
 
-		gd->levels[gd->curr_selected_level].update(ms);
-		if (gd->levels[gd->curr_selected_level].can_spawn()) {
-			evec.push_back(&gd->levels[gd->curr_selected_level].spawn());
-		}
+		for (int i = 0; i < govec.size(); ++i)
+			govec[i]->update(ms);
 
-		for (int i = 0; i < evec.size(); ++i)
-		{
-			evec[i]->update(ms);
-			if (evec[i]->hasFired())
-				pvec.push_back(&(evec[i]->getProjectile()));
-		}
-
-		for (int i = 0; i < pvec.size(); ++i)
-			pvec[i]->update(ms);
 		if (eplayer.hasFired())
-			pvec.push_back(&eplayer.getProjectile());
-
-		break;
-	}
-	case game_states::LOAD: {
-		gd->el += ms;
-
-		if (gd->el > (1 / (gd->sps)) * 1000.0f)
-		{
-			gd->el = 0.0f;
-			++(gd->curr_img);
-		}
-
-		gd->game_state = ((game_states::MENU * (gd->curr_img == gd->images.size())) + (gd->game_state * !(gd->curr_img == gd->images.size())));
+			govec.push_back(&eplayer.getProjectile());
 
 		break;
 	}
@@ -91,69 +69,33 @@ void update(float ms)
 
 		break;
 	}
-case game_states::GAME: {
-		//Because of the way C++ handles templates we can't define a list containing all the other lists
-		//without using dynamic_cast for every object, so we have to handle every list 'manually'
-
+	case game_states::GAME: {
+		
 	//update
-		for (Drawing* dr : gd->enemyLs) 
-			dr->update(ms);
-
-		for (Drawing* dr : gd->enemyProjLs)
-			dr->update(ms);
-
-		for (Drawing* dr : gd->playerProjLs)
-			dr->update(ms);
-
-		for (Drawing* dr : gd->effectsLs)
-			dr->update(ms);		
+		gd->update(ms, gd->enemyLs);
+		gd->update(ms, gd->enemyProjLs);
+		gd->update(ms, gd->playerLs);
+		gd->update(ms, gd->playerProjLs);
+		gd->update(ms, gd->effectsLs);
 
 	//check collisions
-
-		//Enemy proj -> player
-		for (GameObject* en_proj : gd->enemyProjLs)
-			for (GameObject* player : gd->playerLs)
-				en_proj->collides(player);
-
-		//Player proj -> enemy
-		for (GameObject* pl_proj : gd->playerProjLs)
-			for (GameObject* enemy : gd->enemyLs)
-				pl_proj->collides(enemy);
-
-		//Enemy -> player (ram)
-		for (GameObject* player : gd->playerLs)
-			for (GameObject* enemy : gd->enemyLs)
-				player->collides(enemy);
+		gd->checkCollisions(gd->enemyProjLs, gd->playerLs);
+		gd->checkCollisions(gd->playerProjLs, gd->enemyLs);
+		gd->checkCollisions(gd->enemyLs, gd->playerLs);
 
 	//fire
-		for (Entity* player : gd->playerLs)
-			;//fire...		
-		for (Entity* enemy : gd->enemyLs)
-			;//fire...		<- common function?
+		gd->fire(gd->playerLs);
+		gd->fire(gd->enemyLs);
 
 	//spawn
-		//if (toBeSpawned()) gd->spawnNextEnemy
+		//if (toBeSpawned()) gd->spawn()
 
 	//delete
-		for (Drawing* dr : gd->enemyLs)
-			if(!dr)
-				//remove obj from list
-				//delete			<- common function?
-
-		for (Drawing* dr : gd->enemyProjLs)
-			if (!dr)
-				//remove obj from list
-				//delete
-
-		for (Drawing* dr : gd->playerProjLs)
-			if (!dr)
-				//remove obj from list
-				//delete
-
-		for (Drawing* dr : gd->effectsLs)
-			if (!dr)
-				//remove obj from list
-				//delete
+		gd->checkAndDelete(gd->enemyLs);
+		gd->checkAndDelete(gd->enemyProjLs);
+		gd->checkAndDelete(gd->playerLs);
+		gd->checkAndDelete(gd->playerProjLs);
+		gd->checkAndDelete(gd->effectsLs);
 
 		break;
 	}
@@ -167,32 +109,7 @@ case game_states::GAME: {
 	case game_states::OPTIONS: {
 		gd->game_state = ((game_states::MENU * graphics::getKeyState(graphics::scancode_t::SCANCODE_B)) + (gd->game_state * !graphics::getKeyState(graphics::scancode_t::SCANCODE_B)));
 
-		gd->game_state = ((game_states::OP_LEVEL * graphics::getKeyState(graphics::scancode_t::SCANCODE_L)) + (gd->game_state * !graphics::getKeyState(graphics::scancode_t::SCANCODE_L)));
-
 		// ...
-
-		break;
-	}
-	case game_states::OP_LEVEL: {
-		gd->game_state = ((game_states::OPTIONS * graphics::getKeyState(graphics::scancode_t::SCANCODE_B)) + (gd->game_state * !graphics::getKeyState(graphics::scancode_t::SCANCODE_B)));
-
-
-		gd->curr_active_level = (0 * graphics::getKeyState(graphics::scancode_t::SCANCODE_0)) + (gd->curr_active_level * !graphics::getKeyState(graphics::scancode_t::SCANCODE_0));
-		gd->curr_active_level = (1 * graphics::getKeyState(graphics::scancode_t::SCANCODE_1)) + (gd->curr_active_level * !graphics::getKeyState(graphics::scancode_t::SCANCODE_1));
-		gd->curr_active_level = (2 * graphics::getKeyState(graphics::scancode_t::SCANCODE_2)) + (gd->curr_active_level * !graphics::getKeyState(graphics::scancode_t::SCANCODE_2));
-		gd->curr_active_level = (3 * graphics::getKeyState(graphics::scancode_t::SCANCODE_3)) + (gd->curr_active_level * !graphics::getKeyState(graphics::scancode_t::SCANCODE_3));
-		gd->curr_active_level = (4 * graphics::getKeyState(graphics::scancode_t::SCANCODE_4)) + (gd->curr_active_level * !graphics::getKeyState(graphics::scancode_t::SCANCODE_4));
-		gd->curr_active_level = (5 * graphics::getKeyState(graphics::scancode_t::SCANCODE_5)) + (gd->curr_active_level * !graphics::getKeyState(graphics::scancode_t::SCANCODE_5));
-		gd->curr_active_level = (6 * graphics::getKeyState(graphics::scancode_t::SCANCODE_6)) + (gd->curr_active_level * !graphics::getKeyState(graphics::scancode_t::SCANCODE_6));
-		gd->curr_active_level = (7 * graphics::getKeyState(graphics::scancode_t::SCANCODE_7)) + (gd->curr_active_level * !graphics::getKeyState(graphics::scancode_t::SCANCODE_7));
-		gd->curr_active_level = (8 * graphics::getKeyState(graphics::scancode_t::SCANCODE_8)) + (gd->curr_active_level * !graphics::getKeyState(graphics::scancode_t::SCANCODE_8));
-		gd->curr_active_level = (9 * graphics::getKeyState(graphics::scancode_t::SCANCODE_9)) + (gd->curr_active_level * !graphics::getKeyState(graphics::scancode_t::SCANCODE_9));
-
-		gd->curr_selected_level = (gd->curr_active_level * graphics::getKeyState(graphics::scancode_t::SCANCODE_S)) + (gd->curr_selected_level * !graphics::getKeyState(graphics::scancode_t::SCANCODE_S));
-
-
-		gd->curr_active_level = (-1 * graphics::getKeyState(graphics::scancode_t::SCANCODE_D)) + (gd->curr_active_level * !graphics::getKeyState(graphics::scancode_t::SCANCODE_D));
-		gd->curr_selected_level = (-1 * graphics::getKeyState(graphics::scancode_t::SCANCODE_D)) + (gd->curr_selected_level * !graphics::getKeyState(graphics::scancode_t::SCANCODE_D));
 
 		break;
 	}
@@ -223,26 +140,9 @@ void draw()
 	switch (gd->game_state)
 	{
 	case game_states::TEST: {
-		eplayer.draw();
-		for (int i = 0; i < evec.size(); ++i)
-			evec[i]->draw();
-		for (int i = 0; i < pvec.size(); ++i)
-			pvec[i]->draw();
-		break;
-	}
-	case game_states::LOAD: {
-		setColor(br, 'W');
-
-		if (gd->images.empty())
-			return;
-		std::string curr_image = image_path + gd->images[gd->curr_img];
-
-		br.texture = curr_image;
-		graphics::drawRect(CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2, CANVAS_HEIGHT / 4, CANVAS_HEIGHT / 4, br);
-
-		br.texture = "";
-		graphics::drawText(CANVAS_WIDTH / 50, 4 * CANVAS_HEIGHT / 5, CANVAS_HEIGHT / 8, "Loading:   " + curr_image, br);
-		
+		ve.draw();
+		for (int i = 0; i < govec.size(); ++i)
+			govec[i]->draw();
 		break;
 	}
 	case game_states::MENU: {
@@ -263,7 +163,12 @@ void draw()
 	}
 	case game_states::GAME: {
 
-		// ...
+	//draw
+		gd->draw(gd->enemyLs);
+		gd->draw(gd->enemyProjLs);
+		gd->draw(gd->playerLs);
+		gd->draw(gd->playerProjLs);
+		gd->draw(gd->effectsLs);
 
 		break;
 	}
@@ -283,34 +188,8 @@ void draw()
 		setColor(br, new float[3]{ 0.0f, 0.0f, 0.0f });
 
 		graphics::drawText(CANVAS_WIDTH / 100, CANVAS_HEIGHT / 20, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 30, "<<< go Back", br);
-		graphics::drawText(CANVAS_WIDTH / 3, CANVAS_HEIGHT / 7, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 15, "Level select", br);
 
 		// ...
-		break;
-	}
-	case game_states::OP_LEVEL: {
-		setColor(br, new float[3]{ 0.0f, 0.0f, 1.0f });
-		graphics::drawRect(CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2, CANVAS_WIDTH, CANVAS_HEIGHT, br);
-
-		setColor(br, new float[3]{ 0.0f, 0.0f, 0.0f });
-
-		graphics::drawText(CANVAS_WIDTH / 100, CANVAS_HEIGHT / 20, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 30, "<<< go Back", br);
-
-		gd->curr_active_level == -1
-			? graphics::drawText(CANVAS_WIDTH / 11, 1.7f * CANVAS_HEIGHT / 10, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 20, "use  the  numbers  to  select  a  track", br)
-			: graphics::drawText(CANVAS_WIDTH / 8, 1.7f * CANVAS_HEIGHT / 10, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 30, "Select  this  track  or  Deselect  all  tracks", br);
-
-		for (int i = 0; i < gd->levels.size(); ++i)
-		{
-			if (gd->curr_selected_level == gd->levels[i].id())
-				setColor(br, 'O');
-			else if (gd->curr_active_level == gd->levels[i].id())
-				setColor(br, new float[3]{ 1.0f, 1.0f, 1.0f });
-			else
-				setColor(br, new float[3]{ 0.0f, 0.0f, 0.0f });
-			graphics::drawText(CANVAS_WIDTH / 20, (2.5f + 0.5f * i) * CANVAS_HEIGHT / 10, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 28, gd->levels[i].info(), br);
-		}
-
 		break;
 	}
 	case game_states::HELP: {
@@ -364,6 +243,9 @@ int main(int argc, char** argv)
 	graphics::setDrawFunction(draw);
 	graphics::setUpdateFunction(update);
 
+	if (!graphics::setFont(font))
+		std::cerr << "Unable to load font from: " << font << std::endl;
+
 	initialize();
 
 	graphics::startMessageLoop();
@@ -375,20 +257,20 @@ int main(int argc, char** argv)
 void initialize()
 {
 	GameData* gd = new GameData();
-	gd->game_state = game_states::LOAD;
 
 	graphics::setUserData((void*)gd);
 
-	// load stuffx
-	if (!graphics::setFont(font))
-		std::cerr << "Unable to load font from: " << font << std::endl;
-
-	if (!load_images_from_file(image_path))
-		std::cerr << "Unable to load images from: " << image_path << std::endl;
+	govec.push_back(&eaccel);
+	govec.push_back(&erotate);
+	govec.push_back(&enormal);
+	govec.push_back(&eplayer);
 
 	// ...
 }
 
+// void reset() { ; }
+// ...
+
 // nothing to see below here
-float canvas_width() { return CANVAS_WIDTH; }
-float canvas_height() { return CANVAS_HEIGHT; }
+float get_canvas_width() { return CANVAS_WIDTH; }
+float get_canvas_height() { return CANVAS_HEIGHT; }
