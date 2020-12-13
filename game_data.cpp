@@ -4,6 +4,12 @@ template <class T>
 void GameData::update(float ms, list<T*>* ls) {
 	for (Drawing* dr : ls) {
 		dr->update(ms);
+	}
+}
+
+template <class T>
+void GameData::draw(list<T*>* ls) {
+	for (Drawing* dr : ls) {
 		dr->draw();
 	}
 }
