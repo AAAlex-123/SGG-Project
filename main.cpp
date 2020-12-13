@@ -163,7 +163,12 @@ void draw()
 	}
 	case game_states::GAME: {
 
-		// ...
+	//draw
+		gd->draw(gd->enemyLs);
+		gd->draw(gd->enemyProjLs);
+		gd->draw(gd->playerLs);
+		gd->draw(gd->playerProjLs);
+		gd->draw(gd->effectsLs);
 
 		break;
 	}
