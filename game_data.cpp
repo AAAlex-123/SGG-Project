@@ -4,12 +4,10 @@ GameData::GameData() : fps(0), game_state(0),
 	el(0.0f), sps(4.0f), curr_img(0), images(),
 	levels(), curr_active_level(-1), curr_selected_level(-1)
 {
-
 	if (!load_levels_from_file(level_path))
 		std::cerr << "Unable to load levels from: " << level_path << std::endl;
 
-	// initialize collections here
-	;
+	// initialize other stuff ...
 }
 
 bool GameData::load_levels_from_file(const std::string& levels_path) {
