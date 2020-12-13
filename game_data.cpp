@@ -1,5 +1,61 @@
 #include "game_data.h"
 
+GameData::GameData() : fps(0), game_state(0),
+	el(0.0f), sps(4.0f), curr_img(0), images(),
+	levels(), curr_active_level(-1), curr_selected_level(-1)
+{
+
+	if (!load_levels_from_file(level_path))
+		std::cerr << "Unable to load levels from: " << level_path << std::endl;
+
+	// initialize collections here
+	;
+}
+
+bool game_data::load_levels_from_file(const std::string& levels_path) {
+	// create stream to levels_path
+	std::ifstream in(levels_path);
+
+	if (!in) {
+		std::cerr << "Error opening file '" << levels_path << "'" << std::endl;
+		return false;
+	}
+
+	// get all lines from file
+	std::string contents((std::istreambuf_iterator<char>(in)), std::istreambuf_iterator<char>());
+	std::smatch match;
+
+	// regex pattern 1 ...
+	std::string sr1(".*");
+
+	// regex objects ...
+	std::regex r1;
+
+	int curr_level = 0, curr_wave = 0, line = 0;
+
+	while (true)
+	{
+		// construct regexes ...
+		r1 = std::regex(std::to_string(line) + "   " + sr1);
+
+		// match with 1st ...
+		if (std::regex_search(contents, match, r1))
+		{
+			// ...
+		}
+		
+		// no match
+		else { break; }
+		++line;
+		contents = match.suffix();
+	}
+
+	// close stream
+	in.close();
+	return true;
+}
+
+
 template <class T>
 void GameData::update(float ms, list<T*>* ls) {
 	for (Drawing* dr : ls) {
@@ -47,13 +103,11 @@ void GameData::checkAndDelete(list<T*>* ls) {
 	}
 }
 
-
-
 GameData::~GameData() {
-		delete[] enemyLs; delete enemyLs;
-		delete[] playerLs; delete playerLs;
-		delete[] enemyProjLs; delete enemyProjLs;
+		delete[] enemyLs;      delete enemyLs;
+		delete[] playerLs;     delete playerLs;
+		delete[] enemyProjLs;  delete enemyProjLs;
 		delete[] playerProjLs; delete playerProjLs;
-		delete[] effectsLs; delete effectsLs;
-		delete[] enemyQueue; delete enemyQueue;
+		delete[] effectsLs;    delete effectsLs;
+		delete[] enemyQueue;   delete enemyQueue;
 }
