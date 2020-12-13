@@ -4,7 +4,6 @@
 #include "visual_effect.h"
 #include <list>
 
-//game data
 using namespace std;
 
 struct GameData {
@@ -20,10 +19,14 @@ struct GameData {
 	int game_state;
 
 	//void spawn();
-
+	
 	//Updates all objects within the list. Template class must be derived from Drawing.
 	template<class T>
 	void update(float ms, list<T*>*);
+	
+	// Draws all objects within the list. Template class must be derived from Drawing.
+	template <class T>
+	void draw(list<T*>* ls);
 
 	//Checks collisions between 2 lists. Template classes must both be derived from GameObject.
 	template<class T1,class T2>
