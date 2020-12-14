@@ -1,4 +1,7 @@
 #include "game_data.h"
+#include <iostream>
+#include <regex>
+#include <fstream>
 
 GameData::GameData() : fps(0), game_state(0),
 	el(0.0f), sps(4.0f), curr_img(0), images(),
@@ -10,6 +13,8 @@ GameData::GameData() : fps(0), game_state(0),
 	// initialize other stuff ...
 }
 
+// doesn't work properly at the moment, it's just a template.
+// code should be added where there are '...'
 bool GameData::load_levels_from_file(const std::string& levels_path) {
 	// create stream to levels_path
 	std::ifstream in(levels_path);
@@ -53,7 +58,6 @@ bool GameData::load_levels_from_file(const std::string& levels_path) {
 	return true;
 }
 
-
 template <class T>
 void GameData::update(float ms, list<T*>* ls) {
 	for (Drawing* dr : ls) {
@@ -76,24 +80,39 @@ void GameData::checkCollisions(list<T1*>* ls1, list<T2*>* ls2) {
 }
 
 template <class T>
-void GameData::fire(list<T*>* ls) const{
+void GameData::fire(list<T*>* ls) const {
 	bool isPlayer = false;
 	for (Entity* en : ls) {
+
 		//check if projectile was launched by a player
-		for (Entity* pl : playerLs) 
-			if (pl == en) return true;
-		
+		for (Entity* pl : playerLs)
+			isPlayer |= pl == en;
+
 		if (en->hasFired && isPlayer)
 			playerProjLs->push_back(en->getProjectile());
 		else if (en->hasFired && !isPlayer)
 			enemyProjLs->push_back(en->getProjectile());
 
+		/*
+		// firing is rare, so we shouldn't do 2 ifs and one for loop if the entity hasn't fired
+
+		if (en->hasFired) {
+			//check if projectile was launched by a player
+			for (Entity* pl : playerLs)
+				isPlayer |= pl == en;	// fancy
+
+			if (isPlayer) {
+				playerProjLs->push_back(en->getProjectile());
+			} else {
+				enemyProjLs->push_back(en->getProjectile());
+			}
+		}*/
 	}
 }
 
 template <class T>
 void GameData::checkAndDelete(list<T*>* ls) {
-	for (iter = ls.begin(); iter != ls.end(); ++iter) {
+	for (auto iter = ls.begin(); iter != ls.end(); ++iter) {
 		if (!*iter) {
 			delete *iter;
 			iter = ls->erase(iter);
@@ -102,10 +121,28 @@ void GameData::checkAndDelete(list<T*>* ls) {
 }
 
 GameData::~GameData() {
-		delete[] enemyLs;      delete enemyLs;
-		delete[] playerLs;     delete playerLs;
-		delete[] enemyProjLs;  delete enemyProjLs;
-		delete[] playerProjLs; delete playerProjLs;
-		delete[] effectsLs;    delete effectsLs;
-		delete[] enemyQueue;   delete enemyQueue;
+	/* the code with the delete[]; delete, is the same as the snippet below :p
+	* 
+	*		int* pa = new int[3];
+	*		delete[] pa;
+	*		delete pa;
+	* 
+	* which doesn't work properly because you're deleting the same thing twice
+	* maybe you want
+	* 
+	*	for (acollection* : all collections) {
+	*		for  (Entity* en : acollection) {
+	*				delete en;
+	*		}
+	*		delete acollection
+	*	}
+	* 
+	* or something like that
+	*/
+	delete[] enemyLs;      delete enemyLs;
+	delete[] playerLs;     delete playerLs;
+	delete[] enemyProjLs;  delete enemyProjLs;
+	delete[] playerProjLs; delete playerProjLs;
+	delete[] effectsLs;    delete effectsLs;
+	delete[] enemyQueue;   delete enemyQueue;
 }
