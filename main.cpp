@@ -78,23 +78,23 @@ void update(float ms)
 	case game_states::GAME: {
 		
 	//update
-		gd->update(ms, gd->enemyLs);
-		gd->update(ms, gd->enemyProjLs);
-		gd->update(ms, gd->playerLs);
-		gd->update(ms, gd->playerProjLs);
-		gd->update(ms, gd->effectsLs);
+		gd->update<Entity>(ms, gd->enemyLs);
+		gd->update<Projectile>(ms, gd->enemyProjLs);
+		gd->update<Entity>(ms, gd->playerLs);
+		gd->update<Projectile>(ms, gd->playerProjLs);
+		gd->update<VisualEffect>(ms, gd->effectsLs);
 		/*
 		gd->levels[gd->curr_selected_level].update(ms);
 		*/
 
 	//check collisions
-		gd->checkCollisions(gd->enemyProjLs, gd->playerLs);
-		gd->checkCollisions(gd->playerProjLs, gd->enemyLs);
-		gd->checkCollisions(gd->enemyLs, gd->playerLs);
+		gd->checkCollisions<Projectile,Entity>(gd->enemyProjLs, gd->playerLs);
+		gd->checkCollisions<Projectile,Entity>(gd->playerProjLs, gd->enemyLs);
+		gd->checkCollisions<Entity,Entity>(gd->enemyLs, gd->playerLs);
 
 	//fire
-		gd->fire(gd->playerLs);
-		gd->fire(gd->enemyLs);
+		gd->fire<Entity>(gd->playerLs);
+		gd->fire<Entity>(gd->enemyLs);
 
 	//spawn
 		/*
@@ -105,11 +105,11 @@ void update(float ms)
 		*/
 
 	//delete
-		gd->checkAndDelete(gd->enemyLs);
-		gd->checkAndDelete(gd->enemyProjLs);
-		gd->checkAndDelete(gd->playerLs);
-		gd->checkAndDelete(gd->playerProjLs);
-		gd->checkAndDelete(gd->effectsLs);
+		gd->checkAndDelete<Entity>(gd->enemyLs);
+		gd->checkAndDelete<Projectile>(gd->enemyProjLs);
+		gd->checkAndDelete<Entity>(gd->playerLs);
+		gd->checkAndDelete<Projectile>(gd->playerProjLs);
+		gd->checkAndDelete<VisualEffect>(gd->effectsLs);
 
 		break;
 	}
@@ -220,11 +220,11 @@ void draw()
 	case game_states::GAME: {
 
 	//draw
-		gd->draw(gd->enemyLs);
-		gd->draw(gd->enemyProjLs);
-		gd->draw(gd->playerLs);
-		gd->draw(gd->playerProjLs);
-		gd->draw(gd->effectsLs);
+		gd->draw<Entity>(gd->enemyLs);
+		gd->draw<Projectile>(gd->enemyProjLs);
+		gd->draw<Entity>(gd->playerLs);
+		gd->draw<Projectile>(gd->playerProjLs);
+		gd->draw<VisualEffect>(gd->effectsLs);
 
 		break;
 	}
