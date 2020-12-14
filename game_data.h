@@ -16,12 +16,10 @@ private:
 	bool load_levels_from_file(const std::string& levels_path);
 
 public:
-	list<Entity*>* enemyLs = new list<Entity*>;
-	list<Entity*>* playerLs = new list<Entity*>; //uniform access to either 1 or 2 players or more if we do socket stuff (:
-	list<Projectile*>* enemyProjLs = new list<Projectile*>;
-	list<Projectile*>* playerProjLs = new list<Projectile*>;
-	list<VisualEffect*>* effectsLs = new list<VisualEffect*>;
-	list<Entity*>* enemyQueue = new list<Entity*>;
+	// collections
+	list<Entity*>* enemyLs, playerLs; //uniform access to either 1 or 2 players :(
+	list<Projectile*>* enemyProjLs, playerProjLs;
+	list<VisualEffect*>* effectsLs;
 
 	// general
 	int fps;
@@ -37,8 +35,9 @@ public:
 	std::unordered_map<int, Level> levels;
 	int curr_active_level, curr_selected_level;
 	
-	// constructor because why not
+	// constructor and destructor because why not
 	GameData();
+	~GameData();
 	
 	//Updates all objects within the list. Template class must be derived from Drawing.
 	template <class T>
@@ -59,10 +58,9 @@ public:
 	//Checks if any object within the list must be destroyed, and deletes it. Template class must be derived from Drawing.
 	template <class T>
 	void checkAndDelete(list<T*>*);
-
-	~GameData();
 };
 
+// definition in the same file as declaration because c++ is awesome
 template <class T>
 void GameData::update(float ms, list<T*>* ls) {
 	for (Drawing* dr : *ls) {
