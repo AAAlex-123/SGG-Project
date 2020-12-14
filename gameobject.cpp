@@ -1,4 +1,5 @@
 #include "gameobject.h"
+#include "globals.h"
 
 GameObject::GameObject(float xpos, float ypos, float angle, float vel, float radius, const std::string* sprites, Path* p, int damage, int health) :
 	Drawing(xpos, ypos, angle, vel, radius, sprites, p),
