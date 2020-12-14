@@ -1,19 +1,20 @@
 #include "graphics.h"
 #include "constants.h"
-#include <vector> //used in line 9+ ,debug
+#include "GObjFactory.h"
+#include "game_data.h"
+#include <iostream>
+#include <vector> //used in line 9+, debug
 
 // global variables in main
 graphics::Brush br;
 
 // TEST
-std::vector<Drawing*> govec;
-std::vector<Entity*> evec;
-std::vector<Drawing*> pvec;
+std::vector<GameObject*> govec;
 
 Keyset wasdqex(key::SCANCODE_W, key::SCANCODE_S, key::SCANCODE_A, key::SCANCODE_D, key::SCANCODE_Q, key::SCANCODE_E, key::SCANCODE_X);
-//Keyset tfghryb(key::SCANCODE_T, key::SCANCODE_G, key::SCANCODE_F, key::SCANCODE_H, key::SCANCODE_R, key::SCANCODE_Y, key::SCANCODE_B);
+Keyset tfghryb(key::SCANCODE_T, key::SCANCODE_G, key::SCANCODE_F, key::SCANCODE_H, key::SCANCODE_R, key::SCANCODE_Y, key::SCANCODE_B);
 
-/*VisualEffect ve(600.0f, 400.0f, 0.0f, 0.0f, 50.0f,
+VisualEffect ve(600.0f, 400.0f, 0.0f, 0.0f, 50.0f,
 	new std::string[7] {
 		"assets\\expl1.png", "assets\\expl2.png",
 		"assets\\expl3.png", "assets\\expl4.png",
@@ -23,7 +24,7 @@ Keyset wasdqex(key::SCANCODE_W, key::SCANCODE_S, key::SCANCODE_A, key::SCANCODE_
 
 Entity eaccel = GObjFactory::createEntity(GObjFactory::ENEMY_1, 200.0f, 250.0f, -PI / 2.0f);
 Entity erotate = GObjFactory::createEntity(GObjFactory::ENEMY_2, 500.0f, 250.0f, 0);
-Entity enormal = GObjFactory::createEntity(GObjFactory::ENEMY_3, 800.0f, 250.0f, PI / 2.0f);*/
+Entity enormal = GObjFactory::createEntity(GObjFactory::ENEMY_3, 800.0f, 250.0f, PI / 2.0f);
 Entity eplayer = GObjFactory::createEntity(GObjFactory::PLAYER, 1000.0f, 250.0f, PI / 2.0f, PI/4.0f, wasdqex);
 // END TEST
 
@@ -38,25 +39,8 @@ void update(float ms)
 	case game_states::TEST: {
 		gd->game_state = ((game_states::MENU * graphics::getKeyState(graphics::scancode_t::SCANCODE_B)) + (gd->game_state * !graphics::getKeyState(graphics::scancode_t::SCANCODE_B)));
 
-		eplayer.update(ms);
-
-		gd->levels[gd->curr_selected_level].update(ms);
-		if (gd->levels[gd->curr_selected_level].can_spawn()) {
-			evec.push_back(&gd->levels[gd->curr_selected_level].spawn());
-		}
-
-		for (int i = 0; i < evec.size(); ++i)
-		{
-			evec[i]->update(ms);
-			if (evec[i]->hasFired())
-				pvec.push_back(&(evec[i]->getProjectile()));
-		}
-
-		for (int i = 0; i < pvec.size(); ++i)
-			pvec[i]->update(ms);
-		if (eplayer.hasFired())
-			pvec.push_back(&eplayer.getProjectile());
-
+		// ...
+		
 		break;
 	}
 	case game_states::LOAD: {
@@ -91,69 +75,41 @@ void update(float ms)
 
 		break;
 	}
-case game_states::GAME: {
-		//Because of the way C++ handles templates we can't define a list containing all the other lists
-		//without using dynamic_cast for every object, so we have to handle every list 'manually'
-
+	case game_states::GAME: {
+		
 	//update
-		for (Drawing* dr : gd->enemyLs) 
-			dr->update(ms);
-
-		for (Drawing* dr : gd->enemyProjLs)
-			dr->update(ms);
-
-		for (Drawing* dr : gd->playerProjLs)
-			dr->update(ms);
-
-		for (Drawing* dr : gd->effectsLs)
-			dr->update(ms);		
+		gd->update(ms, gd->enemyLs);
+		gd->update(ms, gd->enemyProjLs);
+		gd->update(ms, gd->playerLs);
+		gd->update(ms, gd->playerProjLs);
+		gd->update(ms, gd->effectsLs);
+		/*
+		gd->levels[gd->curr_selected_level].update(ms);
+		*/
 
 	//check collisions
-
-		//Enemy proj -> player
-		for (GameObject* en_proj : gd->enemyProjLs)
-			for (GameObject* player : gd->playerLs)
-				en_proj->collides(player);
-
-		//Player proj -> enemy
-		for (GameObject* pl_proj : gd->playerProjLs)
-			for (GameObject* enemy : gd->enemyLs)
-				pl_proj->collides(enemy);
-
-		//Enemy -> player (ram)
-		for (GameObject* player : gd->playerLs)
-			for (GameObject* enemy : gd->enemyLs)
-				player->collides(enemy);
+		gd->checkCollisions(gd->enemyProjLs, gd->playerLs);
+		gd->checkCollisions(gd->playerProjLs, gd->enemyLs);
+		gd->checkCollisions(gd->enemyLs, gd->playerLs);
 
 	//fire
-		for (Entity* player : gd->playerLs)
-			;//fire...		
-		for (Entity* enemy : gd->enemyLs)
-			;//fire...		<- common function?
+		gd->fire(gd->playerLs);
+		gd->fire(gd->enemyLs);
 
 	//spawn
-		//if (toBeSpawned()) gd->spawnNextEnemy
+		/*
+		if (gd->levels[gd->curr_selected_level].can_spawn()) {
+			// Level::spawn() returns a pointer to a new enemy
+			gd->enemyLs->push_back(&gd->levels[gd->curr_selected_level].spawn());
+		}
+		*/
 
 	//delete
-		for (Drawing* dr : gd->enemyLs)
-			if(!dr)
-				//remove obj from list
-				//delete			<- common function?
-
-		for (Drawing* dr : gd->enemyProjLs)
-			if (!dr)
-				//remove obj from list
-				//delete
-
-		for (Drawing* dr : gd->playerProjLs)
-			if (!dr)
-				//remove obj from list
-				//delete
-
-		for (Drawing* dr : gd->effectsLs)
-			if (!dr)
-				//remove obj from list
-				//delete
+		gd->checkAndDelete(gd->enemyLs);
+		gd->checkAndDelete(gd->enemyProjLs);
+		gd->checkAndDelete(gd->playerLs);
+		gd->checkAndDelete(gd->playerProjLs);
+		gd->checkAndDelete(gd->effectsLs);
 
 		break;
 	}
@@ -206,8 +162,10 @@ case game_states::GAME: {
 		break;
 	}
 	default: {
-		std::cerr << "Invalid game state" << std::endl;
-		gd->game_state = game_states::EXIT;
+		// instead of that, make the window show the invalid state
+
+		// std::cerr << "Invalid game state" << std::endl;
+		// gd->game_state = game_states::EXIT;
 	}
 	}
 }
@@ -223,11 +181,9 @@ void draw()
 	switch (gd->game_state)
 	{
 	case game_states::TEST: {
-		eplayer.draw();
-		for (int i = 0; i < evec.size(); ++i)
-			evec[i]->draw();
-		for (int i = 0; i < pvec.size(); ++i)
-			pvec[i]->draw();
+		
+		// ...
+		
 		break;
 	}
 	case game_states::LOAD: {
@@ -263,7 +219,12 @@ void draw()
 	}
 	case game_states::GAME: {
 
-		// ...
+	//draw
+		gd->draw(gd->enemyLs);
+		gd->draw(gd->enemyProjLs);
+		gd->draw(gd->playerLs);
+		gd->draw(gd->playerProjLs);
+		gd->draw(gd->effectsLs);
 
 		break;
 	}
@@ -349,7 +310,8 @@ void draw()
 		break;
 	}
 	default: {
-		std::cerr << "Invalid game state" << std::endl;
+		graphics::drawText(40 * CANVAS_WIDTH / 100, 1 * CANVAS_HEIGHT / 7, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 15, "Invalid game state", br);
+		graphics::drawText(20 * CANVAS_WIDTH / 100, 1 * CANVAS_HEIGHT / 7, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 15, "Please exit and inform the develompers", br);
 	}
 	}
 }
@@ -379,7 +341,7 @@ void initialize()
 
 	graphics::setUserData((void*)gd);
 
-	// load stuffx
+	// load stuff
 	if (!graphics::setFont(font))
 		std::cerr << "Unable to load font from: " << font << std::endl;
 
@@ -390,5 +352,5 @@ void initialize()
 }
 
 // nothing to see below here
-float canvas_width() { return CANVAS_WIDTH; }
-float canvas_height() { return CANVAS_HEIGHT; }
+float get_canvas_width() { return CANVAS_WIDTH; }
+float get_canvas_height() { return CANVAS_HEIGHT; }

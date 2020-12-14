@@ -1,16 +1,26 @@
 #include "game_data.h"
-#include <fstream>
-#include <regex>
 #include <iostream>
-#include "GObjFactory.h"
+#include <regex>
+#include <fstream>
 
-bool game_data::load_levels_from_file(const std::string& levels_path)
+GameData::GameData() : fps(0), game_state(0),
+	el(0.0f), sps(4.0f), curr_img(0), images(),
+	levels(), curr_active_level(-1), curr_selected_level(-1),
+	enemyLs(), playerLs(), enemyProjLs(), playerProjLs(), effectsLs()
 {
+	if (!load_levels_from_file(level_path))
+		std::cerr << "Unable to load levels from: " << level_path << std::endl;
+
+	// initialize other stuff ...
+}
+
+// doesn't work properly at the moment, it's just a template.
+// code should be added where there are '...'
+bool GameData::load_levels_from_file(const std::string& levels_path) {
 	// create stream to levels_path
 	std::ifstream in(levels_path);
 
-	if (!in)
-	{
+	if (!in) {
 		std::cerr << "Error opening file '" << levels_path << "'" << std::endl;
 		return false;
 	}
@@ -19,34 +29,26 @@ bool game_data::load_levels_from_file(const std::string& levels_path)
 	std::string contents((std::istreambuf_iterator<char>(in)), std::istreambuf_iterator<char>());
 	std::smatch match;
 
-	//0 straight enemies going down
-	std::string sr1("(\\d) ([\\w ]+)");
+	// regex pattern 1 ...
+	std::string sr1(".*");
 
-	//4, 3, 100.0, 50.0, PI
-	std::string sr2("(.+?), (\\d+), (.+?), (.+?), (.+)");
+	// regex objects ...
+	std::regex r1;
 
-	std::regex r1, r2;
-
-	int curr_level = 0, line = 0;
+	int curr_level = 0, curr_wave = 0, line = 0;
 
 	while (true)
 	{
+		// construct regexes ...
 		r1 = std::regex(std::to_string(line) + "   " + sr1);
-		r2 = std::regex(std::to_string(line) + "   " + sr2);
 
-		// new level
+		// match with 1st ...
 		if (std::regex_search(contents, match, r1))
 		{
-			curr_level = stoi(match[1].str());
-			this->levels[curr_level] = Level(curr_level, match[2].str());
+			// ...
 		}
-
-		// new enemy
-		else if (std::regex_search(contents, match, r2))
-		{
-			this->levels[curr_level].add_enemy(stof(match[1].str()), &GObjFactory::createEntity(stoi(match[2].str()), stof(match[3].str()), stof(match[4].str()), stof(match[5].str()) * PI / 180));
-		}
-
+		
+		// no match
 		else { break; }
 		++line;
 		contents = match.suffix();
@@ -54,6 +56,13 @@ bool game_data::load_levels_from_file(const std::string& levels_path)
 
 	// close stream
 	in.close();
-
 	return true;
+}
+
+GameData::~GameData() {
+	deleteList(playerLs);
+	deleteList(enemyLs);
+	deleteList(enemyProjLs);
+	deleteList(playerProjLs);
+	deleteList(effectsLs);
 }

@@ -9,7 +9,7 @@
 
 bool load_images_from_file(const std::string& image_path)
 {
-	game_data* gd = (game_data*)graphics::getUserData();
+	GameData* gd = reinterpret_cast<GameData*> (graphics::getUserData());
 
 	std::string temp_file_name = "_mytemp.txt";
 
