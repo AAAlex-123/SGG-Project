@@ -352,5 +352,5 @@ void initialize()
 }
 
 // nothing to see below here
-float canvas_width() { return CANVAS_WIDTH; }
-float canvas_height() { return CANVAS_HEIGHT; }
+float get_canvas_width() { return CANVAS_WIDTH; }
+float get_canvas_height() { return CANVAS_HEIGHT; }
