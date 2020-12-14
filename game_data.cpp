@@ -65,5 +65,4 @@ GameData::~GameData() {
 	deleteList(enemyProjLs);
 	deleteList(playerProjLs);
 	deleteList(effectsLs);
-	deleteList(enemyQueue);
 }
