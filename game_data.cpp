@@ -59,28 +59,10 @@ bool GameData::load_levels_from_file(const std::string& levels_path) {
 }
 
 GameData::~GameData() {
-	/* the code with the delete[]; delete, is the same as the snippet below :p
-	* 
-	*		int* pa = new int[3];
-	*		delete[] pa;
-	*		delete pa;
-	* 
-	* which doesn't work properly because you're deleting the same thing twice
-	* maybe you want
-	* 
-	*	for (acollection* : all collections) {
-	*		for  (Entity* en : acollection) {
-	*				delete en;
-	*		}
-	*		delete acollection
-	*	}
-	* 
-	* or something like that
-	*/
-	delete[] enemyLs;      delete enemyLs;
-	delete[] playerLs;     delete playerLs;
-	delete[] enemyProjLs;  delete enemyProjLs;
-	delete[] playerProjLs; delete playerProjLs;
-	delete[] effectsLs;    delete effectsLs;
-	delete[] enemyQueue;   delete enemyQueue;
+	deleteList(playerLs);
+	deleteList(enemyLs);
+	deleteList(enemyProjLs);
+	deleteList(playerProjLs);
+	deleteList(effectsLs);
+	deleteList(enemyQueue);
 }
