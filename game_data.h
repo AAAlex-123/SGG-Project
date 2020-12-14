@@ -17,9 +17,9 @@ private:
 
 public:
 	// collections
-	list<Entity*>* enemyLs, playerLs; //uniform access to either 1 or 2 players :(
-	list<Projectile*>* enemyProjLs, playerProjLs;
-	list<VisualEffect*>* effectsLs;
+	list<Entity*> *enemyLs, *playerLs; //uniform access to either 1 or 2 players :(
+	list<Projectile*> *enemyProjLs, *playerProjLs;
+	list<VisualEffect*> *effectsLs;
 
 	// general
 	int fps;
@@ -58,6 +58,9 @@ public:
 	//Checks if any object within the list must be destroyed, and deletes it. Template class must be derived from Drawing.
 	template <class T>
 	void checkAndDelete(list<T*>*);
+
+	template<class T>
+	void deleteList(list<T*>*);
 };
 
 // definition in the same file as declaration because c++ is awesome
@@ -87,7 +90,7 @@ void GameData::fire(list<T*>* ls) const {
 	bool isPlayer = false;
 	for (Entity* en : *ls) {
 
-		if (en->hasFired) {
+		if (en->hasFired()) {
 			//check if projectile was launched by a player
 			for (Entity* pl : *playerLs)
 				isPlayer |= pl == en;	// fancy
