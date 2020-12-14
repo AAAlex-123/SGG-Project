@@ -112,3 +112,10 @@ void GameData::checkAndDelete(list<T*>* ls) {
 		}
 	}
 }
+
+template<class T>
+void GameData::deleteList(list<T*>* ls) {
+	for (T* obj : *ls)
+		delete obj;
+	delete ls;
+}
