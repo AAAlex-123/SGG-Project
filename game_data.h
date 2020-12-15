@@ -66,7 +66,8 @@ public:
 	//Checks if any object within the list must be destroyed, and deletes it. Template class must be derived from Drawing.
 	template <class T>
 	void checkAndDelete(list<T*>*);
-
+	
+private:
 	template<class T>
 	void deleteList(list<T*>*);
 };
