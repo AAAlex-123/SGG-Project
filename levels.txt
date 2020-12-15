@@ -1,0 +1,17 @@
+// int level int enemies string description
+// nseconds, ntype, fx, fy, fangle
+0   0 straight enemies going down
+1   4, 3, 100.0, 50.0, 180.0
+2   6, 3, 300.0, 50.0, 180.0
+3   8, 3, 500.0, 50.0, 180.0
+4   10, 3, 700.0, 50.0, 180.0
+5   1 accel enemies going right
+6   3, 1, 100.0, 100.0, -90.0
+7   3, 1, 100.0, 200.0, -90.0
+8   3, 1, 100.0, 300.0, -90.0
+9   3, 1, 100.0, 400.0, -90.0
+10   2 rotating enemies going nowhere
+11   3, 2, 150.0, 300.0, 0
+12   4, 2, 450.0, 300.0, -90.0
+13   5, 2, 750.0, 300.0, 180.0
+14   6, 2, 1050.0, 300.0, 90
