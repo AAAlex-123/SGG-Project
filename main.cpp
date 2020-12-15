@@ -61,7 +61,7 @@ void update(float ms)
 		{
 			gd->game_state = game_states::GAME;
 
-			// ...
+			// other stuff to do when game starts ...
 
 		}
 
@@ -84,7 +84,7 @@ void update(float ms)
 		gd->update(ms, gd->playerProjLs);
 		gd->update(ms, gd->effectsLs);
 		/*
-		gd->levels[gd->curr_selected_level].update(ms);
+		gd->updateLevel(ms);
 		*/
 
 	//check collisions
@@ -98,10 +98,7 @@ void update(float ms)
 
 	//spawn
 		/*
-		if (gd->levels[gd->curr_selected_level].can_spawn()) {
-			// Level::spawn() returns a pointer to a new enemy
-			gd->enemyLs->push_back(&gd->levels[gd->curr_selected_level].spawn());
-		}
+		gd->spawn();
 		*/
 
 	//delete
@@ -162,10 +159,7 @@ void update(float ms)
 		break;
 	}
 	default: {
-		// instead of that, make the window show the invalid state
-
-		// std::cerr << "Invalid game state" << std::endl;
-		// gd->game_state = game_states::EXIT;
+		;
 	}
 	}
 }
@@ -219,7 +213,6 @@ void draw()
 	}
 	case game_states::GAME: {
 
-	//draw
 		gd->draw(gd->enemyLs);
 		gd->draw(gd->enemyProjLs);
 		gd->draw(gd->playerLs);
