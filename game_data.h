@@ -17,7 +17,7 @@ private:
 
 public:
 	// collections
-	list<Entity*> *enemyLs, *playerLs; //uniform access to either 1 or 2 players :(
+	list<Entity*> *enemyLs, *playerLs;
 	list<Projectile*> *enemyProjLs, *playerProjLs;
 	list<VisualEffect*> *effectsLs;
 
@@ -38,6 +38,14 @@ public:
 	// constructor and destructor because why not
 	GameData();
 	~GameData();
+	
+	// Level stuff
+	inline void updateLevel(float ms) { levels[curr_selected_level].update(ms); }
+	inline void spawn()
+	{
+		if (levels[curr_selected_level].can_spawn())
+			enemyLs->push_back(&(levels[curr_selected_level].spawn()));
+	}
 	
 	//Updates all objects within the list. Template class must be derived from Drawing.
 	template <class T>
