@@ -12,6 +12,31 @@ GameData::GameData() : fps(0), game_state(0),
 		std::cerr << "Unable to load levels from: " << level_path << std::endl;
 
 	// initialize other stuff ...
+
+	Spawnpoint* sp11 = new Spawnpoint(3, 100.0f, 150.0f, -PI / 2, 6.0f, 1.0f, 0.0f);
+	Spawnpoint* sp12 = new Spawnpoint(3, 100.0f, 300.0f, -PI / 2, 8.0f, 1.5f, 1.0f);
+	Spawnpoint* sp13 = new Spawnpoint(3, 100.0f, 450.0f, -PI / 2, 10.0f, 2.0f, 2.0f);
+
+	std::unordered_set<Spawnpoint*>* sps1 = new std::unordered_set<Spawnpoint*>;
+	sps1->insert(sp11);
+	sps1->insert(sp12);
+	sps1->insert(sp13);
+
+	Spawnpoint* sp21 = new Spawnpoint(2, 300.0f, 300.0f, 0.0f, 10.0f, 1.5f, 1.0f);
+	Spawnpoint* sp22 = new Spawnpoint(2, 600.0f, 300.0f, 0.0f, 10.0f, 3.0f, 1.0f);
+	Spawnpoint* sp23 = new Spawnpoint(2, 900.0f, 300.0f, 0.0f, 10.0f, 5.0f, 1.0f);
+
+	std::unordered_set<Spawnpoint*>* sps2 = new std::unordered_set<Spawnpoint*>;
+	sps2->insert(sp21);
+	sps2->insert(sp22);
+	sps2->insert(sp23);
+
+	Wave* w1 = new Wave(sps1);
+	Wave* w2 = new Wave(sps2);
+
+	levels[0] = new Level(1, "owo");
+	levels[0]->add_wave(5.0f, w2);
+	levels[0]->add_wave(10.0f, w1);
 }
 
 // doesn't work properly at the moment, it's just a template.
