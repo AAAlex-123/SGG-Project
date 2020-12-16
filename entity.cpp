@@ -15,7 +15,7 @@ bool Entity::hasFired() const {
 	return _hasFired;
 }
 
-Projectile& Entity::getProjectile() const {
+Projectile* Entity::getProjectile() const {
 	return GObjFactory::createProjectile(curr_projectile, x - (radius*sin(angle)), y - (radius*cos(angle)), angle);
 }
 
