@@ -1,73 +1,73 @@
 #pragma once
 #include "entity.h"
+#include <unordered_set>
 #include <queue>
+
+class Wave;
+class Spawnpoint;
 
 class Level
 {
 private:
-	class Wave;
-	int _id;
-	std::string _desc;
+	const int _id;
+	const std::string _desc;
 
-	std::queue<std::pair<float, Wave*>> waves;
+	std::queue<std::pair<float, Wave*>*>* waves;
 
 	float _total_time;
 
-	class Wave
-	{
-	private:
-		int _id;
-		std::string _desc;
-
-		std::queue<std::pair<float, Entity*>> enemies;
-
-		float _total_time;
-
-	public:
-		void update(float ms) { _total_time += (ms / 1000.0f); }
-		bool can_spawn()
-		{
-			if (enemies.empty())
-				return false;
-			return _total_time > enemies.front().first;
-		}
-
-		Entity& spawn()
-		{
-			Entity* return_value = enemies.front().second;
-			enemies.pop();
-			return *(return_value);
-		}
-
-		void add_enemy(float time, Entity* enemy) { enemies.push(std::pair<float, Entity*>(time, enemy)); }
-	};
-
 public:
-	// default constructor needed for some reason
-	Level(int = -1, std::string = "null descr");
+	Level(int, const std::string&);
 
-	void operator=(const Level& rhs);
-
-	void update(float ms) { _total_time += (ms / 1000.0f); waves.front().second->update(ms); }
-	bool can_spawn()
-	{
-		if (waves.empty())
-			return false;
-		return waves.front().second->can_spawn();
-	}
-
-	Entity& spawn()
-	{
-		Entity* return_value = &waves.front().second->spawn();
-		waves.pop();
-		return *(return_value);
-	}
-
-	void add_enemy(float time, Entity* enemy) { waves.back().second->add_enemy(time, enemy); }
+	void update(float ms);
+	bool can_spawn();
+	Entity* spawn();
+	void add_wave(float, Wave*);
 
 	int id() { return _id; }
 	std::string info() { return "level " + std::to_string(id()) + ": " + _desc; }
 	
-	// returns the string necessary to rebuild this level
+	std::string to_file_string();
+
+	~Level();
+};
+
+class Wave
+{
+private:
+	std::unordered_set<Spawnpoint*>* spawnpoints;
+	std::queue<Entity*>* enemy_queue;
+
+public:
+	Wave();
+	Wave(std::unordered_set<Spawnpoint*>* spawnpoints);
+
+	void update(float);
+
+	bool can_spawn();
+	Entity* spawn();
+	void add_spawnpoint(Spawnpoint*);
+
+	std::string to_file_string();
+
+	~Wave();
+};
+
+class Spawnpoint
+{
+private:
+	const int type;
+	const float x, y, angle;
+
+	const float _duration, _spawn_delta, _initial_delay;
+	float _total_time, _elapsed_time;
+
+public:
+	Spawnpoint(int type, float x, float y, float angle, float duration, float spawn_delta, float spawn_delay);
+
+	void update(float);
+	bool can_spawn();
+	Entity* spawn();
+
 	std::string to_file_string();
 };
