@@ -13,6 +13,7 @@ std::vector<GameObject*> govec;
 
 Keyset wasdqex(key::SCANCODE_W, key::SCANCODE_S, key::SCANCODE_A, key::SCANCODE_D, key::SCANCODE_Q, key::SCANCODE_E, key::SCANCODE_X);
 Keyset tfghryb(key::SCANCODE_T, key::SCANCODE_G, key::SCANCODE_F, key::SCANCODE_H, key::SCANCODE_R, key::SCANCODE_Y, key::SCANCODE_B);
+Entity* eplayer = GObjFactory::createEntity(GObjFactory::PLAYER, 1000.0f, 250.0f, PI / 2.0f, PI / 4.0f, wasdqex);
 
 VisualEffect ve(600.0f, 400.0f, 0.0f, 0.0f, 50.0f,
 	new std::string[7] {
@@ -25,7 +26,6 @@ VisualEffect ve(600.0f, 400.0f, 0.0f, 0.0f, 50.0f,
 Entity* eaccel = GObjFactory::createEntity(GObjFactory::ENEMY_1, 200.0f, 250.0f, -PI / 2.0f);
 Entity* erotate = GObjFactory::createEntity(GObjFactory::ENEMY_2, 500.0f, 250.0f, 0);
 Entity* enormal = GObjFactory::createEntity(GObjFactory::ENEMY_3, 800.0f, 250.0f, PI / 2.0f);
-Entity* eplayer = GObjFactory::createEntity(GObjFactory::PLAYER, 1000.0f, 250.0f, PI / 2.0f, PI/4.0f, wasdqex);
 // END TEST
 
 // sgg functions
@@ -41,6 +41,8 @@ void update(float ms)
 		// custom entity spawning
 
 		gd->curr_selected_level = 0;
+
+		gd->playerLs->push_back(eplayer);
 
 		// ...
 
