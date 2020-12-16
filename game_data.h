@@ -32,7 +32,7 @@ public:
 	std::vector<std::string> images;
 
 	// levels
-	std::unordered_map<int, Level> levels;
+	std::unordered_map<int, Level*> levels;
 	int curr_active_level, curr_selected_level;
 	
 	// constructor and destructor because why not
@@ -40,11 +40,11 @@ public:
 	~GameData();
 	
 	// Level stuff
-	inline void updateLevel(float ms) { levels[curr_selected_level].update(ms); }
+	inline void updateLevel(float ms) { levels[curr_selected_level]->update(ms); }
 	inline void spawn()
 	{
-		if (levels[curr_selected_level].can_spawn())
-			enemyLs->push_back(&(levels[curr_selected_level].spawn()));
+		if (levels[curr_selected_level]->can_spawn())
+			enemyLs->push_back(levels[curr_selected_level]->spawn());
 	}
 	
 	//Updates all objects within the list. Template class must be derived from Drawing.
@@ -116,10 +116,14 @@ void GameData::fire(list<T*>* ls) const {
 template <class T>
 void GameData::checkAndDelete(list<T*>* ls) {
 	for (auto iter = ls->begin(); iter != ls->end(); ++iter) {
-		if (!*iter) {
-			delete *iter;
+		if (!**iter) {
+			delete* iter;
 			iter = ls->erase(iter);
 		}
+		// if the last item is deleted, `iter == ls->end()`
+		// so `++iter` increments the end iterator before checking the `for` condition
+		if (iter == ls->end())
+			break;
 	}
 }
 
