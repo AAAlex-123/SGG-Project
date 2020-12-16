@@ -22,10 +22,10 @@ VisualEffect ve(600.0f, 400.0f, 0.0f, 0.0f, 50.0f,
 		"assets\\expl7.png",
 	}, 7, 20.0f, 10.f);
 
-Entity eaccel = GObjFactory::createEntity(GObjFactory::ENEMY_1, 200.0f, 250.0f, -PI / 2.0f);
-Entity erotate = GObjFactory::createEntity(GObjFactory::ENEMY_2, 500.0f, 250.0f, 0);
-Entity enormal = GObjFactory::createEntity(GObjFactory::ENEMY_3, 800.0f, 250.0f, PI / 2.0f);
-Entity eplayer = GObjFactory::createEntity(GObjFactory::PLAYER, 1000.0f, 250.0f, PI / 2.0f, PI/4.0f, wasdqex);
+Entity* eaccel = GObjFactory::createEntity(GObjFactory::ENEMY_1, 200.0f, 250.0f, -PI / 2.0f);
+Entity* erotate = GObjFactory::createEntity(GObjFactory::ENEMY_2, 500.0f, 250.0f, 0);
+Entity* enormal = GObjFactory::createEntity(GObjFactory::ENEMY_3, 800.0f, 250.0f, PI / 2.0f);
+Entity* eplayer = GObjFactory::createEntity(GObjFactory::PLAYER, 1000.0f, 250.0f, PI / 2.0f, PI/4.0f, wasdqex);
 // END TEST
 
 // sgg functions
@@ -37,9 +37,15 @@ void update(float ms)
 	switch (gd->game_state)
 	{
 	case game_states::TEST: {
-		gd->game_state = ((game_states::MENU * graphics::getKeyState(graphics::scancode_t::SCANCODE_B)) + (gd->game_state * !graphics::getKeyState(graphics::scancode_t::SCANCODE_B)));
+		
+		// custom entity spawning
+
+		gd->curr_selected_level = 0;
 
 		// ...
+
+
+		gd->game_state = game_states::GAME;
 		
 		break;
 	}
@@ -61,7 +67,7 @@ void update(float ms)
 		{
 			gd->game_state = game_states::GAME;
 
-			// other stuff to do when game starts ...
+			// stuff to do when game starts ...
 
 		}
 
@@ -83,9 +89,9 @@ void update(float ms)
 		gd->update(ms, gd->playerLs);
 		gd->update(ms, gd->playerProjLs);
 		gd->update(ms, gd->effectsLs);
-		/*
+		
 		gd->updateLevel(ms);
-		*/
+		
 
 	//check collisions
 		gd->checkCollisions(gd->enemyProjLs, gd->playerLs);
@@ -97,9 +103,8 @@ void update(float ms)
 		gd->fire(gd->enemyLs);
 
 	//spawn
-		/*
 		gd->spawn();
-		*/
+		
 
 	//delete
 		gd->checkAndDelete(gd->enemyLs);
@@ -256,13 +261,13 @@ void draw()
 
 		for (int i = 0; i < gd->levels.size(); ++i)
 		{
-			if (gd->curr_selected_level == gd->levels[i].id())
+			if (gd->curr_selected_level == gd->levels[i]->id())
 				setColor(br, 'O');
-			else if (gd->curr_active_level == gd->levels[i].id())
+			else if (gd->curr_active_level == gd->levels[i]->id())
 				setColor(br, new float[3]{ 1.0f, 1.0f, 1.0f });
 			else
 				setColor(br, new float[3]{ 0.0f, 0.0f, 0.0f });
-			graphics::drawText(CANVAS_WIDTH / 20, (2.5f + 0.5f * i) * CANVAS_HEIGHT / 10, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 28, gd->levels[i].info(), br);
+			graphics::drawText(CANVAS_WIDTH / 20, (2.5f + 0.5f * i) * CANVAS_HEIGHT / 10, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 28, gd->levels[i]->info(), br);
 		}
 
 		break;
@@ -330,7 +335,7 @@ int main(int argc, char** argv)
 void initialize()
 {
 	GameData* gd = new GameData();
-	gd->game_state = game_states::LOAD;
+	gd->game_state = game_states::MENU;
 
 	graphics::setUserData((void*)gd);
 
