@@ -20,7 +20,7 @@ public:
 	bool hasFired() const;
 
 	// Returns a projectile of type `curr_projectile` using the friend GObjFactory class
-	Projectile& getProjectile() const;
+	Projectile* getProjectile() const;
 
 	// Changes the projectile type
 	void setProjectile(int proj_type);

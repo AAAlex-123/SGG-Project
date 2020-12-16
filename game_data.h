@@ -105,9 +105,9 @@ void GameData::fire(list<T*>* ls) const {
 				isPlayer |= pl == en;	// fancy
 
 			if (isPlayer) {
-				playerProjLs->push_back(&en->getProjectile());
+				playerProjLs->push_back(en->getProjectile());
 			} else {
-				enemyProjLs->push_back(&en->getProjectile());
+				enemyProjLs->push_back(en->getProjectile());
 			}
 		}
 	}
