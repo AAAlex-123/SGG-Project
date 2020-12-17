@@ -1,9 +1,10 @@
 #include "gameobject.h"
 #include "globals.h"
+#include "game_data.h"
 
-GameObject::GameObject(float xpos, float ypos, float angle, float vel, float radius, const std::string* sprites, Path* p, int damage, int health) :
-	Drawing(xpos, ypos, angle, vel, radius, sprites, p),
-	damage(damage), health(health)
+GameObject::GameObject(float xpos, float ypos, float angle, float vel, float width,float height, const std::string* sprites, Path* p, int damage, int health,int score) :
+	Drawing(xpos, ypos, angle, vel, (width+height)/2, sprites, p),
+	damage(damage), health(health),score(score)
 {}
 
 void GameObject::hit(const GameObject& o2) {
@@ -25,4 +26,10 @@ GameObject::operator bool() const {
 	return (this->x < get_canvas_width() && this->x > 0 && this->y < get_canvas_height() && this->y > 0) && (this->health > 0);
 }
 
-GameObject::~GameObject() {}
+GameObject::~GameObject() {
+	if (health <= 0 && score>0) { //ignore redundant 'score += 0' calls
+		GameData* gd = reinterpret_cast<GameData*>(graphics::getUserData());
+		gd->addScore(score);
+	}
+		
+}
