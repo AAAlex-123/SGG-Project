@@ -5,6 +5,7 @@
 class GameObject : public Drawing{
 protected:
 	const int damage,score;
+	const float radius;
 	int health;
 	void hit(const GameObject& o2);
 
