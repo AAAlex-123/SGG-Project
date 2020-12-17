@@ -117,13 +117,13 @@ template <class T>
 void GameData::checkAndDelete(list<T*>* ls) {
 	for (auto iter = ls->begin(); iter != ls->end(); ++iter) {
 		if (!**iter) {
-			delete* iter;
+			delete (*iter);
 			iter = ls->erase(iter);
+			// if the last item is deleted, `iter == ls->end()`
+			// so `++iter` increments the end iterator before checking the `for` condition
+			if (iter == ls->end())
+				break;
 		}
-		// if the last item is deleted, `iter == ls->end()`
-		// so `++iter` increments the end iterator before checking the `for` condition
-		if (iter == ls->end())
-			break;
 	}
 }
 
