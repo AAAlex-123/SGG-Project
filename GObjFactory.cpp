@@ -1,37 +1,36 @@
 #include "GObjFactory.h"
 #include "Path.h"
+#include "globals.h"
 #include <iostream>
 
 using namespace std;
 
-const string GObjFactory::asset_path = "assets\\";
-
 Entity* GObjFactory::createPlayer(float x, float y, float angle, float dangle, Keyset keyset) {
-	return new Entity(x, y, angle, (float)std_speed * 5, (float)std_size * 3, new string(asset_path + "player1.png"), new KeyboardPath(dangle, keyset), 5, 1, GObjFactory::STANDARD_BULLET);
+	return new Entity(x, y, angle, std_speed / 2, (float)zep_width, (float)zep_height, new string(asset_path + "player1.png"), new KeyboardPath(dangle, keyset), 5, 1, 0, GObjFactory::STANDARD_BULLET);
 }
 
 Entity* GObjFactory::createEnemy1(float x,float y,float angle) {
-	return new Entity(x, y, angle, std_speed, std_size, new string(asset_path + "plane1.png"), new FiringPath(0.5f, new AcceleratingPath(150.0f, new Path())), 5, 1, GObjFactory::STANDARD_BULLET);
+	return new Entity(x, y, angle, std_speed, plane_size, plane_size, new string(asset_path + "plane1.png"), new FiringPath(0.5f, new AcceleratingPath(150.0f, new Path())), 5, 1, 100,GObjFactory::STANDARD_BULLET);
 }
 
 Entity* GObjFactory::createEnemy2(float x, float y, float angle) {
-	return new Entity(x, y, angle, std_speed, std_size, new string(asset_path + "plane2.png"), new FiringPath(1.0f, new RotatingPath(1.0f / 4, new Path())), 5, 1, GObjFactory::INCEND_BULLET);
+	return new Entity(x, y, angle, std_speed, plane_size, plane_size, new string(asset_path + "plane2.png"), new FiringPath(1.0f, new RotatingPath(1.0f / 4, new Path())), 5, 1, 150, GObjFactory::INCEND_BULLET);
 }
 
 Entity* GObjFactory::createEnemy3(float x, float y, float angle) {
-	return new Entity(x, y, angle, std_speed, std_size, new string(asset_path + "plane3.png"), new FiringPath(1.0f, new Path()), 5, 1, GObjFactory::LIGHT_BULLET);
+	return new Entity(x, y, angle, std_speed / 2, zep_width, zep_height, new string(asset_path + "plane3.png"), new FiringPath(1.0f, new Path()), 5, 1, 400, GObjFactory::LIGHT_BULLET);
 }
 
 Projectile* GObjFactory::createStdB(float x, float y, float angle) {
-	return new Projectile(x, y, angle, std_speed * 2, (float)std_size / 2, new string(asset_path + "bullet1.png"), new AcceleratingPath(50.0f, new Path()), 2);
+	return new Projectile(x, y, angle, std_speed * 2, (float)proj_size, new string(asset_path + "bullet1.png"), new AcceleratingPath(50.0f, new Path()), 2);
 }
 
 Projectile* GObjFactory::createLB(float x, float y, float angle) {
-	return new Projectile(x, y, angle, std_speed * 3, (float)std_size / 2, new string(asset_path + "bullet2.png"), new AcceleratingPath(50.0f, new Path()), 1);
+	return new Projectile(x, y, angle, std_speed * 3, (float)proj_size, new string(asset_path + "bullet2.png"), new AcceleratingPath(50.0f, new Path()), 1);
 }
 
 Projectile* GObjFactory::createIncB(float x, float y, float angle) {
-	return new Projectile(x, y, angle, std_speed * 2, (float)std_size / 2, new string(asset_path + "bullet3.png"), new AcceleratingPath(50.0f, new Path()), 4);
+	return new Projectile(x, y, angle, std_speed * 2, (float)proj_size, new string(asset_path + "bullet3.png"), new AcceleratingPath(50.0f, new Path()), 4);
 }
 
 Entity* GObjFactory::createEntity(int type, float x, float y, float angle, float dangle, Keyset keyset) {
