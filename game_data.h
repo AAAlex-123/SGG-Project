@@ -12,7 +12,7 @@ using namespace std;
 struct GameData {
 private:
 	template<class T>
-	void deleteList(list<T*>*);
+	void static deleteList(list<T*>*);
 	bool load_levels_from_file(const string& filename);
 	int score;
 
@@ -50,15 +50,15 @@ public:
 	
 	//Updates all objects within the list. Template class must be derived from Drawing.
 	template <class T>
-	void update(float ms, list<T*>*);
+	static void update(float ms, list<T*>*);
 	
 	// Draws all objects within the list. Template class must be derived from Drawing.
 	template <class T>
-	void draw(list<T*>* ls);
+	static void draw(list<T*>* ls);
 
 	//Checks collisions between 2 lists. Template classes must both be derived from GameObject.
 	template <class T1,class T2>
-	void checkCollisions(list<T1*>*, list<T2*>*);
+	static void checkCollisions(list<T1*>*, list<T2*>*);
 
 	//Spawns a projectile for every eligible object in the list. Template class must be derived from Entity.
 	template <class T>
@@ -66,7 +66,7 @@ public:
 
 	//Checks if any object within the list must be destroyed, and deletes it. Template class must be derived from Drawing.
 	template <class T>
-	void checkAndDelete(list<T*>*);
+	static void checkAndDelete(list<T*>*);
 	
 	void addScore(int scored) {
 			score += scored;
