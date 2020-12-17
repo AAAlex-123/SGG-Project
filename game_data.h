@@ -3,9 +3,7 @@
 #include "entity.h"
 #include "visual_effect.h"
 #include "level.h"
-#include "constants.h"
 #include <list>
-#include <vector>
 #include <unordered_map>
 
 // lmao imagine using using
@@ -13,7 +11,10 @@ using namespace std;
 
 struct GameData {
 private:
-	bool load_levels_from_file(const std::string& levels_path);
+	template<class T>
+	void deleteList(list<T*>*);
+	bool load_levels_from_file(const string& filename);
+	int score;
 
 public:
 	// collections
@@ -67,9 +68,14 @@ public:
 	template <class T>
 	void checkAndDelete(list<T*>*);
 	
-private:
-	template<class T>
-	void deleteList(list<T*>*);
+	void addScore(int scored) {
+			score += scored;
+	}
+
+	int getScore() {
+		return score;
+	}
+
 };
 
 // definition in the same file as declaration because c++ is awesome
