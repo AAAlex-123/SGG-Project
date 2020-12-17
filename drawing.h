@@ -13,13 +13,13 @@ protected:
 	const std::string* const sprites;
 
 	float x, y, angle, vel;	// angle is measured in radiants and not in degrees
-	const float radius;
+	const float width, height;
 	int curr_sprite;
 
-	Path* movement;
+	Path* movement; //movement across the screen
 
 public:
-	Drawing(float xpos, float ypos, float angle, float vel, float radius, const std::string* sprites, Path*);
+	Drawing(float xpos, float ypos, float angle, float vel, float width,float height, const std::string* sprites, Path*);
 
 	// Updates the entities state (movement etc.)
 	virtual void update(float) = 0;
