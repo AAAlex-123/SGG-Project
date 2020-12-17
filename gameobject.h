@@ -4,12 +4,12 @@
 // Superclass for all interactive objects in the game
 class GameObject : public Drawing{
 protected:
-	const int damage;
+	const int damage,score;
 	int health;
 	void hit(const GameObject& o2);
 
 public:
-	GameObject(float xpos, float ypos, float angle, float vel, float radius, const std::string* sprites, Path*, int damage, int health);
+	GameObject(float xpos, float ypos, float angle, float vel, float width,float height, const std::string* sprites, Path*, int damage, int health, int score);
 
 	// Routine called by the update() main function; updated the object's state
 	virtual void update(float ms) override;
