@@ -3,10 +3,15 @@
 #include "projectile.h"
 #include "globals.h"
 
+//See "entity.h" for why the factory pattern was neccesary here
+
+//A Factory class that's used to assemble and produce all game objects in the game.
 class GObjFactory {
 private:
-	const static std::string asset_path;
-	const static int std_size = 30;
+	const static int plane_size = 46;
+	const static int zep_width = 20;
+	const static int zep_height = 43;
+	const static int proj_size = 20;
 	const static int std_speed = 120;
   
 	static Entity* createEnemy1(float x, float y, float angle);
