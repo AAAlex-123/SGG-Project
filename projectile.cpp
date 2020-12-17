@@ -1,7 +1,7 @@
 #include "projectile.h"
 
 Projectile::Projectile(float xpos, float ypos, float angle, float vel, float radius, std::string* sprites, Path* p, int damage) :
-	GameObject(xpos, ypos, angle, vel, radius, sprites, p, damage, 1)
+	GameObject(xpos, ypos, angle, vel, radius,radius, sprites, p, damage, 1,0) //width == height -> square
 {}
 
 void Projectile::update(float ms){
