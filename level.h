@@ -46,12 +46,14 @@ public:
 class Wave
 {
 private:
+	const std::string _desc;
+
 	std::unordered_set<Spawnpoint*>* spawnpoints;
 	// queue of enemies to be spawned (look at Wave::update() for why it is a queue)
 	std::queue<Entity*>* enemy_queue;
 
 public:
-	Wave();
+	Wave(const std::string&);
 
 	// update the spawnpoints' timer, add new enemies to enemy_queue
 	void update(float);
@@ -62,6 +64,7 @@ public:
 	void add_spawnpoint(Spawnpoint*);
 
 	// false if no spawnpoint has any enemies left
+	// false if it shouldn't be here
 	operator bool() const;
 
 	// (wip) returns the string necessary to rebuild the wave
