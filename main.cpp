@@ -38,16 +38,12 @@ void update(float ms)
 	{
 	case game_states::TEST: {
 		
-		// custom entity spawning
+		// apply custom settings
 
-		gd->curr_selected_level = 0;
-
-		gd->playerLs->push_back(eplayer);
-
-		// ...
+		gd->curr_selected_level = -2;
 
 
-		gd->game_state = game_states::GAME;
+		gd->game_state = game_states::MENU;
 		
 		break;
 	}
@@ -70,7 +66,8 @@ void update(float ms)
 			gd->game_state = game_states::GAME;
 
 			// stuff to do when game starts ...
-
+			gd->playerLs->push_back(eplayer);
+			break;
 		}
 
 		gd->game_state = ((game_states::OPTIONS * graphics::getKeyState(graphics::scancode_t::SCANCODE_O)) + (gd->game_state * !graphics::getKeyState(graphics::scancode_t::SCANCODE_O)));
@@ -84,6 +81,9 @@ void update(float ms)
 		break;
 	}
 	case game_states::GAME: {
+		// temp
+		gd->game_state = ((game_states::OPTIONS * graphics::getKeyState(graphics::scancode_t::SCANCODE_B)) + (gd->game_state * !graphics::getKeyState(graphics::scancode_t::SCANCODE_B)));
+
 		
 	//update
 		gd->update(ms, gd->enemyLs);
@@ -107,7 +107,6 @@ void update(float ms)
 	//spawn
 		gd->spawn();
 		
-
 	//delete
 		gd->checkAndDelete(gd->enemyLs);
 		gd->checkAndDelete(gd->enemyProjLs);
@@ -137,16 +136,16 @@ void update(float ms)
 		gd->game_state = ((game_states::OPTIONS * graphics::getKeyState(graphics::scancode_t::SCANCODE_B)) + (gd->game_state * !graphics::getKeyState(graphics::scancode_t::SCANCODE_B)));
 
 
-		gd->curr_active_level = (0 * graphics::getKeyState(graphics::scancode_t::SCANCODE_0)) + (gd->curr_active_level * !graphics::getKeyState(graphics::scancode_t::SCANCODE_0));
-		gd->curr_active_level = (1 * graphics::getKeyState(graphics::scancode_t::SCANCODE_1)) + (gd->curr_active_level * !graphics::getKeyState(graphics::scancode_t::SCANCODE_1));
-		gd->curr_active_level = (2 * graphics::getKeyState(graphics::scancode_t::SCANCODE_2)) + (gd->curr_active_level * !graphics::getKeyState(graphics::scancode_t::SCANCODE_2));
-		gd->curr_active_level = (3 * graphics::getKeyState(graphics::scancode_t::SCANCODE_3)) + (gd->curr_active_level * !graphics::getKeyState(graphics::scancode_t::SCANCODE_3));
-		gd->curr_active_level = (4 * graphics::getKeyState(graphics::scancode_t::SCANCODE_4)) + (gd->curr_active_level * !graphics::getKeyState(graphics::scancode_t::SCANCODE_4));
-		gd->curr_active_level = (5 * graphics::getKeyState(graphics::scancode_t::SCANCODE_5)) + (gd->curr_active_level * !graphics::getKeyState(graphics::scancode_t::SCANCODE_5));
-		gd->curr_active_level = (6 * graphics::getKeyState(graphics::scancode_t::SCANCODE_6)) + (gd->curr_active_level * !graphics::getKeyState(graphics::scancode_t::SCANCODE_6));
-		gd->curr_active_level = (7 * graphics::getKeyState(graphics::scancode_t::SCANCODE_7)) + (gd->curr_active_level * !graphics::getKeyState(graphics::scancode_t::SCANCODE_7));
-		gd->curr_active_level = (8 * graphics::getKeyState(graphics::scancode_t::SCANCODE_8)) + (gd->curr_active_level * !graphics::getKeyState(graphics::scancode_t::SCANCODE_8));
-		gd->curr_active_level = (9 * graphics::getKeyState(graphics::scancode_t::SCANCODE_9)) + (gd->curr_active_level * !graphics::getKeyState(graphics::scancode_t::SCANCODE_9));
+		gd->curr_active_level = (0 * (graphics::getKeyState(graphics::scancode_t::SCANCODE_0) && gd->levels[0])) + (gd->curr_active_level * !(graphics::getKeyState(graphics::scancode_t::SCANCODE_0) && gd->levels[0]));
+		gd->curr_active_level = (1 * (graphics::getKeyState(graphics::scancode_t::SCANCODE_1) && gd->levels[1])) + (gd->curr_active_level * !(graphics::getKeyState(graphics::scancode_t::SCANCODE_1) && gd->levels[1]));
+		gd->curr_active_level = (2 * (graphics::getKeyState(graphics::scancode_t::SCANCODE_2) && gd->levels[2])) + (gd->curr_active_level * !(graphics::getKeyState(graphics::scancode_t::SCANCODE_2) && gd->levels[2]));
+		gd->curr_active_level = (3 * (graphics::getKeyState(graphics::scancode_t::SCANCODE_3) && gd->levels[3])) + (gd->curr_active_level * !(graphics::getKeyState(graphics::scancode_t::SCANCODE_3) && gd->levels[3]));
+		gd->curr_active_level = (4 * (graphics::getKeyState(graphics::scancode_t::SCANCODE_4) && gd->levels[4])) + (gd->curr_active_level * !(graphics::getKeyState(graphics::scancode_t::SCANCODE_4) && gd->levels[4]));
+		gd->curr_active_level = (5 * (graphics::getKeyState(graphics::scancode_t::SCANCODE_5) && gd->levels[5])) + (gd->curr_active_level * !(graphics::getKeyState(graphics::scancode_t::SCANCODE_5) && gd->levels[5]));
+		gd->curr_active_level = (6 * (graphics::getKeyState(graphics::scancode_t::SCANCODE_6) && gd->levels[6])) + (gd->curr_active_level * !(graphics::getKeyState(graphics::scancode_t::SCANCODE_6) && gd->levels[6]));
+		gd->curr_active_level = (7 * (graphics::getKeyState(graphics::scancode_t::SCANCODE_7) && gd->levels[7])) + (gd->curr_active_level * !(graphics::getKeyState(graphics::scancode_t::SCANCODE_7) && gd->levels[7]));
+		gd->curr_active_level = (8 * (graphics::getKeyState(graphics::scancode_t::SCANCODE_8) && gd->levels[8])) + (gd->curr_active_level * !(graphics::getKeyState(graphics::scancode_t::SCANCODE_8) && gd->levels[8]));
+		gd->curr_active_level = (9 * (graphics::getKeyState(graphics::scancode_t::SCANCODE_9) && gd->levels[9])) + (gd->curr_active_level * !(graphics::getKeyState(graphics::scancode_t::SCANCODE_9) && gd->levels[9]));
 
 		gd->curr_selected_level = (gd->curr_active_level * graphics::getKeyState(graphics::scancode_t::SCANCODE_S)) + (gd->curr_selected_level * !graphics::getKeyState(graphics::scancode_t::SCANCODE_S));
 
@@ -261,15 +260,19 @@ void draw()
 			? graphics::drawText(CANVAS_WIDTH / 11, 1.7f * CANVAS_HEIGHT / 10, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 20, "use  the  numbers  to  select  a  track", br)
 			: graphics::drawText(CANVAS_WIDTH / 8, 1.7f * CANVAS_HEIGHT / 10, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 30, "Select  this  track  or  Deselect  all  tracks", br);
 
-		for (int i = 0; i < gd->levels.size(); ++i)
+		int display_height_index = -1;	// -1 because prefix ++ is cooler
+		for (int i = 0; i < 10; ++i)
 		{
-			if (gd->curr_selected_level == gd->levels[i]->id())
-				setColor(br, 'O');
-			else if (gd->curr_active_level == gd->levels[i]->id())
-				setColor(br, new float[3]{ 1.0f, 1.0f, 1.0f });
-			else
-				setColor(br, new float[3]{ 0.0f, 0.0f, 0.0f });
-			graphics::drawText(CANVAS_WIDTH / 20, (2.5f + 0.5f * i) * CANVAS_HEIGHT / 10, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 28, gd->levels[i]->info(), br);
+			if (gd->levels[i])
+			{
+				if (gd->curr_selected_level == gd->levels[i]->id())
+					setColor(br, 'O');
+				else if (gd->curr_active_level == gd->levels[i]->id())
+					setColor(br, new float[3]{ 1.0f, 1.0f, 1.0f });
+				else
+					setColor(br, new float[3]{ 0.0f, 0.0f, 0.0f });
+				graphics::drawText(CANVAS_WIDTH / 20, (2.5f + 0.5f * ++display_height_index) * CANVAS_HEIGHT / 10, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 28, gd->levels[i]->info(), br);
+			}
 		}
 
 		break;
