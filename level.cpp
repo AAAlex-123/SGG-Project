@@ -7,7 +7,16 @@
 Level::Level(int id, const std::string& desc)
 	: _id(id), _desc(desc), waves(new std::unordered_set<std::pair<float, Wave*>*>),
 	enemy_queue(new std::queue<Entity*>), _total_time(0.0f)
-{}
+{
+	if (id == -1)
+	{
+		std::cerr << "Error: invalid level id" << std::endl;
+	}
+	else if (id < 0 || id > 9)
+	{
+		std::cerr << "Warning: level id out of bounds; players won't be able to select this level" << std::endl;
+	}
+}
 
 void Level::update(float ms)
 {
@@ -78,8 +87,8 @@ Level::~Level()
 
 // ===== WAVE =====
 
-Wave::Wave()
-	: spawnpoints(new std::unordered_set<Spawnpoint*>), enemy_queue(new std::queue<Entity*>)
+Wave::Wave(const std::string& desc)
+	: _desc(desc), spawnpoints(new std::unordered_set<Spawnpoint*>), enemy_queue(new std::queue<Entity*>)
 {}
 
 void Wave::update(float ms)
