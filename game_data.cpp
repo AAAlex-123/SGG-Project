@@ -17,7 +17,7 @@ GameData::GameData() : fps(0), game_state(0),
 	if (!load_levels_from_file(level_path, wave_path))
 	{
 		std::cerr << "Warning: Level loading from files failed, loading hardcoded levels..." << level_path << std::endl;
-		load_hardcoded_levels();
+		_load_hardcoded_levels();
 	}
 
 	// initialize other stuff ...
@@ -128,7 +128,7 @@ bool GameData::_load_levels_from_file(const std::string& wave_path)
 	return true;
 }
 
-void GameData::load_hardcoded_levels()
+void GameData::_load_hardcoded_levels()
 {
 	Spawnpoint* sp11 = new Spawnpoint(3, 100.0f, 150.0f, -PI / 2, 10, 1.0f, 0.0f);
 
