@@ -3,7 +3,9 @@
 #include "entity.h"
 #include "visual_effect.h"
 #include "level.h"
+#include "globals.h"
 #include <list>
+#include <vector>
 #include <unordered_map>
 
 // lmao imagine using using
@@ -13,7 +15,11 @@ struct GameData {
 private:
 	template<class T>
 	void static deleteList(list<T*>*);
-	bool load_levels_from_file(const string& filename);
+	bool load_levels_from_file(const std::string& level_path, const std::string& wave_path);
+	bool _load_waves_from_file(const std::string& wave_path);
+	bool _load_levels_from_file(const std::string& wave_path);
+	// callback in case reading from file fails
+	void _load_hardcoded_levels();
 	int score;
 
 public:
@@ -34,6 +40,7 @@ public:
 
 	// levels
 	std::unordered_map<int, Level*> levels;
+	std::unordered_map<const std::string&, Wave*> _waves;
 	int curr_active_level, curr_selected_level;
 	
 	// constructor and destructor because why not
