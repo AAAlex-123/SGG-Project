@@ -2,9 +2,9 @@
 #include "globals.h"
 #include "game_data.h"
 
-GameObject::GameObject(float xpos, float ypos, float angle, float vel, float width,float height, const std::string* sprites, Path* p, int damage, int health,int score) :
+GameObject::GameObject(float xpos, float ypos, float angle, float vel, float width, float height, const std::string* sprites, Path* p, int damage, int health,int score) :
 	Drawing(xpos, ypos, angle, vel, width, height, sprites, p),
-	damage(damage), health(health),score(score), radius((width+height)/2)
+	damage(damage), health(health),score(score), radius(std::min(width, height) / 2)
 {}
 
 void GameObject::hit(const GameObject& o2) {
