@@ -78,7 +78,7 @@ class Spawnpoint
 private:
 	// enemy parameters
 	const int type;
-	const float x, y, angle;
+	const float perc_x, perc_y, angle;
 
 	// spawnpoint parameters
 	const float _spawn_delta;
@@ -86,7 +86,7 @@ private:
 	float _initial_delay, _elapsed_time;
 
 public:
-	Spawnpoint(int type, float x, float y, float angle, int amount, float spawn_delta, float initial_delay);
+	Spawnpoint(int type, float perc_x, float perc_y, float angle, int amount, float spawn_delta, float initial_delay);
 
 	void update(float);
 	bool can_spawn();
