@@ -1,5 +1,6 @@
 #include "level.h"
 #include "GObjFactory.h"
+#include "globals.h""
 #include <iostream>
 
 // ===== LEVEL =====
@@ -155,8 +156,8 @@ Wave::~Wave()
 
 // ===== SPAWNPOINT =====
 
-Spawnpoint::Spawnpoint(int type, float x, float y, float angle, int amount, float spawn_delta, float initial_delay)
-	: type(type), x(x), y(y), angle(angle), _spawn_delta(spawn_delta), _amount(amount), _initial_delay(initial_delay), _elapsed_time(spawn_delta - 0.1f)
+Spawnpoint::Spawnpoint(int type, float perc_x, float perc_y, float angle, int amount, float spawn_delta, float initial_delay)
+	: type(type), perc_x(perc_x), perc_y(perc_y), angle(angle), _spawn_delta(spawn_delta), _amount(amount), _initial_delay(initial_delay), _elapsed_time(spawn_delta - 0.1f)
 {}
 
 void Spawnpoint::update(float ms)
@@ -180,7 +181,7 @@ bool Spawnpoint::can_spawn()
 Entity* Spawnpoint::spawn()
 {
 	--_amount;
-	return GObjFactory::createEntity(type, x, y, angle);
+	return GObjFactory::createEntity(type, get_canvas_width() * perc_x, get_canvas_height() * perc_y, angle);
 }
 
 Spawnpoint::operator bool() const
