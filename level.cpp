@@ -115,12 +115,12 @@ void Wave::add_spawnpoint(Spawnpoint* s)
 
 Wave::operator bool() const
 {
-	bool res;
+	bool res = false;
 	for (Spawnpoint* sp : *spawnpoints)
 	{
 		res |= *sp;
 	}
-	return !res;
+	return res;
 }
 
 std::string Wave::to_file_string()
@@ -176,7 +176,7 @@ Entity* Spawnpoint::spawn()
 
 Spawnpoint::operator bool() const
 {
-	return _amount <= 0;
+	return _amount > 0;
 }
 
 std::string Spawnpoint::to_file_string()
