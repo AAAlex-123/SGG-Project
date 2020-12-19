@@ -1,6 +1,6 @@
 #include "level.h"
 #include "GObjFactory.h"
-#include "globals.h""
+#include "globals.h"
 #include <iostream>
 
 // ===== LEVEL =====
@@ -11,11 +11,11 @@ Level::Level(int id, const std::string& desc)
 {
 	if (id == -1)
 	{
-		std::cerr << "Error: invalid level id" << std::endl;
+		std::cerr << "Error: invalid level id: " << id << std::endl;
 	}
 	else if (id < 0 || id > 9)
 	{
-		std::cerr << "Warning: level id out of bounds; players won't be able to select this level" << std::endl;
+		std::cerr << "Warning: level id '" << id << "' out of bounds; players won't be able to select this level" << std::endl;
 	}
 }
 
@@ -92,6 +92,15 @@ Wave::Wave(const std::string& desc)
 	: _desc(desc), spawnpoints(new std::unordered_set<Spawnpoint*>), enemy_queue(new std::queue<Entity*>)
 {}
 
+Wave::Wave(const Wave& w)
+	: _desc(w._desc), spawnpoints(new std::unordered_set<Spawnpoint*>), enemy_queue(new std::queue<Entity*>)
+{
+	for (Spawnpoint* sp : *(w.spawnpoints))
+	{
+		spawnpoints->insert(new Spawnpoint(*sp));
+	}
+}
+
 void Wave::update(float ms)
 {
 	// update spawnpoints' timer and add new enemies to the queue
@@ -159,6 +168,10 @@ Wave::~Wave()
 Spawnpoint::Spawnpoint(int type, float perc_x, float perc_y, float angle, int amount, float spawn_delta, float initial_delay)
 	: type(type), perc_x(perc_x), perc_y(perc_y), angle(angle), _spawn_delta(spawn_delta), _amount(amount), _initial_delay(initial_delay), _elapsed_time(spawn_delta - 0.1f)
 {}
+
+//Spawnpoint::Spawnpoint(const Spawnpoint& s)
+//	: type(s.type), perc_x(s.perc_x), perc_y(s.perc_y), angle(s.angle), _spawn_delta(s._spawn_delta), _amount(s._amount), _initial_delay(s._initial_delay), _elapsed_time(s._spawn_delta - 0.1f)
+//{}
 
 void Spawnpoint::update(float ms)
 {
