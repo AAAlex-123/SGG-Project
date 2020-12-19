@@ -3,7 +3,7 @@
 #include "entity.h"
 #include "visual_effect.h"
 #include "level.h"
-#include "constants.h"
+#include "globals.h"
 #include <list>
 #include <vector>
 #include <unordered_map>
@@ -11,9 +11,18 @@
 // lmao imagine using using
 using namespace std;
 
-struct GameData {
+class GameData {
 private:
-	bool load_levels_from_file(const std::string& levels_path);
+	template<class T>
+	void static deleteList(list<T*>*);
+	
+	bool load_level_data_from_file(const std::string& level_path, const std::string& wave_path);
+	bool _load_waves_from_file(const std::string& wave_path);
+	bool _load_levels_from_file(const std::string& wave_path);
+	// callback in case reading from file fails
+	void _load_hardcoded_levels();
+	
+	int score;
 
 public:
 	// collections
@@ -32,7 +41,8 @@ public:
 	std::vector<std::string> images;
 
 	// levels
-	std::unordered_map<int, Level> levels;
+	std::unordered_map<int, Level*> levels;
+	std::unordered_map<std::string, Wave*> _waves;
 	int curr_active_level, curr_selected_level;
 	
 	// constructor and destructor because why not
@@ -40,24 +50,24 @@ public:
 	~GameData();
 	
 	// Level stuff
-	inline void updateLevel(float ms) { levels[curr_selected_level].update(ms); }
-	inline void spawn()
+	void updateLevel(float ms) { levels[curr_selected_level]->update(ms); }
+	void spawn()
 	{
-		if (levels[curr_selected_level].can_spawn())
-			enemyLs->push_back(&(levels[curr_selected_level].spawn()));
+		if (levels[curr_selected_level]->can_spawn())
+			enemyLs->push_back(levels[curr_selected_level]->spawn());
 	}
 	
 	//Updates all objects within the list. Template class must be derived from Drawing.
 	template <class T>
-	void update(float ms, list<T*>*);
+	static void update(float ms, list<T*>*);
 	
 	// Draws all objects within the list. Template class must be derived from Drawing.
 	template <class T>
-	void draw(list<T*>* ls);
+	static void draw(list<T*>* ls);
 
 	//Checks collisions between 2 lists. Template classes must both be derived from GameObject.
 	template <class T1,class T2>
-	void checkCollisions(list<T1*>*, list<T2*>*);
+	static void checkCollisions(list<T1*>*, list<T2*>*);
 
 	//Spawns a projectile for every eligible object in the list. Template class must be derived from Entity.
 	template <class T>
@@ -65,11 +75,15 @@ public:
 
 	//Checks if any object within the list must be destroyed, and deletes it. Template class must be derived from Drawing.
 	template <class T>
-	void checkAndDelete(list<T*>*);
+	static void checkAndDelete(list<T*>*);
 	
-private:
-	template<class T>
-	void deleteList(list<T*>*);
+	void addScore(int scored) {
+		score += scored;
+	}
+
+	int getScore() {
+		return score;
+	}
 };
 
 // definition in the same file as declaration because c++ is awesome
@@ -105,9 +119,9 @@ void GameData::fire(list<T*>* ls) const {
 				isPlayer |= pl == en;	// fancy
 
 			if (isPlayer) {
-				playerProjLs->push_back(&en->getProjectile());
+				playerProjLs->push_back(en->getProjectile());
 			} else {
-				enemyProjLs->push_back(&en->getProjectile());
+				enemyProjLs->push_back(en->getProjectile());
 			}
 		}
 	}
@@ -116,9 +130,13 @@ void GameData::fire(list<T*>* ls) const {
 template <class T>
 void GameData::checkAndDelete(list<T*>* ls) {
 	for (auto iter = ls->begin(); iter != ls->end(); ++iter) {
-		if (!*iter) {
-			delete *iter;
+		if (!**iter) {
+			delete (*iter);
 			iter = ls->erase(iter);
+			// if the last item is deleted, `iter == ls->end()`
+			// so `++iter` increments the end iterator before checking the `for` condition
+			if (iter == ls->end())
+				break;
 		}
 	}
 }

@@ -1,0 +1,14 @@
+0// yes every line must start with a number, starting from 0
+1// lines starting with 'line_no//' are comments and are ignored
+2// lines starting with 'line_no   ' (3 spaces) contain data
+3// yes there must be a line with just the line number at the end for better error messages
+4// Level declarations are the same used by the constructor
+5// \line_no\   wave \desc:str\
+6// \line_no\   Spawnpoint(\type:n\, \perc_x:f\, \perc_y:f\, \angle:f\, \amount:n\, \spawn_delta:f\, \initial_delay:f\)
+7   Wave("line")
+8   Spawnpoint(3, 0.0f, 0.5f, -90.0f, 10, 1.0f, 0.0f)
+9   Wave("donuts")
+10   Spawnpoint(2, 0.2f, 0.1f, 0.0f, 2, 1.5f, 1.0f)
+11   Spawnpoint(2, 0.5f, 0.1f, 0.0f, 2, 3.0f, 1.0f)
+12   Spawnpoint(2, 0.8f, 0.1f, 0.0f, 2, 5.0f, 1.0f)
+13

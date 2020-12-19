@@ -1,73 +1,103 @@
 #pragma once
 #include "entity.h"
+#include <unordered_set>
 #include <queue>
 
+class Wave;
+class Spawnpoint;
+
+// defines a set of waves and their timings
 class Level
 {
 private:
-	class Wave;
-	int _id;
-	std::string _desc;
+	const int _id;
+	const std::string _desc;
 
-	std::queue<std::pair<float, Wave*>> waves;
+	// queue of waves and their start time
+	// the time of each wave corresponds to the amount of time that will pass
+	// from level start before the wave starts
+	std::unordered_set<std::pair<float, Wave*>*>* waves;
+	// queue of enemies to be spawned (look at Wave::update() for why it is a queue)
+	std::queue<Entity*>* enemy_queue;
 
 	float _total_time;
 
-	class Wave
-	{
-	private:
-		int _id;
-		std::string _desc;
-
-		std::queue<std::pair<float, Entity*>> enemies;
-
-		float _total_time;
-
-	public:
-		void update(float ms) { _total_time += (ms / 1000.0f); }
-		bool can_spawn()
-		{
-			if (enemies.empty())
-				return false;
-			return _total_time > enemies.front().first;
-		}
-
-		Entity& spawn()
-		{
-			Entity* return_value = enemies.front().second;
-			enemies.pop();
-			return *(return_value);
-		}
-
-		void add_enemy(float time, Entity* enemy) { enemies.push(std::pair<float, Entity*>(time, enemy)); }
-	};
-
 public:
-	// default constructor needed for some reason
-	Level(int = -1, std::string = "null descr");
+	Level(int, const std::string&);
 
-	void operator=(const Level& rhs);
+	// update level time and wave time
+	void update(float ms);
+	// delegate spawning to the waves
+	bool can_spawn();
+	Entity* spawn();
 
-	void update(float ms) { _total_time += (ms / 1000.0f); waves.front().second->update(ms); }
-	bool can_spawn()
-	{
-		if (waves.empty())
-			return false;
-		return waves.front().second->can_spawn();
-	}
+	void add_wave(float, Wave*);
 
-	Entity& spawn()
-	{
-		Entity* return_value = &waves.front().second->spawn();
-		waves.pop();
-		return *(return_value);
-	}
-
-	void add_enemy(float time, Entity* enemy) { waves.back().second->add_enemy(time, enemy); }
-
+	// used by level selection to display info and select level
 	int id() { return _id; }
 	std::string info() { return "level " + std::to_string(id()) + ": " + _desc; }
-	
-	// returns the string necessary to rebuild this level
+
+	// (wip) returns the string necessary to rebuild the level
+	std::string to_file_string();
+
+	~Level();
+};
+
+class Wave
+{
+private:
+	const std::string _desc;
+
+	std::unordered_set<Spawnpoint*>* spawnpoints;
+	// queue of enemies to be spawned (look at Wave::update() for why it is a queue)
+	std::queue<Entity*>* enemy_queue;
+
+public:
+	Wave(const std::string&);
+	Wave(const Wave&);
+
+	// update the spawnpoints' timer, add new enemies to enemy_queue
+	void update(float);
+	// work with the enemy_queue
+	bool can_spawn();
+	Entity* spawn();
+
+	void add_spawnpoint(Spawnpoint*);
+
+	// false if no spawnpoint has any enemies left
+	// false if it shouldn't be here
+	operator bool() const;
+
+	// (wip) returns the string necessary to rebuild the wave
+	std::string to_file_string();
+
+	~Wave();
+};
+
+class Spawnpoint
+{
+private:
+	// enemy parameters
+	const int type;
+	const float perc_x, perc_y, angle;
+
+	// spawnpoint parameters
+	const float _spawn_delta;
+	int _amount;
+	float _initial_delay, _elapsed_time;
+
+public:
+	Spawnpoint(int type, float perc_x, float perc_y, float angle, int amount, float spawn_delta, float initial_delay);
+	// the automatically generated one should be just fine
+	//Spawnpoint(const Spawnpoint&);
+
+	void update(float);
+	bool can_spawn();
+	Entity* spawn();
+
+	// false if there are no enemies left
+	operator bool() const;
+
+	// (wip) returns the string necessary to rebuild the spawnpoint
 	std::string to_file_string();
 };
