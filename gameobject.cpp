@@ -23,7 +23,7 @@ void GameObject::update(float ms) {
 }
 
 GameObject::operator bool() const {
-	return (this->x < get_canvas_width() && this->x > 0 && this->y < get_canvas_height() && this->y > 0) && (this->health > 0);
+	return ((this->x < get_canvas_width() * 1.5f) && (this->x > get_canvas_width() * (-0.5f)) && (this->y < get_canvas_height() * 1.5) && (this->y > get_canvas_width() * (-0.5f))) && (this->health > 0);
 }
 
 GameObject::~GameObject() {
