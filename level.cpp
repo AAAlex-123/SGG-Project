@@ -139,7 +139,7 @@ Wave::operator bool() const
 	{
 		res |= *sp;
 	}
-	return res;
+	return res || !enemy_queue->empty();
 }
 
 std::string Wave::to_file_string()
