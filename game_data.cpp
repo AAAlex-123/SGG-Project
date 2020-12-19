@@ -16,26 +16,23 @@ GameData::GameData() : fps(0), game_state(0),
 	for (int i = 0; i < 10; ++i)
 		levels[i] = nullptr;
 
-	if (!load_levels_from_file(level_path, wave_path))
+	if (!load_level_data_from_file(level_path, wave_path))
 	{
 		std::cerr << "Warning: Level loading from files failed, loading hardcoded levels" << std::endl;
 		_load_hardcoded_levels();
 	}
-
-	// initialize other stuff ...
+	std::cout << "Levels loaded successfully" << std::endl;
 }
 
+bool GameData::load_level_data_from_file(const std::string& level_path, const std::string& wave_path) {
 
-// doesn't work properly at the moment, it's just a template.
-// code should be added where there are '...'
-bool GameData::load_levels_from_file(const std::string& level_path, const std::string& wave_path) {
-	return false;
-
+	// first load waves
 	if (!_load_waves_from_file(wave_path))
 	{
 		std::cerr << "Warning: Unable to load waves from file: " + level_path << std::endl;
 		return false;
 	}
+	// then load levels; the levels' waves must have the same name as the waves loaded above
 	if (!_load_levels_from_file(level_path))
 	{
 		std::cerr << "Warning: Unable to load levels from file: " + level_path << std::endl;
@@ -45,11 +42,13 @@ bool GameData::load_levels_from_file(const std::string& level_path, const std::s
 }
 
 bool GameData::_load_waves_from_file(const std::string& wave_path)
-{	// create stream to levels_path
-	std::ifstream in(level_path);
+{
+	std::cout << "Loading waves..." << std::endl;
+	// create stream to levels_path
+	std::ifstream in(wave_path);
 
 	if (!in) {
-		std::cerr << "Error opening file '" << level_path << "'" << std::endl;
+		std::cerr << "Error opening file '" << wave_path << "'" << std::endl;
 		return false;
 	}
 
@@ -57,27 +56,56 @@ bool GameData::_load_waves_from_file(const std::string& wave_path)
 	std::string contents((std::istreambuf_iterator<char>(in)), std::istreambuf_iterator<char>());
 	std::smatch match;
 
-	// regex pattern 1 ...
-	std::string sr1(".*");
+	// regex patterns
+	std::string rs1("Wave\\(\"(.*)\"\\)");
+	std::string rs2("Spawnpoint\\((\\d+), (.*?), (.*?), (.*?), (\\d+), (.*?), (.*?)\\)");
 
-	// regex objects ...
-	std::regex r1;
+	// regex objects
+	std::regex r1, r2, eof, comment;
 
-	int curr_level = 0, curr_wave = 0, line = 0;
+	int line = 0;
+	std::string curr_wave = "";
 
 	while (true)
 	{
-		// construct regexes ...
-		r1 = std::regex(std::to_string(line) + "   " + sr1);
+		// construct regexes 
+		r1 = std::regex("^" + std::to_string(line) + "   " + rs1 + "$");
+		r2 = std::regex("^" + std::to_string(line) + "   " + rs2 + "$");
+		eof = std::regex("^" + std::to_string(line) + "$");
+		comment = std::regex("^" + std::to_string(line) + "//");
 
-		// match with 1st ...
+		// wave declaration
 		if (std::regex_search(contents, match, r1))
 		{
-			// ...
+			curr_wave = match[1];
+			_waves[curr_wave] = new Wave(curr_wave);
+		}
+		// spawnnpoint declaration
+		else if (std::regex_search(contents, match, r2))
+		{
+			if (curr_wave == "")
+			{
+				std::cerr << "Error: Attempting to add spawnpoint before declaring a wave at line " << line << std::endl;
+				return false;
+			}
+			_waves[curr_wave]->add_spawnpoint(new Spawnpoint(
+				stoi(match[1]), stof(match[2]), stof(match[3]), stof(match[4]) / 180 * PI,
+				stoi(match[5]), stof(match[6]), stof(match[7])
+			));
+		}
+		// eof
+		else if (std::regex_search(contents, match, eof))
+		{ break; }
+		// comment
+		else if (std::regex_search(contents, match, comment))
+		{ ; }
+		// no match and not eof -> invalid line syntax
+		else
+		{
+			std::cerr << "Error: Line " << line << " has invalid syntax or was not found" << std::endl;
+			return false;
 		}
 
-		// no match
-		else { break; }
 		++line;
 		contents = match.suffix();
 	}
@@ -87,8 +115,9 @@ bool GameData::_load_waves_from_file(const std::string& wave_path)
 	return true;
 }
 
-bool GameData::_load_levels_from_file(const std::string& wave_path)
+bool GameData::_load_levels_from_file(const std::string& level_path)
 {
+	std::cout << "Loading levels..." << std::endl;
 	// create stream to levels_path
 	std::ifstream in(level_path);
 
@@ -101,27 +130,52 @@ bool GameData::_load_levels_from_file(const std::string& wave_path)
 	std::string contents((std::istreambuf_iterator<char>(in)), std::istreambuf_iterator<char>());
 	std::smatch match;
 
-	// regex pattern 1 ...
-	std::string sr1(".*");
+	// regex patterns
+	std::string rs1("Level\\((-?\\d+), \"(.*)\"\\)");
+	std::string rs2("wave (.*?) (.*)");
 
-	// regex objects ...
-	std::regex r1;
+	// regex objects
+	std::regex r1, r2, eof, comment;
 
-	int curr_level = 0, curr_wave = 0, line = 0;
+	int curr_level_id = 0, line = 0;
 
 	while (true)
 	{
 		// construct regexes ...
-		r1 = std::regex(std::to_string(line) + "   " + sr1);
+		r1 = std::regex("^" + std::to_string(line) + "   " + rs1 + "$");
+		r2 = std::regex("^" + std::to_string(line) + "   " + rs2 + "$");
+		eof = std::regex("^" + std::to_string(line) + "$");
+		comment = std::regex("^" + std::to_string(line) + "//");
 
-		// match with 1st ...
+		// level declaration
 		if (std::regex_search(contents, match, r1))
 		{
-			// ...
+			curr_level_id = stoi(match[1]);
+			levels[curr_level_id] = new Level(curr_level_id, match[2]);
+		}	
+		// wave declaration
+		else if (std::regex_search(contents, match, r2))
+		{
+			if (_waves.find(match[1]) == _waves.end())
+			{
+				std::cerr << "Error: Wave with name '" << match[1] << "' not found" << std::endl;
+				return false;
+			}
+			levels[curr_level_id]->add_wave(stof(match[2]), new Wave(*_waves[match[1]]));
+		}
+		// eof
+		else if (std::regex_search(contents, match, eof))
+		{ break; }
+		// comment
+		else if (std::regex_search(contents, match, comment))
+		{ ; }
+		// no match and not eof -> invalid line syntax
+		else
+		{
+			std::cerr << "Error: Line " << line << " has invalid syntax or was not found" << std::endl;
+			return false;
 		}
 
-		// no match
-		else { break; }
 		++line;
 		contents = match.suffix();
 	}
