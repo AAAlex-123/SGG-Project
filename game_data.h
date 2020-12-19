@@ -11,15 +11,17 @@
 // lmao imagine using using
 using namespace std;
 
-struct GameData {
+class GameData {
 private:
 	template<class T>
 	void static deleteList(list<T*>*);
-	bool load_levels_from_file(const std::string& level_path, const std::string& wave_path);
+	
+	bool load_level_data_from_file(const std::string& level_path, const std::string& wave_path);
 	bool _load_waves_from_file(const std::string& wave_path);
 	bool _load_levels_from_file(const std::string& wave_path);
 	// callback in case reading from file fails
 	void _load_hardcoded_levels();
+	
 	int score;
 
 public:
@@ -40,7 +42,7 @@ public:
 
 	// levels
 	std::unordered_map<int, Level*> levels;
-	std::unordered_map<const std::string&, Wave*> _waves;
+	std::unordered_map<std::string, Wave*> _waves;
 	int curr_active_level, curr_selected_level;
 	
 	// constructor and destructor because why not
@@ -48,8 +50,8 @@ public:
 	~GameData();
 	
 	// Level stuff
-	inline void updateLevel(float ms) { levels[curr_selected_level]->update(ms); }
-	inline void spawn()
+	void updateLevel(float ms) { levels[curr_selected_level]->update(ms); }
+	void spawn()
 	{
 		if (levels[curr_selected_level]->can_spawn())
 			enemyLs->push_back(levels[curr_selected_level]->spawn());
@@ -76,13 +78,12 @@ public:
 	static void checkAndDelete(list<T*>*);
 	
 	void addScore(int scored) {
-			score += scored;
+		score += scored;
 	}
 
 	int getScore() {
 		return score;
 	}
-
 };
 
 // definition in the same file as declaration because c++ is awesome
