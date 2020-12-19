@@ -15,25 +15,25 @@ class GameData {
 private:
 	template<class T>
 	void static deleteList(list<T*>*);
-	
+
 	bool load_level_data_from_file(const std::string& level_path, const std::string& wave_path);
 	bool _load_waves_from_file(const std::string& wave_path);
 	bool _load_levels_from_file(const std::string& wave_path);
 	// callback in case reading from file fails
 	void _load_hardcoded_levels();
-	
+
 	int score;
 
 public:
 	// collections
-	list<Entity*> *enemyLs, *playerLs;
-	list<Projectile*> *enemyProjLs, *playerProjLs;
-	list<VisualEffect*> *effectsLs;
+	list<Entity*>* enemyLs, * playerLs;
+	list<Projectile*>* enemyProjLs, * playerProjLs;
+	list<VisualEffect*>* effectsLs;
 
 	// general
 	int fps;
 	int game_state;
-	
+
 	// loading
 	float el;
 	const float sps;
@@ -44,6 +44,10 @@ public:
 	std::unordered_map<int, Level*> levels;
 	std::unordered_map<std::string, Wave*> _waves;
 	int curr_active_level, curr_selected_level;
+
+	// game
+	float bg_offset;
+	void updateOffset(float ms) { bg_offset = (bg_offset < get_canvas_width() / get_canvas_height()) ? (bg_offset + (0.1f * (ms / 1000.0f))) : (0.0f); }
 	
 	// constructor and destructor because why not
 	GameData();
