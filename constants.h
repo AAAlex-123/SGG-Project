@@ -4,8 +4,8 @@
 // constants
 const short WINDOW_WIDTH = 1200;
 const short WINDOW_HEIGHT = 600;
-const float CANVAS_WIDTH = 1200.0f;
-const float CANVAS_HEIGHT = 600.0f;
+const float CANVAS_WIDTH = 400.0f;
+const float CANVAS_HEIGHT = 500.0f;
 
 // enum
 enum game_states
@@ -21,12 +21,6 @@ enum game_states
 	HELP = 8,
 	EXIT = 9,
 };
-
-// assets and other paths
-const std::string asset_path = ".\\assets\\";
-const std::string font = asset_path + "orange juice 2.0.ttf";
-const std::string image_path = ".\\assets\\";
-const std::string level_path = ".\\levels.txt";
 
 // function declarations
 void initialize();
