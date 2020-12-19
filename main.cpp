@@ -40,7 +40,7 @@ void update(float ms)
 		
 		// apply custom settings
 
-		gd->curr_selected_level = -2;
+		gd->curr_selected_level = 1;
 
 
 		gd->game_state = game_states::MENU;
@@ -93,7 +93,7 @@ void update(float ms)
 		gd->update(ms, gd->effectsLs);
 		
 		gd->updateLevel(ms);
-		
+		gd->updateOffset(ms);
 
 	//check collisions
 		gd->checkCollisions(gd->enemyProjLs, gd->playerLs);
@@ -219,6 +219,16 @@ void draw()
 	}
 	case game_states::GAME: {
 
+		// scrolling background
+		br.texture = asset_path + "background.png";
+		setColor(br, new float[3]{ 1.0f, 1.0f, 1.0f });
+		br.outline_opacity = 0.0f;
+		float cw = get_canvas_width(), ch = get_canvas_height();
+		graphics::drawRect(cw / 2, ch * (gd->bg_offset - (cw / ch)), cw, cw, br);
+		graphics::drawRect(cw / 2, ch * gd->bg_offset, cw, cw, br);
+		graphics::drawRect(cw / 2, ch * (gd->bg_offset + (cw / ch)), cw, cw, br);
+
+		// entity drawing
 		gd->draw(gd->enemyLs);
 		gd->draw(gd->enemyProjLs);
 		gd->draw(gd->playerLs);

@@ -17,6 +17,7 @@ const std::string asset_path = ".\\assets\\";
 const std::string font = asset_path + "orange juice 2.0.ttf";
 const std::string image_path = ".\\assets\\";
 const std::string level_path = ".\\levels.txt";
+const std::string wave_path = ".\\waves.txt";
 const std::string sound_path = ".\\sounds\\";
 
 float get_canvas_height();
