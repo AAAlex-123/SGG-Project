@@ -9,9 +9,9 @@ using namespace std;
 
 // ===== ENTITY =====
 
-Entity* GObjFactory::createEntity(int type, float x, float y, float angle, float dangle, Keyset keyset) {
+Entity* GObjFactory::createEntity(int type, float x, float y, float angle, float dangle, float cooldown, Keyset keyset) {
 	switch (type) {
-	case GObjFactory::PLAYER: return createPlayer(x, y, angle, dangle, keyset);
+	case GObjFactory::PLAYER: return createPlayer(x, y, angle, dangle, cooldown, keyset);
 	case GObjFactory::ENEMY_1: return createEnemy1(x, y, angle);
 	case GObjFactory::ENEMY_2: return createEnemy2(x, y, angle);
 	case GObjFactory::ENEMY_3: return createEnemy3(x, y, angle);
@@ -21,8 +21,8 @@ Entity* GObjFactory::createEntity(int type, float x, float y, float angle, float
 	}
 }
 
-Entity* GObjFactory::createPlayer(float x, float y, float angle, float dangle, Keyset keyset) {
-	return new Entity(x, y, angle, std_speed / 2, (float)zep_width, (float)zep_height, new string(image_path + "player1.png"), new KeyboardPath(dangle, keyset), 5, 1, 0, GObjFactory::STANDARD_BULLET);
+Entity* GObjFactory::createPlayer(float x, float y, float angle, float dangle, float cooldown, Keyset keyset) {
+	return new Entity(x, y, angle, std_speed / 2, (float)zep_width, (float)zep_height, new string(image_path + "player1.png"), new KeyboardPath(dangle, cooldown, keyset), 5, 1, 0, GObjFactory::STANDARD_BULLET);
 }
 
 Entity* GObjFactory::createEnemy1(float x,float y,float angle) {
