@@ -27,9 +27,6 @@ void initialize();
 // true == success
 bool load_images_from_file(const std::string& image_path);
 
-void setColor(graphics::Brush&, const float*);
-void setColor(graphics::Brush&, char c);
-
 // key short names
 const graphics::scancode_t K_UP = graphics::scancode_t::SCANCODE_UP;
 const graphics::scancode_t K_DOWN = graphics::scancode_t::SCANCODE_DOWN;
