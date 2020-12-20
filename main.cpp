@@ -1,9 +1,11 @@
-#include "graphics.h"
+#include "globals.h"
 #include "constants.h"
 #include "GObjFactory.h"
 #include "game_data.h"
 #include <iostream>
-#include <vector> //used in line 9+, debug
+
+// temp includes
+#include <vector>
 
 // global variables in main
 graphics::Brush br;
@@ -13,15 +15,7 @@ std::vector<GameObject*> govec;
 
 Keyset wasdqex(key::SCANCODE_W, key::SCANCODE_S, key::SCANCODE_A, key::SCANCODE_D, key::SCANCODE_Q, key::SCANCODE_E, key::SCANCODE_X);
 Keyset tfghryb(key::SCANCODE_T, key::SCANCODE_G, key::SCANCODE_F, key::SCANCODE_H, key::SCANCODE_R, key::SCANCODE_Y, key::SCANCODE_B);
-Entity* eplayer = GObjFactory::createEntity(GObjFactory::PLAYER, 1000.0f, 250.0f, PI / 2.0f, PI / 4.0f, wasdqex);
-
-VisualEffect ve(600.0f, 400.0f, 0.0f, 0.0f, 50.0f,
-	new std::string[7] {
-		"assets\\expl1.png", "assets\\expl2.png",
-		"assets\\expl3.png", "assets\\expl4.png",
-		"assets\\expl5.png", "assets\\expl6.png",
-		"assets\\expl7.png",
-	}, 7, 20.0f, 10.f);
+Entity* eplayer = GObjFactory::createEntity(GObjFactory::PLAYER, get_canvas_width() / 2.0f, get_canvas_width() * 0.8f, 0, PI / 4.0f, wasdqex);
 
 Entity* eaccel = GObjFactory::createEntity(GObjFactory::ENEMY_1, 200.0f, 250.0f, -PI / 2.0f);
 Entity* erotate = GObjFactory::createEntity(GObjFactory::ENEMY_2, 500.0f, 250.0f, 0);
@@ -84,7 +78,6 @@ void update(float ms)
 		// temp
 		gd->game_state = ((game_states::OPTIONS * graphics::getKeyState(graphics::scancode_t::SCANCODE_B)) + (gd->game_state * !graphics::getKeyState(graphics::scancode_t::SCANCODE_B)));
 
-		
 	//update
 		gd->update(ms, gd->enemyLs);
 		gd->update(ms, gd->enemyProjLs);
@@ -93,7 +86,7 @@ void update(float ms)
 		gd->update(ms, gd->effectsLs);
 		
 		gd->updateLevel(ms);
-		gd->updateOffset(ms);
+		gd->updateBackground(ms);
 
 	//check collisions
 		gd->checkCollisions(gd->enemyProjLs, gd->playerLs);
@@ -219,14 +212,7 @@ void draw()
 	}
 	case game_states::GAME: {
 
-		// scrolling background
-		br.texture = asset_path + "background.png";
-		setColor(br, new float[3]{ 1.0f, 1.0f, 1.0f });
-		br.outline_opacity = 0.0f;
-		float cw = get_canvas_width(), ch = get_canvas_height();
-		graphics::drawRect(cw / 2, ch * (gd->bg_offset - (cw / ch)), cw, cw, br);
-		graphics::drawRect(cw / 2, ch * gd->bg_offset, cw, cw, br);
-		graphics::drawRect(cw / 2, ch * (gd->bg_offset + (cw / ch)), cw, cw, br);
+		gd->drawBackground(br);
 
 		// entity drawing
 		gd->draw(gd->enemyLs);
@@ -350,7 +336,7 @@ int main(int argc, char** argv)
 void initialize()
 {
 	GameData* gd = new GameData();
-	gd->game_state = game_states::MENU;
+	gd->game_state = game_states::LOAD;
 
 	graphics::setUserData((void*)gd);
 
