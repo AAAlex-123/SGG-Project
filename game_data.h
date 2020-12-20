@@ -1,12 +1,15 @@
 #pragma once
-#include "projectile.h"
-#include "entity.h"
-#include "visual_effect.h"
-#include "level.h"
 #include "globals.h"
 #include <list>
 #include <vector>
 #include <unordered_map>
+#include <iostream>
+
+// needed because templates are defined in this header file
+#include "projectile.h"
+#include "entity.h"
+#include "visual_effect.h"
+#include "level.h"
 
 // lmao imagine using using
 using namespace std;
@@ -49,7 +52,7 @@ public:
 	float bg_offset, height_perc_per_second;
 	void updateBackground(float ms);
 	void drawBackground(graphics::Brush&);
-	
+
 	// constructor and destructor because why not
 	GameData();
 	~GameData();
@@ -80,7 +83,7 @@ public:
 
 	//Checks if any object within the list must be destroyed, and deletes it. Template class must be derived from Drawing.
 	template <class T>
-	static void checkAndDelete(list<T*>*);
+	void checkAndDelete(list<T*>*);
 	
 	void addScore(int scored) {
 		score += scored;
@@ -128,6 +131,7 @@ void GameData::fire(list<T*>* ls) const {
 			} else {
 				enemyProjLs->push_back(en->getProjectile());
 			}
+			effectsLs->push_back(en->getFireVisualEffect());
 		}
 	}
 }
@@ -136,6 +140,10 @@ template <class T>
 void GameData::checkAndDelete(list<T*>* ls) {
 	for (auto iter = ls->begin(); iter != ls->end(); ++iter) {
 		if (!**iter) {
+			// don't question this
+			if ((void*) ls == (void*)enemyLs || (void*)ls == (void*)playerLs) {
+				effectsLs->push_back((*iter)->getDestructionVisualEffect());
+			}
 			delete (*iter);
 			iter = ls->erase(iter);
 			// if the last item is deleted, `iter == ls->end()`

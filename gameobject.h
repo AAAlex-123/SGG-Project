@@ -1,8 +1,10 @@
 #pragma once
 #include "drawing.h"
 
+class VisualEffect;
+
 // Superclass for all interactive objects in the game
-class GameObject : public Drawing{
+class GameObject : public Drawing {
 protected:
 	const int damage,score;
 	const float radius;
@@ -20,6 +22,8 @@ public:
 
 	// Returns false if the object is not alive; i.e. it must be destroyed
 	virtual operator bool() const override;
+
+	virtual VisualEffect* getDestructionVisualEffect() const = 0;
 
 	virtual ~GameObject();
 };

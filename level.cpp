@@ -1,6 +1,6 @@
 #include "level.h"
+#include "entity.h"
 #include "GObjFactory.h"
-#include "globals.h"
 #include <iostream>
 
 // ===== LEVEL =====
