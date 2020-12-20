@@ -52,6 +52,7 @@ public:
 	float bg_offset, height_perc_per_second;
 	void updateBackground(float ms);
 	void drawBackground(graphics::Brush&);
+	std::unordered_map<std::string, Keyset*> keysets;
 
 	// constructor and destructor because why not
 	GameData();
