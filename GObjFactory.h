@@ -1,9 +1,11 @@
 #pragma once
-#include "entity.h"
-#include "projectile.h"
 #include "globals.h"
 
 //See "entity.h" for why the factory pattern was neccesary here
+
+class Entity;
+class Projectile;
+class VisualEffect;
 
 //A Factory class that's used to assemble and produce all game objects in the game.
 class GObjFactory {
@@ -23,11 +25,18 @@ private:
 	static Projectile* createLB(float x, float y, float angle);
 	static Projectile* createIncB(float x, float y, float angle);
 
+	static VisualEffect* createExplosion1(float x, float y, float angle, float duration, float fps);
+	static VisualEffect* createSmoke(float x, float y, float angle, float duration);
+	static VisualEffect* createNoEffect();
+
 public:
 	const static int STANDARD_BULLET = 10, LIGHT_BULLET = 11, INCEND_BULLET = 12;
 	const static int PLAYER = 0, ENEMY_1 = 1, ENEMY_2 = 2, ENEMY_3 = 3;
+	const static int NOEFFECT = 404, EXPLOSION_1 = 100, EXPLOSION_2 = 200, SMOKE = 300;
 
 	static Entity* createEntity(int type, float x, float y, float angle, float dangle = 0.0f,
 			Keyset keyset = Keyset(key::SCANCODE_Z, key::SCANCODE_Z, key::SCANCODE_Z, key::SCANCODE_Z, key::SCANCODE_Z, key::SCANCODE_Z, key::SCANCODE_Z));
 	static Projectile* createProjectile(int type, float x, float y, float angle);
+	// fps not needed when creating VisualEffects with only 1 sprite
+	static VisualEffect* createVisualEffect(int type, float x, float y, float angle, float duration, float fps = 0.0f);
 };
