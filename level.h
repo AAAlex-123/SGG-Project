@@ -1,10 +1,11 @@
 #pragma once
-#include "entity.h"
+#include "globals.h"
 #include <unordered_set>
 #include <queue>
 
 class Wave;
 class Spawnpoint;
+class Entity;
 
 // defines a set of waves and their timings
 class Level
