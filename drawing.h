@@ -1,10 +1,8 @@
 #pragma once
-#include "graphics.h"
 #include "globals.h"
 #include "Path.h"
-#include <string>
 
-//Interface to allow uniform access to all drawable objects. Includes a standard drawing method all classes need to use.
+// Interface to allow uniform access to all drawable objects. Includes a standard drawing method all classes need to use.
 class Drawing {
 private:
 	graphics::Brush br;
@@ -16,7 +14,7 @@ protected:
 	const float width, height;
 	int curr_sprite;
 
-	Path* movement; //movement across the screen
+	class Path* movement; //movement across the screen
 
 public:
 	Drawing(float xpos, float ypos, float angle, float vel, float width,float height, const std::string* sprites, Path*);
@@ -28,6 +26,9 @@ public:
 
 	// Returns false if the object is not alive; i.e. it must be destroyed
 	virtual operator bool() const = 0;
+	
+	virtual float get_x() { return x; }
+	virtual float get_y() { return y; }
 
 	virtual ~Drawing();
 };
