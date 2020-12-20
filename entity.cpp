@@ -1,6 +1,5 @@
 #include "entity.h"
 #include "GObjFactory.h"
-#include "graphics.h"
 #include <cmath>
 
 Entity::Entity(float xpos, float ypos, float angle, float vel, float width,float height,std::string* sprites, Path* path,
@@ -19,6 +18,14 @@ bool Entity::hasFired() const {
 
 Projectile* Entity::getProjectile() const {
 	return GObjFactory::createProjectile(curr_projectile, x - (radius*sin(angle)), y - (radius*cos(angle)), angle);
+}
+
+VisualEffect* Entity::getFireVisualEffect() const {
+	return GObjFactory::createVisualEffect(GObjFactory::SMOKE, x - (radius * sin(angle)), y - (radius * cos(angle)), angle, 0.3f);
+}
+
+VisualEffect* Entity::getDestructionVisualEffect() const {
+	return GObjFactory::createVisualEffect(GObjFactory::EXPLOSION_1, x, y, 0.0f, 1.0f, 18.0f);
 }
 
 void Entity::setProjectile(int proj_type) {
