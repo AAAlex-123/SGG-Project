@@ -1,13 +1,16 @@
 #include "game_data.h"
+
 #include <iostream>
 #include <regex>
 #include <fstream>
+
+#include "GObjFactory.h"
 
 GameData::GameData() : fps(0), game_state(0),
 	el(0.0f), sps(4.0f), curr_img(0), images(),
 	levels(std::unordered_map<int, Level*>()), _waves(std::unordered_map<std::string, Wave*>()),
 	curr_active_level(-1), curr_selected_level(-1),
-	bg_offset(0.0f),
+	bg_offset(0.0f), height_perc_per_second(0.02f),
 	enemyLs(new list<Entity*>), playerLs(new list<Entity*>), enemyProjLs(new list<Projectile*>), playerProjLs(new list<Projectile*>), effectsLs(new list<VisualEffect*>)
 	
 {
@@ -23,6 +26,24 @@ GameData::GameData() : fps(0), game_state(0),
 		_load_hardcoded_levels();
 	}
 	std::cout << "Levels loaded successfully" << std::endl;
+}
+
+void GameData::updateBackground(float ms)
+{
+	bg_offset = (bg_offset < get_canvas_width() / get_canvas_height())
+		? (bg_offset + (height_perc_per_second * (ms / 1000.0f)))
+		: (0.0f);
+}
+
+void GameData::drawBackground(graphics::Brush& br)
+{
+	br.texture = image_path + "background.png";
+	setColor(br, new float[3]{ 1.0f, 1.0f, 1.0f });
+	br.outline_opacity = 0.0f;
+	float cw = get_canvas_width(), ch = get_canvas_height();
+	graphics::drawRect(cw / 2, ch * (bg_offset - (cw / ch)), cw, cw, br);
+	graphics::drawRect(cw / 2, ch * bg_offset, cw, cw, br);
+	graphics::drawRect(cw / 2, ch * (bg_offset + (cw / ch)), cw, cw, br);
 }
 
 bool GameData::load_level_data_from_file(const std::string& level_path, const std::string& wave_path) {
