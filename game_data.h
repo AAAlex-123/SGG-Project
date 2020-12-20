@@ -46,8 +46,9 @@ public:
 	int curr_active_level, curr_selected_level;
 
 	// game
-	float bg_offset;
-	void updateOffset(float ms) { bg_offset = (bg_offset < get_canvas_width() / get_canvas_height()) ? (bg_offset + (0.1f * (ms / 1000.0f))) : (0.0f); }
+	float bg_offset, height_perc_per_second;
+	void updateBackground(float ms);
+	void drawBackground(graphics::Brush&);
 	
 	// constructor and destructor because why not
 	GameData();
