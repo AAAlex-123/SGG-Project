@@ -1,9 +1,6 @@
 #include "entity.h"
 #include "GObjFactory.h"
-#include "graphics.h"
 #include <cmath>
-#include <iostream>
-#include <string>
 
 Entity::Entity(float xpos, float ypos, float angle, float vel, float width,float height, const std::string* sprite_name, Path* path,
 	int damage, int health,int score, int proj_type) :
