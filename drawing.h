@@ -1,7 +1,6 @@
 #pragma once
-#include "graphics.h"
+#include "globals.h"
 #include "Path.h"
-#include <string>
 
 //Interface to allow uniform access to all drawable objects. Includes a standard virtual drawing method.
 class Drawing {
@@ -26,6 +25,9 @@ public:
 
 	// Returns false if the object is not alive; i.e. it must be destroyed
 	virtual operator bool() const = 0;
+
+	virtual float get_x() { return x; }
+	virtual float get_y() { return y; }
 
 	virtual ~Drawing();
 };
