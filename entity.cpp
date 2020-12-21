@@ -22,7 +22,15 @@ bool Entity::hasFired() const {
 }
 
 Projectile* Entity::getProjectile() const {
-	return Factory::createProjectile(curr_projectile, x - (radius*sin(angle)), y - (radius*cos(angle)), angle);
+	return GObjFactory::createProjectile(curr_projectile, x - (radius*sin(angle)), y - (radius*cos(angle)), angle);
+}
+
+VisualEffect* Entity::getFireVisualEffect() const {
+	return GObjFactory::createVisualEffect(GObjFactory::SMOKE, x - (radius * sin(angle)), y - (radius * cos(angle)), angle, 0.3f);
+}
+
+VisualEffect* Entity::getDestructionVisualEffect() const {
+	return GObjFactory::createVisualEffect(GObjFactory::EXPLOSION_1, x, y, 0.0f, 1.0f, 18.0f);
 }
 
 void Entity::setProjectile(int proj_type) {
