@@ -13,6 +13,7 @@
 
 // lmao imagine using using
 using namespace std;
+enum game_states;
 
 class GameData {
 private:
@@ -52,17 +53,29 @@ public:
 	float bg_offset, height_perc_per_second;
 	void updateBackground(float ms);
 	void drawBackground(graphics::Brush&);
+	std::unordered_map<std::string, Keyset*> keysets;
+	
+	int curr_playing_level;
+	float level_transition_timer;
+	float set_level_transition_timer(float timer = 5.0f) { return timer; }
+	void next_level() { --curr_playing_level; }
+	Level* has_next_level() { 
+		Level* return_val = levels[curr_playing_level - 1];
+		if (!return_val)
+			levels.erase(curr_playing_level - 1);
+		return return_val;
+	}
 
 	// constructor and destructor because why not
 	GameData();
 	~GameData();
 	
 	// Level stuff
-	void updateLevel(float ms) { levels[curr_selected_level]->update(ms); }
+	void updateLevel(float ms) { levels[curr_playing_level]->update(ms); }
 	void spawn()
 	{
-		if (levels[curr_selected_level]->can_spawn())
-			enemyLs->push_back(levels[curr_selected_level]->spawn());
+		if (levels[curr_playing_level]->can_spawn())
+			enemyLs->push_back(levels[curr_playing_level]->spawn());
 	}
 	
 	//Updates all objects within the list. Template class must be derived from Drawing.
@@ -152,6 +165,8 @@ void GameData::checkAndDelete(list<T*>* ls) {
 				break;
 		}
 	}
+	if (playerLs->size() == 0)
+		game_state = game_states::GAME_LOSE;
 }
 
 template<class T>
