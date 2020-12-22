@@ -38,6 +38,10 @@ public:
 	int id() { return _id; }
 	std::string info() { return "level " + std::to_string(id()) + ": " + _desc; }
 
+	// false if no enemies or waves left;
+	// false if it shouldn't be here
+	operator bool() const;
+
 	// (wip) returns the string necessary to rebuild the level
 	std::string to_file_string();
 

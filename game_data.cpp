@@ -7,10 +7,11 @@
 #include "GObjFactory.h"
 
 GameData::GameData() : fps(0), game_state(0),
-	el(0.0f), sps(4.0f), curr_img(0), images(),
+	el(0.0f), sps(7.0f), curr_img(0), images(),
 	levels(std::unordered_map<int, Level*>()), _waves(std::unordered_map<std::string, Wave*>()),
 	curr_active_level(-1), curr_selected_level(-1),
 	bg_offset(0.0f), height_perc_per_second(0.02f), keysets(std::unordered_map<std::string, Keyset*>()),
+	curr_playing_level(-1), level_transition_timer(set_level_transition_timer()),
 	enemyLs(new list<Entity*>), playerLs(new list<Entity*>), enemyProjLs(new list<Projectile*>), playerProjLs(new list<Projectile*>), effectsLs(new list<VisualEffect*>)
 	
 {
@@ -29,7 +30,8 @@ GameData::GameData() : fps(0), game_state(0),
 	// this should probably be done at `main::update::OP_PLAYERS`, potentially with more customization
 	keysets["wasdqex"] = new Keyset(key::SCANCODE_W, key::SCANCODE_S, key::SCANCODE_A, key::SCANCODE_D, key::SCANCODE_Q, key::SCANCODE_E, key::SCANCODE_X);
 	keysets["tfghryb"] = new Keyset(key::SCANCODE_T, key::SCANCODE_G, key::SCANCODE_F, key::SCANCODE_H, key::SCANCODE_R, key::SCANCODE_Y, key::SCANCODE_B);
-	keysets["udlrzcspace"] = new Keyset(key::SCANCODE_UP, key::SCANCODE_DOWN, key::SCANCODE_LEFT, key::SCANCODE_RIGHT, key::SCANCODE_SPACE, key::SCANCODE_Z, key::SCANCODE_C);
+	keysets["udlrzcspace"] = new Keyset(key::SCANCODE_UP, key::SCANCODE_DOWN, key::SCANCODE_LEFT, key::SCANCODE_RIGHT, key::SCANCODE_Z, key::SCANCODE_C, key::SCANCODE_SPACE);
+
 	// other keysets
 
 	std::cout << "Levels loaded successfully" << std::endl;
