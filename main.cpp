@@ -10,18 +10,6 @@
 // global variables in main
 graphics::Brush br;
 
-// TEST
-std::vector<GameObject*> govec;
-
-Keyset wasdqex(key::SCANCODE_W, key::SCANCODE_S, key::SCANCODE_A, key::SCANCODE_D, key::SCANCODE_Q, key::SCANCODE_E, key::SCANCODE_X);
-Keyset tfghryb(key::SCANCODE_T, key::SCANCODE_G, key::SCANCODE_F, key::SCANCODE_H, key::SCANCODE_R, key::SCANCODE_Y, key::SCANCODE_B);
-Entity* eplayer = GObjFactory::createEntity(GObjFactory::PLAYER, get_canvas_width() / 2.0f, get_canvas_width() * 0.8f, 0, PI / 4.0f, wasdqex);
-
-Entity* eaccel = GObjFactory::createEntity(GObjFactory::ENEMY_1, 200.0f, 250.0f, -PI / 2.0f);
-Entity* erotate = GObjFactory::createEntity(GObjFactory::ENEMY_2, 500.0f, 250.0f, 0);
-Entity* enormal = GObjFactory::createEntity(GObjFactory::ENEMY_3, 800.0f, 250.0f, PI / 2.0f);
-// END TEST
-
 // sgg functions
 void update(float ms)
 {
@@ -32,9 +20,9 @@ void update(float ms)
 	{
 	case game_states::TEST: {
 		
-		// apply custom settings
-
 		gd->curr_selected_level = 1;
+		
+		// apply other custom settings
 
 
 		gd->game_state = game_states::MENU;
@@ -58,9 +46,8 @@ void update(float ms)
 		if (graphics::getKeyState(graphics::scancode_t::SCANCODE_S))
 		{
 			gd->game_state = game_states::GAME;
-
-			// stuff to do when game starts ...
-			gd->playerLs->push_back(eplayer);
+																																					// 1.0f = fire cooldown
+			gd->playerLs->push_back(GObjFactory::createEntity(GObjFactory::PLAYER, get_canvas_width() / 2.0f, get_canvas_height() * 0.9f, 0, PI / 4.0f, 1.0f, *gd->keysets["wasdqex"]));
 			break;
 		}
 
@@ -120,6 +107,7 @@ void update(float ms)
 		gd->game_state = ((game_states::MENU * graphics::getKeyState(graphics::scancode_t::SCANCODE_B)) + (gd->game_state * !graphics::getKeyState(graphics::scancode_t::SCANCODE_B)));
 
 		gd->game_state = ((game_states::OP_LEVEL * graphics::getKeyState(graphics::scancode_t::SCANCODE_L)) + (gd->game_state * !graphics::getKeyState(graphics::scancode_t::SCANCODE_L)));
+		gd->game_state = ((game_states::OP_PLAYER * graphics::getKeyState(graphics::scancode_t::SCANCODE_P)) + (gd->game_state * !graphics::getKeyState(graphics::scancode_t::SCANCODE_P)));
 
 		// ...
 
@@ -145,6 +133,11 @@ void update(float ms)
 
 		gd->curr_active_level = (-1 * graphics::getKeyState(graphics::scancode_t::SCANCODE_D)) + (gd->curr_active_level * !graphics::getKeyState(graphics::scancode_t::SCANCODE_D));
 		gd->curr_selected_level = (-1 * graphics::getKeyState(graphics::scancode_t::SCANCODE_D)) + (gd->curr_selected_level * !graphics::getKeyState(graphics::scancode_t::SCANCODE_D));
+
+		break;
+	}
+	case game_states::OP_PLAYER: {
+		gd->game_state = ((game_states::OPTIONS * graphics::getKeyState(graphics::scancode_t::SCANCODE_B)) + (gd->game_state * !graphics::getKeyState(graphics::scancode_t::SCANCODE_B)));
 
 		break;
 	}
@@ -270,6 +263,18 @@ void draw()
 				graphics::drawText(CANVAS_WIDTH / 20, (2.5f + 0.5f * ++display_height_index) * CANVAS_HEIGHT / 10, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 28, gd->levels[i]->info(), br);
 			}
 		}
+
+		break;
+	}
+	case game_states::OP_PLAYER: {
+		setColor(br, new float[3]{ 0.0f, 0.0f, 1.0f });
+		graphics::drawRect(CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2, CANVAS_WIDTH, CANVAS_HEIGHT, br);
+
+		setColor(br, new float[3]{ 0.0f, 0.0f, 0.0f });
+
+		graphics::drawText(CANVAS_WIDTH / 100, CANVAS_HEIGHT / 20, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 30, "<<< go Back", br);
+
+		
 
 		break;
 	}
