@@ -12,15 +12,16 @@ private:
 	Entity* player1; 
 	Entity* player2; //might be nullptr depending on initialization so not &
 	graphics::Brush health_br, std_br, bg_br;
+	const GameData *const gd;
 	int new_fps = 40;
 
-	void drawPlayerPanel(Entity* player, int x_pos) ;
+	void drawPlayerPanel(Entity* player, float x_pos) ;
 	void initializeBrushes();
 
 public:
-	UI(Entity* player);
-	UI(Entity* player1, Entity* player2);
+	UI(Entity* player, GameData* gd);
+	UI(Entity* player1, Entity* player2, GameData* gd);
 
-	void draw(GameData*);
+	void draw();
 };
 
