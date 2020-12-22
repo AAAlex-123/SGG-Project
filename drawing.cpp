@@ -1,5 +1,7 @@
 #include "drawing.h"
 
+graphics::Brush Drawing::br;
+
 Drawing::Drawing(float xpos, float ypos, float angle, float vel, float width,float height, const std::string* sprites, Path* movement) :
 	sprites(sprites),
 	x(xpos), y(ypos), angle(angle), vel(vel),
