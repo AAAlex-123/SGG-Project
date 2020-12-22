@@ -15,9 +15,11 @@ enum game_states
 	CREDITS = 0,
 	MENU = 1,
 	GAME = 2,
-	END = 3,
+	GAME_LOSE = 10,
+	GAME_WIN = 11,
 	OPTIONS = 4,
 	OP_LEVEL = 5,
+	LEVEL_TRANSITION = 7,
 	HELP = 8,
 	EXIT = 9,
 };
