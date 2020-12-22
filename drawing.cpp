@@ -6,7 +6,9 @@ Drawing::Drawing(float xpos, float ypos, float angle, float vel, float width,flo
 	width(width), height(height),
 	curr_sprite(0),
 	movement(movement)
-{}
+{
+	br.outline_opacity = 0.0f;
+}
 
 void Drawing::draw() {
 	br.fill_opacity = 1.0f;

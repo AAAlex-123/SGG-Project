@@ -14,10 +14,11 @@ private:
 	int curr_projectile;
 	bool _hasFired;
 
-	Entity(float xpos, float ypos, float angle, float vel, float width, float height, std::string* sprites, Path*,
+	Entity(float xpos, float ypos, float angle, float vel, float width, float height, const std::string* sprite_name, Path*,
 		int damage, int health, int score, int proj_type);
 
 	friend class GObjFactory; //allow creation of entities only to the factory
+	std::string shadow;
 
 public:
 	// Routine called by the update() main function; updated the object's state
@@ -26,6 +27,7 @@ public:
 	// Returns whether or not this object has fired
 	bool hasFired() const;
 
+	virtual void draw() override;
 	// Returns a projectile of type `curr_projectile` using the friend GObjFactory class
 	Projectile* getProjectile() const;
 	VisualEffect* getFireVisualEffect() const;
