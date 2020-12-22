@@ -22,8 +22,8 @@ Entity* GObjFactory::createEntity(int type, float x, float y, float angle, float
 }
 
 
-Entity* GObjFactory::createPlayer(float x, float y, float angle, float dangle, Keyset keyset) {
-	return new Entity(x, y, angle, std_speed / 2, (float)zep_width, (float)zep_height, new string(image_path + "player1"), new KeyboardPath(dangle, keyset), 5, 1, 0, GObjFactory::STANDARD_BULLET);
+Entity* GObjFactory::createPlayer(float x, float y, float angle, float dangle, float cooldown, Keyset keyset) {
+	return new Entity(x, y, angle, std_speed / 2, (float)zep_width, (float)zep_height, new string(image_path + "player1"), new KeyboardPath(dangle, cooldown, keyset), 5, 1, 0, GObjFactory::STANDARD_BULLET);
 }
 
 Entity* GObjFactory::createEnemy1(float x,float y,float angle) {
