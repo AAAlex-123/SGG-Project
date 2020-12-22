@@ -2,13 +2,16 @@
 #include "constants.h"
 #include "GObjFactory.h"
 #include "game_data.h"
+#include "UI.h"
 #include <iostream>
+
 
 // temp includes
 #include <vector>
 
 // global variables in main
 graphics::Brush br;
+UI* ui = nullptr;
 
 // sgg functions
 void update(float ms)
@@ -46,7 +49,7 @@ void update(float ms)
 			gd->curr_playing_level = gd->curr_selected_level == -1 ? -2 : gd->curr_selected_level;
 																																					// 0.1f = fire cooldown
 			gd->playerLs->push_back(GObjFactory::createEntity(GObjFactory::PLAYER, get_canvas_width() / 2.0f, get_canvas_height() * 0.9f, 0, PI / 4.0f, 0.1f, *gd->keysets["udlrzcspace"]));
-
+		    ui = new UI(gd->playerLs->front(),gd);
 			break;
 		}
 
@@ -79,7 +82,7 @@ void update(float ms)
 		gd->update(ms, gd->effectsLs);
 		
 		gd->updateLevel(ms);
-		gd->updateBackground(ms);
+		//gd->updateBackground(ms);
 
 	//check collisions
 		gd->checkCollisions(gd->enemyProjLs, gd->playerLs);
@@ -155,7 +158,7 @@ void update(float ms)
 	case game_states::OP_LEVEL: {
 		gd->game_state = ((game_states::OPTIONS * graphics::getKeyState(graphics::scancode_t::SCANCODE_B)) + (gd->game_state * !graphics::getKeyState(graphics::scancode_t::SCANCODE_B)));
 
-
+		//TODO fix lol
 		gd->curr_active_level = (0 * (graphics::getKeyState(graphics::scancode_t::SCANCODE_0) && gd->levels[0])) + (gd->curr_active_level * !(graphics::getKeyState(graphics::scancode_t::SCANCODE_0) && gd->levels[0]));
 		gd->curr_active_level = (1 * (graphics::getKeyState(graphics::scancode_t::SCANCODE_1) && gd->levels[1])) + (gd->curr_active_level * !(graphics::getKeyState(graphics::scancode_t::SCANCODE_1) && gd->levels[1]));
 		gd->curr_active_level = (2 * (graphics::getKeyState(graphics::scancode_t::SCANCODE_2) && gd->levels[2])) + (gd->curr_active_level * !(graphics::getKeyState(graphics::scancode_t::SCANCODE_2) && gd->levels[2]));
@@ -198,11 +201,9 @@ void update(float ms)
 void draw()
 {
 	GameData* gd = reinterpret_cast<GameData*> (graphics::getUserData());
-
 	br.texture = "";
 	graphics::resetPose();
 	setColor(br, 'G');
-	graphics::drawText(CANVAS_WIDTH / 150, 2 * CANVAS_HEIGHT / 20, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 35, "FPS: " + std::to_string(gd->fps), br);
 	switch (gd->game_state)
 	{
 	case game_states::TEST: {
@@ -246,14 +247,13 @@ void draw()
 	case game_states::GAME: {
 
 		gd->drawBackground(br);
-
 		// entity drawing
 		gd->draw(gd->enemyLs);
 		gd->draw(gd->enemyProjLs);
 		gd->draw(gd->playerLs);
 		gd->draw(gd->playerProjLs);
 		gd->draw(gd->effectsLs);
-
+		ui->draw();
 		break;
 	}
 	case game_states::LEVEL_TRANSITION: {	
@@ -270,7 +270,7 @@ void draw()
 		setColor(br, 'L');
 		graphics::drawText(0.2f * get_canvas_width(), 0.3f * get_canvas_height(), 20,
 			"next level in: " + std::to_string(gd->level_transition_timer), br);
-
+		ui->draw();
 		break;
 	}
 	case game_states::GAME_LOSE: {
@@ -392,6 +392,7 @@ void draw()
 
 int main(int argc, char** argv)
 {
+
 	graphics::createWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "1942ripoff");
 
 	graphics::setCanvasSize(CANVAS_WIDTH, CANVAS_HEIGHT);
@@ -400,8 +401,12 @@ int main(int argc, char** argv)
 	graphics::setDrawFunction(draw);
 	graphics::setUpdateFunction(update);
 
-	initialize();
+	br.fill_color[0] = 0.5f;
+	br.fill_color[1] = 0.7f;
+	br.fill_color[2] = 0.9f;
+	graphics::setWindowBackground(br);
 
+	initialize();
 	graphics::startMessageLoop();
 
 	return 0;
