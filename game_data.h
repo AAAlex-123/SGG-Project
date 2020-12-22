@@ -102,7 +102,7 @@ public:
 		score += scored;
 	}
 
-	int getScore() {
+	int getScore() const{
 		return score;
 	}
 };
