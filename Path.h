@@ -43,13 +43,14 @@ private:
 // Standalone Path that responds to Keyboard
 class KeyboardPath : public Path {
 public:
-	KeyboardPath(float dangle, Keyset keyset) : dangle(dangle), keyset(keyset)
+	KeyboardPath(float dangle, float cooldown, Keyset keyset) : dangle(dangle), cooldown(cooldown), remaining(0.0f), keyset(keyset)
 	{}
 	virtual bool move(float& x, float& y, float& angle, float& vel, float ms) override;
 
 private:
 	// % of a full rotation per second
-	const float dangle;
+	const float dangle, cooldown;
+	float remaining;
 	const Keyset keyset;
 };
 

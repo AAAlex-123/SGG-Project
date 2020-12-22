@@ -31,6 +31,7 @@ GameData::GameData() : fps(0), game_state(0),
 	keysets["wasdqex"] = new Keyset(key::SCANCODE_W, key::SCANCODE_S, key::SCANCODE_A, key::SCANCODE_D, key::SCANCODE_Q, key::SCANCODE_E, key::SCANCODE_X);
 	keysets["tfghryb"] = new Keyset(key::SCANCODE_T, key::SCANCODE_G, key::SCANCODE_F, key::SCANCODE_H, key::SCANCODE_R, key::SCANCODE_Y, key::SCANCODE_B);
 	keysets["udlrzcspace"] = new Keyset(key::SCANCODE_UP, key::SCANCODE_DOWN, key::SCANCODE_LEFT, key::SCANCODE_RIGHT, key::SCANCODE_Z, key::SCANCODE_C, key::SCANCODE_SPACE);
+
 	// other keysets
 
 	std::cout << "Levels loaded successfully" << std::endl;
