@@ -19,6 +19,7 @@ enum game_states
 	GAME_WIN = 11,
 	OPTIONS = 4,
 	OP_LEVEL = 5,
+	OP_PLAYER = 6,
 	LEVEL_TRANSITION = 7,
 	HELP = 8,
 	EXIT = 9,
