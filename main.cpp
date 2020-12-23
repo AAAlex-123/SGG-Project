@@ -48,8 +48,8 @@ void update(float ms)
 			gd->game_state = game_states::GAME;
 			gd->curr_playing_level = gd->curr_selected_level == -1 ? -2 : gd->curr_selected_level;
 																																					// 0.1f = fire cooldown
-			gd->playerLs->push_back(GObjFactory::createEntity(GObjFactory::PLAYER, get_canvas_width() / 3.0f, get_canvas_height() * 0.7f, 0, PI / 4.0f, 0.1f, *(gd->keysets["udlrzcspace"])));
-			gd->playerLs->push_back(GObjFactory::createEntity(GObjFactory::PLAYER, 2*get_canvas_width() / 3.0f, get_canvas_height() * 0.7f, 0, PI / 4.0f, 0.1f, *(gd->keysets["wasdqex"])));
+			gd->playerLs->push_back(GObjFactory::createEntity(GObjFactory::PLAYER, get_canvas_width() / 3.0f, get_canvas_height() * 0.7f, 0, PI / 4.0f, 0.1f));
+			gd->playerLs->push_back(GObjFactory::createEntity(GObjFactory::PLAYER, 2*get_canvas_width() / 3.0f, get_canvas_height() * 0.7f, 0, PI / 4.0f, 0.1f));
 
 			ui = new UI(gd);
 			break;

@@ -3,6 +3,7 @@
 #include <list>
 #include <vector>
 #include <iostream>
+#include <unordered_map>
 
 // needed because templates are defined in this header file
 #include "projectile.h"
@@ -19,9 +20,9 @@ private:
 	template<class T>
 	void static deleteList(list<T*>*);
 
-	bool load_level_data_from_file(const std::string& level_path, const std::string& wave_path);
-	bool _load_waves_from_file(const std::string& wave_path);
-	bool _load_levels_from_file(const std::string& wave_path);
+	bool load_level_data_from_file(const string& level_path, const string& wave_path);
+	bool _load_waves_from_file(const string& wave_path);
+	bool _load_levels_from_file(const string& wave_path);
 	// callback in case reading from file fails
 	void _load_hardcoded_levels();
 
@@ -41,11 +42,11 @@ public:
 	float el;
 	const float sps;
 	int curr_img;
-	std::vector<std::string> images;
+	vector<string> images;
 
 	// levels
-	std::unordered_map<int, Level*> levels;
-	std::unordered_map<std::string, Wave*> _waves;
+	unordered_map<int, Level*> levels;
+	unordered_map<string, Wave*> _waves;
 	int curr_active_level, curr_selected_level;
 
 	// game
