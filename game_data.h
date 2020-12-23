@@ -2,7 +2,6 @@
 #include "globals.h"
 #include <list>
 #include <vector>
-#include <unordered_map>
 #include <iostream>
 
 // needed because templates are defined in this header file
@@ -53,7 +52,6 @@ public:
 	float bg_offset, height_perc_per_second;
 	void updateBackground(float ms);
 	void drawBackground(graphics::Brush&);
-	std::unordered_map<std::string, Keyset*> keysets;
 	
 	int curr_playing_level;
 	float level_transition_timer;
