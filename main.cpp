@@ -2,13 +2,16 @@
 #include "constants.h"
 #include "GObjFactory.h"
 #include "game_data.h"
+#include "UI.h"
 #include <iostream>
+
 
 // temp includes
 #include <vector>
 
 // global variables in main
 graphics::Brush br;
+UI* ui = nullptr;
 
 // sgg functions
 void update(float ms)
@@ -45,10 +48,13 @@ void update(float ms)
 			gd->game_state = game_states::GAME;
 			gd->curr_playing_level = gd->curr_selected_level == -1 ? -2 : gd->curr_selected_level;
 																																					// 0.1f = fire cooldown
-			gd->playerLs->push_back(GObjFactory::createEntity(GObjFactory::PLAYER, get_canvas_width() / 2.0f, get_canvas_height() * 0.9f, 0, PI / 4.0f, 0.1f, *gd->keysets["udlrzcspace"]));
+			gd->playerLs->push_back(GObjFactory::createEntity(GObjFactory::PLAYER, get_canvas_width() / 3.0f, get_canvas_height() * 0.7f, 0, PI / 4.0f, 0.1f, *(gd->keysets["udlrzcspace"])));
+			gd->playerLs->push_back(GObjFactory::createEntity(GObjFactory::PLAYER, 2*get_canvas_width() / 3.0f, get_canvas_height() * 0.7f, 0, PI / 4.0f, 0.1f, *(gd->keysets["wasdqex"])));
 
+			ui = new UI(gd);
 			break;
 		}
+
 
 		gd->game_state = ((game_states::OPTIONS * graphics::getKeyState(graphics::scancode_t::SCANCODE_O)) + (gd->game_state * !graphics::getKeyState(graphics::scancode_t::SCANCODE_O)));
 		gd->game_state = ((game_states::CREDITS * graphics::getKeyState(graphics::scancode_t::SCANCODE_C)) + (gd->game_state * !graphics::getKeyState(graphics::scancode_t::SCANCODE_C)));
@@ -156,16 +162,14 @@ void update(float ms)
 		gd->game_state = ((game_states::OPTIONS * graphics::getKeyState(graphics::scancode_t::SCANCODE_B)) + (gd->game_state * !graphics::getKeyState(graphics::scancode_t::SCANCODE_B)));
 
 
-		gd->curr_active_level = (0 * (graphics::getKeyState(graphics::scancode_t::SCANCODE_0) && gd->levels[0])) + (gd->curr_active_level * !(graphics::getKeyState(graphics::scancode_t::SCANCODE_0) && gd->levels[0]));
-		gd->curr_active_level = (1 * (graphics::getKeyState(graphics::scancode_t::SCANCODE_1) && gd->levels[1])) + (gd->curr_active_level * !(graphics::getKeyState(graphics::scancode_t::SCANCODE_1) && gd->levels[1]));
-		gd->curr_active_level = (2 * (graphics::getKeyState(graphics::scancode_t::SCANCODE_2) && gd->levels[2])) + (gd->curr_active_level * !(graphics::getKeyState(graphics::scancode_t::SCANCODE_2) && gd->levels[2]));
-		gd->curr_active_level = (3 * (graphics::getKeyState(graphics::scancode_t::SCANCODE_3) && gd->levels[3])) + (gd->curr_active_level * !(graphics::getKeyState(graphics::scancode_t::SCANCODE_3) && gd->levels[3]));
-		gd->curr_active_level = (4 * (graphics::getKeyState(graphics::scancode_t::SCANCODE_4) && gd->levels[4])) + (gd->curr_active_level * !(graphics::getKeyState(graphics::scancode_t::SCANCODE_4) && gd->levels[4]));
-		gd->curr_active_level = (5 * (graphics::getKeyState(graphics::scancode_t::SCANCODE_5) && gd->levels[5])) + (gd->curr_active_level * !(graphics::getKeyState(graphics::scancode_t::SCANCODE_5) && gd->levels[5]));
-		gd->curr_active_level = (6 * (graphics::getKeyState(graphics::scancode_t::SCANCODE_6) && gd->levels[6])) + (gd->curr_active_level * !(graphics::getKeyState(graphics::scancode_t::SCANCODE_6) && gd->levels[6]));
-		gd->curr_active_level = (7 * (graphics::getKeyState(graphics::scancode_t::SCANCODE_7) && gd->levels[7])) + (gd->curr_active_level * !(graphics::getKeyState(graphics::scancode_t::SCANCODE_7) && gd->levels[7]));
-		gd->curr_active_level = (8 * (graphics::getKeyState(graphics::scancode_t::SCANCODE_8) && gd->levels[8])) + (gd->curr_active_level * !(graphics::getKeyState(graphics::scancode_t::SCANCODE_8) && gd->levels[8]));
-		gd->curr_active_level = (9 * (graphics::getKeyState(graphics::scancode_t::SCANCODE_9) && gd->levels[9])) + (gd->curr_active_level * !(graphics::getKeyState(graphics::scancode_t::SCANCODE_9) && gd->levels[9]));
+		bool codes[10] = { graphics::getKeyState(graphics::scancode_t::SCANCODE_0) ,graphics::getKeyState(graphics::scancode_t::SCANCODE_1) ,graphics::getKeyState(graphics::scancode_t::SCANCODE_2) ,
+		graphics::getKeyState(graphics::scancode_t::SCANCODE_3) ,graphics::getKeyState(graphics::scancode_t::SCANCODE_4) ,graphics::getKeyState(graphics::scancode_t::SCANCODE_5),
+			graphics::getKeyState(graphics::scancode_t::SCANCODE_6) ,graphics::getKeyState(graphics::scancode_t::SCANCODE_7) ,graphics::getKeyState(graphics::scancode_t::SCANCODE_8) ,
+		graphics::getKeyState(graphics::scancode_t::SCANCODE_9) };
+
+		for(int i=0; i<10;i++)
+			gd->curr_active_level = (i * (codes[i] && gd->levels[i])) + (gd->curr_active_level * !codes[i] && gd->levels[i]);
+		
 
 		gd->curr_selected_level = (gd->curr_active_level * graphics::getKeyState(graphics::scancode_t::SCANCODE_S)) + (gd->curr_selected_level * !graphics::getKeyState(graphics::scancode_t::SCANCODE_S));
 
@@ -198,11 +202,9 @@ void update(float ms)
 void draw()
 {
 	GameData* gd = reinterpret_cast<GameData*> (graphics::getUserData());
-
 	br.texture = "";
 	graphics::resetPose();
 	setColor(br, 'G');
-	graphics::drawText(CANVAS_WIDTH / 150, 2 * CANVAS_HEIGHT / 20, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 35, "FPS: " + std::to_string(gd->fps), br);
 	switch (gd->game_state)
 	{
 	case game_states::TEST: {
@@ -246,14 +248,13 @@ void draw()
 	case game_states::GAME: {
 
 		gd->drawBackground(br);
-
 		// entity drawing
 		gd->draw(gd->enemyLs);
 		gd->draw(gd->enemyProjLs);
 		gd->draw(gd->playerLs);
 		gd->draw(gd->playerProjLs);
 		gd->draw(gd->effectsLs);
-
+		ui->draw();
 		break;
 	}
 	case game_states::LEVEL_TRANSITION: {	
@@ -270,7 +271,7 @@ void draw()
 		setColor(br, 'L');
 		graphics::drawText(0.2f * get_canvas_width(), 0.3f * get_canvas_height(), 20,
 			"next level in: " + std::to_string(gd->level_transition_timer), br);
-
+		ui->draw();
 		break;
 	}
 	case game_states::GAME_LOSE: {
@@ -344,8 +345,6 @@ void draw()
 
 		graphics::drawText(CANVAS_WIDTH / 100, CANVAS_HEIGHT / 20, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 30, "<<< go Back", br);
 
-		
-
 		break;
 	}
 	case game_states::HELP: {
@@ -392,6 +391,7 @@ void draw()
 
 int main(int argc, char** argv)
 {
+
 	graphics::createWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "1942ripoff");
 
 	graphics::setCanvasSize(CANVAS_WIDTH, CANVAS_HEIGHT);
@@ -400,8 +400,12 @@ int main(int argc, char** argv)
 	graphics::setDrawFunction(draw);
 	graphics::setUpdateFunction(update);
 
-	initialize();
+	br.fill_color[0] = 0.5f;
+	br.fill_color[1] = 0.7f;
+	br.fill_color[2] = 0.9f;
+	graphics::setWindowBackground(br);
 
+	initialize();
 	graphics::startMessageLoop();
 
 	return 0;

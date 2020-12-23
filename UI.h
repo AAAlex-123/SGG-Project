@@ -1,26 +1,22 @@
 #pragma once
-#include "entity.h"
-#include "graphics.h"
 #include "globals.h"
+#include "entity.h"
 #include "game_data.h"
 
-class UI{
-
+class UI {
 private:
 	bool isMult;
 	const float width, height;
-	Entity* player1; 
-	Entity* player2; //might be nullptr depending on initialization so not &
+	Entity** players;
 	graphics::Brush health_br, std_br, bg_br;
+	const GameData* const gd;
 	int new_fps = 40;
 
-	void drawPlayerPanel(Entity* player, int x_pos) ;
+	void drawPlayerPanel(const Entity* player, float x_pos);
 	void initializeBrushes();
 
 public:
-	UI(Entity* player);
-	UI(Entity* player1, Entity* player2);
+	UI(GameData* gd);
 
-	void draw(GameData*);
+	void draw();
 };
-

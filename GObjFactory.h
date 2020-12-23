@@ -2,7 +2,6 @@
 #include "globals.h"
 
 // See "entity.h" for why the factory pattern was neccesary here
-// because it's cool
 
 class Entity;
 class Projectile;
@@ -11,16 +10,19 @@ class VisualEffect;
 // A Factory class that's used to assemble and produce all game objects in the game.
 class GObjFactory {
 private:
+	static bool atLeastOne;
 	const static int plane_size = 46;
 	const static int zep_width = 20;
 	const static int zep_height = 43;
 	const static int proj_size = 20;
 	const static int std_speed = 120;
-  
+	const static Keyset pl1_kset;
+	const static Keyset pl2_kset;
+
 	static Entity* createEnemy1(float x, float y, float angle);
 	static Entity* createEnemy2(float x, float y, float angle);
 	static Entity* createEnemy3(float x, float y, float angle);
-	static Entity* createPlayer(float x, float y, float angle, float dangle, float cooldown, Keyset keyset);
+	static Entity* createPlayer(float x, float y, float angle, float dangle, float cooldown);
 
 	static Projectile* createStdB(float x, float y, float angle);
 	static Projectile* createLB(float x, float y, float angle);
@@ -35,9 +37,9 @@ public:
 	const static int PLAYER = 0, ENEMY_1 = 1, ENEMY_2 = 2, ENEMY_3 = 3;
 	const static int NOEFFECT = 404, EXPLOSION_1 = 100, EXPLOSION_2 = 200, SMOKE = 300;
 
-	static Entity* createEntity(int type, float x, float y, float angle, float dangle = 0.0f, float cooldown = 0.0f,
-			Keyset keyset = Keyset(key::SCANCODE_F18, key::SCANCODE_F19, key::SCANCODE_F20, key::SCANCODE_F21, key::SCANCODE_F22, key::SCANCODE_F23, key::SCANCODE_F24));
+	static Entity* createEntity(int type, float x, float y, float angle, float dangle = 0.0f, float cooldown = 0.0f);
 	static Projectile* createProjectile(int type, float x, float y, float angle);
 	// fps not needed when creating VisualEffects with only 1 sprite
 	static VisualEffect* createVisualEffect(int type, float x, float y, float angle, float duration, float fps = 0.0f);
 };
+
