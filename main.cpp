@@ -7,6 +7,11 @@
 
 // global variables in main
 graphics::Brush br;
+int curr_music;
+const int MENU_MUSIC = 1;
+const int BATTLE_MUSIC = 2;
+const int LOSE_MUSIC = 3;
+const int WIN_MUSIC = 4;
 
 // TEST
 std::vector<GameObject*> govec;
