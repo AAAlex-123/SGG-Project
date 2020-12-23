@@ -48,10 +48,13 @@ void update(float ms)
 			gd->game_state = game_states::GAME;
 			gd->curr_playing_level = gd->curr_selected_level == -1 ? -2 : gd->curr_selected_level;
 																																					// 0.1f = fire cooldown
-			gd->playerLs->push_back(GObjFactory::createEntity(GObjFactory::PLAYER, get_canvas_width() / 2.0f, get_canvas_height() * 0.9f, 0, PI / 4.0f, 0.1f));
-		    ui = new UI(gd->playerLs->front(),gd);
+			gd->playerLs->push_back(GObjFactory::createEntity(GObjFactory::PLAYER, get_canvas_width() / 3.0f, get_canvas_height() * 0.7f, 0, PI / 4.0f, 0.1f, *(gd->keysets["udlrzcspace"])));
+			gd->playerLs->push_back(GObjFactory::createEntity(GObjFactory::PLAYER, 2*get_canvas_width() / 3.0f, get_canvas_height() * 0.7f, 0, PI / 4.0f, 0.1f, *(gd->keysets["wasdqex"])));
+
+			ui = new UI(gd);
 			break;
 		}
+
 
 		gd->game_state = ((game_states::OPTIONS * graphics::getKeyState(graphics::scancode_t::SCANCODE_O)) + (gd->game_state * !graphics::getKeyState(graphics::scancode_t::SCANCODE_O)));
 		gd->game_state = ((game_states::CREDITS * graphics::getKeyState(graphics::scancode_t::SCANCODE_C)) + (gd->game_state * !graphics::getKeyState(graphics::scancode_t::SCANCODE_C)));
@@ -82,7 +85,7 @@ void update(float ms)
 		gd->update(ms, gd->effectsLs);
 		
 		gd->updateLevel(ms);
-		//gd->updateBackground(ms);
+		gd->updateBackground(ms);
 
 	//check collisions
 		gd->checkCollisions(gd->enemyProjLs, gd->playerLs);
@@ -341,8 +344,6 @@ void draw()
 		setColor(br, new float[3]{ 0.0f, 0.0f, 0.0f });
 
 		graphics::drawText(CANVAS_WIDTH / 100, CANVAS_HEIGHT / 20, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 30, "<<< go Back", br);
-
-		
 
 		break;
 	}
