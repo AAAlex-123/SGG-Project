@@ -48,7 +48,7 @@ void update(float ms)
 			gd->game_state = game_states::GAME;
 			gd->curr_playing_level = gd->curr_selected_level == -1 ? -2 : gd->curr_selected_level;
 																																					// 0.1f = fire cooldown
-			gd->playerLs->push_back(GObjFactory::createEntity(GObjFactory::PLAYER, get_canvas_width() / 2.0f, get_canvas_height() * 0.9f, 0, PI / 4.0f, 0.1f, *gd->keysets["udlrzcspace"]));
+			gd->playerLs->push_back(GObjFactory::createEntity(GObjFactory::PLAYER, get_canvas_width() / 2.0f, get_canvas_height() * 0.9f, 0, PI / 4.0f, 0.1f));
 		    ui = new UI(gd->playerLs->front(),gd);
 			break;
 		}
@@ -82,7 +82,7 @@ void update(float ms)
 		gd->update(ms, gd->effectsLs);
 		
 		gd->updateLevel(ms);
-		gd->updateBackground(ms);
+		//gd->updateBackground(ms);
 
 	//check collisions
 		gd->checkCollisions(gd->enemyProjLs, gd->playerLs);
@@ -158,17 +158,15 @@ void update(float ms)
 	case game_states::OP_LEVEL: {
 		gd->game_state = ((game_states::OPTIONS * graphics::getKeyState(graphics::scancode_t::SCANCODE_B)) + (gd->game_state * !graphics::getKeyState(graphics::scancode_t::SCANCODE_B)));
 
-		// no lol
-		gd->curr_active_level = (0 * (graphics::getKeyState(graphics::scancode_t::SCANCODE_0) && gd->levels[0])) + (gd->curr_active_level * !(graphics::getKeyState(graphics::scancode_t::SCANCODE_0) && gd->levels[0]));
-		gd->curr_active_level = (1 * (graphics::getKeyState(graphics::scancode_t::SCANCODE_1) && gd->levels[1])) + (gd->curr_active_level * !(graphics::getKeyState(graphics::scancode_t::SCANCODE_1) && gd->levels[1]));
-		gd->curr_active_level = (2 * (graphics::getKeyState(graphics::scancode_t::SCANCODE_2) && gd->levels[2])) + (gd->curr_active_level * !(graphics::getKeyState(graphics::scancode_t::SCANCODE_2) && gd->levels[2]));
-		gd->curr_active_level = (3 * (graphics::getKeyState(graphics::scancode_t::SCANCODE_3) && gd->levels[3])) + (gd->curr_active_level * !(graphics::getKeyState(graphics::scancode_t::SCANCODE_3) && gd->levels[3]));
-		gd->curr_active_level = (4 * (graphics::getKeyState(graphics::scancode_t::SCANCODE_4) && gd->levels[4])) + (gd->curr_active_level * !(graphics::getKeyState(graphics::scancode_t::SCANCODE_4) && gd->levels[4]));
-		gd->curr_active_level = (5 * (graphics::getKeyState(graphics::scancode_t::SCANCODE_5) && gd->levels[5])) + (gd->curr_active_level * !(graphics::getKeyState(graphics::scancode_t::SCANCODE_5) && gd->levels[5]));
-		gd->curr_active_level = (6 * (graphics::getKeyState(graphics::scancode_t::SCANCODE_6) && gd->levels[6])) + (gd->curr_active_level * !(graphics::getKeyState(graphics::scancode_t::SCANCODE_6) && gd->levels[6]));
-		gd->curr_active_level = (7 * (graphics::getKeyState(graphics::scancode_t::SCANCODE_7) && gd->levels[7])) + (gd->curr_active_level * !(graphics::getKeyState(graphics::scancode_t::SCANCODE_7) && gd->levels[7]));
-		gd->curr_active_level = (8 * (graphics::getKeyState(graphics::scancode_t::SCANCODE_8) && gd->levels[8])) + (gd->curr_active_level * !(graphics::getKeyState(graphics::scancode_t::SCANCODE_8) && gd->levels[8]));
-		gd->curr_active_level = (9 * (graphics::getKeyState(graphics::scancode_t::SCANCODE_9) && gd->levels[9])) + (gd->curr_active_level * !(graphics::getKeyState(graphics::scancode_t::SCANCODE_9) && gd->levels[9]));
+
+		bool codes[10] = { graphics::getKeyState(graphics::scancode_t::SCANCODE_0) ,graphics::getKeyState(graphics::scancode_t::SCANCODE_1) ,graphics::getKeyState(graphics::scancode_t::SCANCODE_2) ,
+		graphics::getKeyState(graphics::scancode_t::SCANCODE_3) ,graphics::getKeyState(graphics::scancode_t::SCANCODE_4) ,graphics::getKeyState(graphics::scancode_t::SCANCODE_5),
+			graphics::getKeyState(graphics::scancode_t::SCANCODE_6) ,graphics::getKeyState(graphics::scancode_t::SCANCODE_7) ,graphics::getKeyState(graphics::scancode_t::SCANCODE_8) ,
+		graphics::getKeyState(graphics::scancode_t::SCANCODE_9) };
+
+		for(int i=0; i<10;i++)
+			gd->curr_active_level = (i * (codes[i] && gd->levels[i])) + (gd->curr_active_level * !codes[i] && gd->levels[i]);
+		
 
 		gd->curr_selected_level = (gd->curr_active_level * graphics::getKeyState(graphics::scancode_t::SCANCODE_S)) + (gd->curr_selected_level * !graphics::getKeyState(graphics::scancode_t::SCANCODE_S));
 
@@ -245,22 +243,20 @@ void draw()
 		break;
 	}
 	case game_states::GAME: {
+
 		gd->drawBackground(br);
-		
 		// entity drawing
 		gd->draw(gd->enemyLs);
 		gd->draw(gd->enemyProjLs);
 		gd->draw(gd->playerLs);
 		gd->draw(gd->playerProjLs);
 		gd->draw(gd->effectsLs);
-		
 		ui->draw();
 		break;
 	}
 	case game_states::LEVEL_TRANSITION: {	
 		// do some drawing while waiting for next level
 		gd->drawBackground(br);
-
 		gd->draw(gd->playerLs);
 		gd->draw(gd->playerProjLs);
 		gd->draw(gd->effectsLs);
@@ -272,7 +268,6 @@ void draw()
 		setColor(br, 'L');
 		graphics::drawText(0.2f * get_canvas_width(), 0.3f * get_canvas_height(), 20,
 			"next level in: " + std::to_string(gd->level_transition_timer), br);
-
 		ui->draw();
 		break;
 	}
