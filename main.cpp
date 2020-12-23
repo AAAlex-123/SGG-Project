@@ -82,7 +82,7 @@ void update(float ms)
 		gd->update(ms, gd->effectsLs);
 		
 		gd->updateLevel(ms);
-		//gd->updateBackground(ms);
+		gd->updateBackground(ms);
 
 	//check collisions
 		gd->checkCollisions(gd->enemyProjLs, gd->playerLs);
@@ -158,7 +158,7 @@ void update(float ms)
 	case game_states::OP_LEVEL: {
 		gd->game_state = ((game_states::OPTIONS * graphics::getKeyState(graphics::scancode_t::SCANCODE_B)) + (gd->game_state * !graphics::getKeyState(graphics::scancode_t::SCANCODE_B)));
 
-		//TODO fix lol
+		// no lol
 		gd->curr_active_level = (0 * (graphics::getKeyState(graphics::scancode_t::SCANCODE_0) && gd->levels[0])) + (gd->curr_active_level * !(graphics::getKeyState(graphics::scancode_t::SCANCODE_0) && gd->levels[0]));
 		gd->curr_active_level = (1 * (graphics::getKeyState(graphics::scancode_t::SCANCODE_1) && gd->levels[1])) + (gd->curr_active_level * !(graphics::getKeyState(graphics::scancode_t::SCANCODE_1) && gd->levels[1]));
 		gd->curr_active_level = (2 * (graphics::getKeyState(graphics::scancode_t::SCANCODE_2) && gd->levels[2])) + (gd->curr_active_level * !(graphics::getKeyState(graphics::scancode_t::SCANCODE_2) && gd->levels[2]));
@@ -245,20 +245,22 @@ void draw()
 		break;
 	}
 	case game_states::GAME: {
-
 		gd->drawBackground(br);
+		
 		// entity drawing
 		gd->draw(gd->enemyLs);
 		gd->draw(gd->enemyProjLs);
 		gd->draw(gd->playerLs);
 		gd->draw(gd->playerProjLs);
 		gd->draw(gd->effectsLs);
+		
 		ui->draw();
 		break;
 	}
 	case game_states::LEVEL_TRANSITION: {	
 		// do some drawing while waiting for next level
 		gd->drawBackground(br);
+
 		gd->draw(gd->playerLs);
 		gd->draw(gd->playerProjLs);
 		gd->draw(gd->effectsLs);
@@ -270,6 +272,7 @@ void draw()
 		setColor(br, 'L');
 		graphics::drawText(0.2f * get_canvas_width(), 0.3f * get_canvas_height(), 20,
 			"next level in: " + std::to_string(gd->level_transition_timer), br);
+
 		ui->draw();
 		break;
 	}
