@@ -7,11 +7,16 @@
 
 using namespace std;
 
+bool GObjFactory::atLeastOne = false;
+const Keyset GObjFactory::pl1_kset = Keyset(key::SCANCODE_W, key::SCANCODE_S, key::SCANCODE_A, key::SCANCODE_D, key::SCANCODE_Q, key::SCANCODE_E, key::SCANCODE_X);
+const Keyset GObjFactory::pl2_kset = Keyset(key::SCANCODE_UP, key::SCANCODE_DOWN, key::SCANCODE_LEFT, key::SCANCODE_RIGHT, key::SCANCODE_Z, key::SCANCODE_C, key::SCANCODE_SPACE);
+//unused: Keyset(key::SCANCODE_T, key::SCANCODE_G, key::SCANCODE_F, key::SCANCODE_H, key::SCANCODE_R, key::SCANCODE_Y, key::SCANCODE_B);
+
 // ===== ENTITY =====
 
-Entity* GObjFactory::createEntity(int type, float x, float y, float angle, float dangle, float cooldown, Keyset keyset) {
+Entity* GObjFactory::createEntity(int type, float x, float y, float angle, float dangle, float cooldown) {
 	switch (type) {
-	case GObjFactory::PLAYER: return createPlayer(x, y, angle, dangle, cooldown, keyset);
+	case GObjFactory::PLAYER: return createPlayer(x, y, angle, dangle, cooldown);
 	case GObjFactory::ENEMY_1: return createEnemy1(x, y, angle);
 	case GObjFactory::ENEMY_2: return createEnemy2(x, y, angle);
 	case GObjFactory::ENEMY_3: return createEnemy3(x, y, angle);
@@ -22,8 +27,12 @@ Entity* GObjFactory::createEntity(int type, float x, float y, float angle, float
 }
 
 
-Entity* GObjFactory::createPlayer(float x, float y, float angle, float dangle, float cooldown, Keyset keyset) {
-	return new Entity(x, y, angle, std_speed / 2, (float)zep_width, (float)zep_height, new string(image_path + "player1"), new KeyboardPath(dangle, cooldown, keyset), 5, 1, 0, GObjFactory::STANDARD_BULLET);
+Entity* GObjFactory::createPlayer(float x, float y, float angle, float dangle, float cooldown) {
+	if (!atLeastOne) {
+		atLeastOne = true;
+		return new Entity(x, y, angle, std_speed / 2, (float)zep_width, (float)zep_height, new string(image_path + "player1"), new KeyboardPath(dangle, cooldown ,pl1_kset), 5, 10, 0, GObjFactory::STANDARD_BULLET);
+	}else
+		return new Entity(x, y, angle, std_speed / 2, (float)zep_width, (float)zep_height, new string(image_path + "player2"), new KeyboardPath(dangle, cooldown, pl2_kset), 5, 10, 0, GObjFactory::STANDARD_BULLET);
 }
 
 Entity* GObjFactory::createEnemy1(float x,float y,float angle) {
