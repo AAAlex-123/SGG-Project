@@ -1,15 +1,12 @@
 #pragma once
-#include "graphics.h"
 #include "globals.h"
 #include "Path.h"
-#include <string>
 
-//Interface to allow uniform access to all drawable objects. Includes a standard drawing method all classes need to use.
+//Interface to allow uniform access to all drawable objects. Includes a standard virtual drawing method.
 class Drawing {
-private:
-	graphics::Brush br;
 
 protected:
+	static graphics::Brush br;
 	const std::string* const sprites;
 
 	float x, y, angle, vel;	// angle is measured in radiants and not in degrees
@@ -24,10 +21,13 @@ public:
 	// Updates the entities state (movement etc.)
 	virtual void update(float) = 0;
 	// Draws the object at [x, y] with `angle` orientation with its `curr_sprite`
-	virtual void draw() final;
+	virtual void draw();
 
 	// Returns false if the object is not alive; i.e. it must be destroyed
 	virtual operator bool() const = 0;
+
+	virtual float get_x() { return x; }
+	virtual float get_y() { return y; }
 
 	virtual ~Drawing();
 };

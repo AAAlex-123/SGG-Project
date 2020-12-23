@@ -3,12 +3,24 @@
 2// lines starting with 'line_no   ' (3 spaces) contain data
 3// yes there must be a line with just the line number at the end for better error messages
 4// Level declarations are the same used by the constructor
-5// \line_no\   wave \desc:str\
+5// \line_no\   wave("\desc:str\")
 6// \line_no\   Spawnpoint(\type:n\, \perc_x:f\, \perc_y:f\, \angle:f\, \amount:n\, \spawn_delta:f\, \initial_delay:f\)
-7   Wave("line")
-8   Spawnpoint(3, 0.0f, 0.5f, -90.0f, 10, 1.0f, 0.0f)
-9   Wave("donuts")
-10   Spawnpoint(2, 0.2f, 0.1f, 0.0f, 2, 1.5f, 1.0f)
-11   Spawnpoint(2, 0.5f, 0.1f, 0.0f, 2, 3.0f, 1.0f)
-12   Spawnpoint(2, 0.8f, 0.1f, 0.0f, 2, 5.0f, 1.0f)
-13
+7   Wave("shower")
+8   Spawnpoint(3, 0.2f, -0.1f, -180.0f, 2, 5.0f, 0.0f)
+9   Spawnpoint(3, 0.5f, -0.1f, -180.0f, 2, 5.0f, 0.0f)
+10   Spawnpoint(3, 0.8f, -0.1f, -180.0f, 2, 5.0f, 0.0f)
+11   Wave("fast-shower")
+12   Spawnpoint(1, 0.2f, -0.1f, -180.0f, 5, 3.0f, 0.0f)
+13   Spawnpoint(1, 0.5f, -0.1f, -180.0f, 5, 3.0f, 0.0f)
+14   Spawnpoint(1, 0.8f, -0.1f, -180.0f, 5, 3.0f, 0.0f)
+15   Wave("circles")
+16   Spawnpoint(2, 0.2f, 0.3f, -90.0f, 1, 6.0f, 0.0f)
+17   Spawnpoint(2, 0.5f, 0.3f, -90.0f, 1, 6.0f, 0.0f)
+18   Spawnpoint(2, 0.8f, 0.3f, -90.0f, 1, 6.0f, 0.0f)
+19   Wave("random")
+20   Spawnpoint(3, 0.5f, -0.1f, -180.0f, 4, 2.0f, 0.0f)
+21   Spawnpoint(3, 0.3f, -0.1f, -160.0f, 2, 4.0f, 2.0f)
+22   Spawnpoint(3, 0.7f, -0.1f, 160.0f, 2, 4.0f, 2.0f)
+23   Spawnpoint(1, 0.1f, -0.1f, -140.0f, 3, 5.0f, 1.0f)
+24   Spawnpoint(1, 0.9f, -0.1f, 140.0f, 3, 5.0f, 1.0f)
+25

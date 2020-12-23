@@ -1,39 +1,42 @@
 #pragma once
+#include "globals.h"
+#include <list>
+#include <vector>
+#include <iostream>
+
+// needed because templates are defined in this header file
 #include "projectile.h"
 #include "entity.h"
 #include "visual_effect.h"
 #include "level.h"
-#include "globals.h"
-#include <list>
-#include <vector>
-#include <unordered_map>
 
 // lmao imagine using using
 using namespace std;
+enum game_states;
 
 class GameData {
 private:
 	template<class T>
 	void static deleteList(list<T*>*);
-	
+
 	bool load_level_data_from_file(const std::string& level_path, const std::string& wave_path);
 	bool _load_waves_from_file(const std::string& wave_path);
 	bool _load_levels_from_file(const std::string& wave_path);
 	// callback in case reading from file fails
 	void _load_hardcoded_levels();
-	
+
 	int score;
 
 public:
 	// collections
-	list<Entity*> *enemyLs, *playerLs;
-	list<Projectile*> *enemyProjLs, *playerProjLs;
-	list<VisualEffect*> *effectsLs;
+	list<Entity*>* enemyLs, * playerLs;
+	list<Projectile*>* enemyProjLs, * playerProjLs;
+	list<VisualEffect*>* effectsLs;
 
 	// general
 	int fps;
 	int game_state;
-	
+
 	// loading
 	float el;
 	const float sps;
@@ -44,17 +47,33 @@ public:
 	std::unordered_map<int, Level*> levels;
 	std::unordered_map<std::string, Wave*> _waves;
 	int curr_active_level, curr_selected_level;
+
+	// game
+	float bg_offset, height_perc_per_second;
+	void updateBackground(float ms);
+	void drawBackground(graphics::Brush&);
 	
+	int curr_playing_level;
+	float level_transition_timer;
+	float set_level_transition_timer(float timer = 5.0f) { return timer; }
+	void next_level() { --curr_playing_level; }
+	Level* has_next_level() { 
+		Level* return_val = levels[curr_playing_level - 1];
+		if (!return_val)
+			levels.erase(curr_playing_level - 1);
+		return return_val;
+	}
+
 	// constructor and destructor because why not
 	GameData();
 	~GameData();
 	
 	// Level stuff
-	void updateLevel(float ms) { levels[curr_selected_level]->update(ms); }
+	void updateLevel(float ms) { levels[curr_playing_level]->update(ms); }
 	void spawn()
 	{
-		if (levels[curr_selected_level]->can_spawn())
-			enemyLs->push_back(levels[curr_selected_level]->spawn());
+		if (levels[curr_playing_level]->can_spawn())
+			enemyLs->push_back(levels[curr_playing_level]->spawn());
 	}
 	
 	//Updates all objects within the list. Template class must be derived from Drawing.
@@ -75,13 +94,13 @@ public:
 
 	//Checks if any object within the list must be destroyed, and deletes it. Template class must be derived from Drawing.
 	template <class T>
-	static void checkAndDelete(list<T*>*);
+	void checkAndDelete(list<T*>*);
 	
 	void addScore(int scored) {
 		score += scored;
 	}
 
-	int getScore() {
+	int getScore() const{
 		return score;
 	}
 };
@@ -123,6 +142,7 @@ void GameData::fire(list<T*>* ls) const {
 			} else {
 				enemyProjLs->push_back(en->getProjectile());
 			}
+			effectsLs->push_back(en->getFireVisualEffect());
 		}
 	}
 }
@@ -131,6 +151,10 @@ template <class T>
 void GameData::checkAndDelete(list<T*>* ls) {
 	for (auto iter = ls->begin(); iter != ls->end(); ++iter) {
 		if (!**iter) {
+			// don't question this
+			if ((void*) ls == (void*)enemyLs || (void*)ls == (void*)playerLs) {
+				effectsLs->push_back((*iter)->getDestructionVisualEffect());
+			}
 			delete (*iter);
 			iter = ls->erase(iter);
 			// if the last item is deleted, `iter == ls->end()`
@@ -139,6 +163,8 @@ void GameData::checkAndDelete(list<T*>* ls) {
 				break;
 		}
 	}
+	if (playerLs->size() == 0)
+		game_state = game_states::GAME_LOSE;
 }
 
 template<class T>

@@ -4,7 +4,6 @@
 #include <iostream>
 
 #include "game_data.h"
-#include "graphics.h"
 #include "level.h"
 
 bool load_images_from_file(const std::string& image_path)

@@ -6,30 +6,19 @@ private:
 	float duration, spf, elapsed, total_elapsed;
 	const int sprite_no;
 
-public:
 	VisualEffect(float xpos, float ypos, float angle, float vel, float size, std::string* sprites,
-		int sprite_no, float duration, float fps) :
-		Drawing(xpos, ypos, angle, vel, size, size, sprites, new StaticPath),
-		sprite_no(sprite_no), duration(duration), spf(1 / fps), elapsed(0), total_elapsed(0)
-	{}
+		int sprite_no, float duration, float fps);
+	
+	friend class GObjFactory;  //allow creation of entities only to the factory
 
+public:
 	// Returns false if the object is not alive; i.e. it must be destroyed
-	virtual operator bool() const override {
-		return total_elapsed < duration;
-	}
+	virtual operator bool() const override;
 
 	// Moved the effect and changes the current sprite based on the elapsed time
-	void update(float ms) {
-		this->movement->move(x, y, angle, vel, ms);
+	void update(float ms);
 
-		total_elapsed += ms / 1000.0f;
-		elapsed += ms / 1000.0f;
-
-		curr_sprite = (((curr_sprite + 1) % sprite_no) * (elapsed > spf)) + (curr_sprite * !(elapsed > spf));
-		elapsed = (0.0f * (elapsed > spf)) + (elapsed * !(elapsed > spf));
-	}
+	virtual VisualEffect* getDestructionVisualEffect() const;
 	
-	virtual ~VisualEffect() {
-		delete[] sprites; 
-	}
+	virtual ~VisualEffect();
 };

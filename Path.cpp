@@ -1,5 +1,4 @@
 #include "Path.h"
-#include "graphics.h"
 #include <cmath>
 
 bool Path::move(float& x, float& y, float& angle, float& vel, float ms)
@@ -46,8 +45,12 @@ bool KeyboardPath::move(float& x, float& y, float& angle, float& vel, float ms)
 		x += vel * (float)sin(angle + PI / 2) * (ms / 1000.0f);
 		y += vel * (float)cos(angle + PI / 2) * (ms / 1000.0f);
 	}
+	// decrease or keep at 0
+	remaining = ((0.0f) * (remaining <= 0.0f)) + ((remaining - (ms / 1000.0f)) * (remaining > 0.0f));
+	// reset if it is 0 and fire is being pressed
+	remaining = ((cooldown) * (remaining == 0.0f && graphics::getKeyState(keyset.fire))) + ((remaining) * !(remaining == 0.0f && graphics::getKeyState(keyset.fire)));
 	
-	return graphics::getKeyState(keyset.fire);
+	return (graphics::getKeyState(keyset.fire)) && (remaining == cooldown);
 }
 
 bool FiringPath::move(float& x, float& y, float& angle, float& vel, float ms)

@@ -4,8 +4,8 @@
 // constants
 const short WINDOW_WIDTH = 1200;
 const short WINDOW_HEIGHT = 600;
-const float CANVAS_WIDTH = 1200.0f;
-const float CANVAS_HEIGHT = 600.0f;
+const float CANVAS_WIDTH = 400.0f;
+const float CANVAS_HEIGHT = 500.0f;
 
 // enum
 enum game_states
@@ -15,26 +15,20 @@ enum game_states
 	CREDITS = 0,
 	MENU = 1,
 	GAME = 2,
-	END = 3,
+	GAME_LOSE = 10,
+	GAME_WIN = 11,
 	OPTIONS = 4,
 	OP_LEVEL = 5,
+	OP_PLAYER = 6,
+	LEVEL_TRANSITION = 7,
 	HELP = 8,
 	EXIT = 9,
 };
-
-// assets and other paths
-const std::string asset_path = ".\\assets\\";
-const std::string font = asset_path + "orange juice 2.0.ttf";
-const std::string image_path = ".\\assets\\";
-const std::string level_path = ".\\levels.txt";
 
 // function declarations
 void initialize();
 // true == success
 bool load_images_from_file(const std::string& image_path);
-
-void setColor(graphics::Brush&, const float*);
-void setColor(graphics::Brush&, char c);
 
 // key short names
 const graphics::scancode_t K_UP = graphics::scancode_t::SCANCODE_UP;

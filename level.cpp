@@ -1,6 +1,6 @@
 #include "level.h"
+#include "entity.h"
 #include "GObjFactory.h"
-#include "globals.h"
 #include <iostream>
 
 // ===== LEVEL =====
@@ -65,6 +65,11 @@ Entity* Level::spawn()
 void Level::add_wave(float time, Wave* w)
 {
 	waves->insert(new std::pair<float, Wave*>(time, w));
+}
+
+Level::operator bool() const
+{
+	return !(waves->empty() && enemy_queue->empty());
 }
 
 std::string Level::to_file_string()
