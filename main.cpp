@@ -32,6 +32,25 @@ Entity* enormal = GObjFactory::createEntity(GObjFactory::ENEMY_3, 800.0f, 250.0f
 void update(float ms)
 {
 	GameData* gd = reinterpret_cast<GameData*> (graphics::getUserData());
+	
+	//choose music
+	
+	if (gd->game_state == game_states::GAME && curr_music == MENU_MUSIC) {
+		graphics::playMusic(music_path + "battle_music.mp3", 0.5f);
+		curr_music = BATTLE_MUSIC;
+	}
+	else if (gd->game_state == game_states::GAME_LOSE && curr_music == BATTLE_MUSIC) {
+		graphics::playMusic(music_path + "defeat_music.mp3", 0.5f, false, 2000);
+		curr_music = LOSE_MUSIC;
+	}
+	else if (gd->game_state == game_states::GAME_WIN && curr_music == BATTLE_MUSIC) {
+		graphics::playMusic(music_path + "victory_music.mp3", 0.5f, false, 2000);
+		curr_music = WIN_MUSIC;
+	}
+	else if (gd->game_state == game_states::MENU && (curr_music == WIN_MUSIC || curr_music == LOSE_MUSIC)) { // if (game_states::MENU && (curr_music == WIN_MUSIC || curr_music == LOSE_MUSIC))
+		graphics::playMusic(music_path + "menu_music.mp3", 0.5f);
+		curr_music = MENU_MUSIC;
+	}
 
 	gd->fps = (int)(1000.0f / ms);
 	switch (gd->game_state)
@@ -351,7 +370,8 @@ void initialize()
 	if (!load_images_from_file(image_path))
 		std::cerr << "Unable to load images from: " << image_path << std::endl;
 
-	// ...
+	graphics::playMusic(music_path + "menu_music.mp3", 0.5f, true);
+	curr_music = MENU_MUSIC;
 }
 
 // nothing to see below here
