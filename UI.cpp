@@ -4,7 +4,7 @@
 #include "UI.h"
 
 UI::UI(GameData* gd) :
-	players(new Entity* [2]{ nullptr, nullptr }), width(get_canvas_width()), height(get_canvas_height()), gd(gd)
+	width(get_canvas_width()), height(get_canvas_height()), gd(gd)
 {
 	initializeBrushes();
 }
