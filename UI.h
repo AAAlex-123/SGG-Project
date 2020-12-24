@@ -5,7 +5,6 @@
 
 class UI {
 private:
-	bool isMult;
 	const float width, height;
 	graphics::Brush health_br, std_br, bg_br;
 	const GameData* const gd;
