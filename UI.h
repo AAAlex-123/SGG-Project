@@ -13,6 +13,7 @@ private:
 	int new_fps = 40;
 
 	void drawPlayerPanel(const Entity* player, float x_pos);
+	void drawDestroyedPanel(float x_pos);
 	void initializeBrushes();
 
 public:
