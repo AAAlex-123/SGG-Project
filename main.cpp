@@ -76,11 +76,12 @@ void update(float ms)
 		{
 			gd->game_state = game_states::GAME;
 			gd->curr_playing_level = gd->curr_selected_level == -1 ? -2 : gd->curr_selected_level;
-																																					
-			gd->playerLs->push_back(GObjFactory::createEntity(GObjFactory::PLAYER, get_canvas_width() / 2.0f, get_canvas_height() * 0.5f, 0, PI / 4.0f, 0.1f)); // 0.1f = fire cooldown
+																																	
+			gd->playerLs->push_back(GObjFactory::createEntity(GObjFactory::PLAYER, get_canvas_width() / 3.0f, get_canvas_height() * 0.7f, 0, PI / 4.0f, 0.1f)); // 0.1f = fire cooldown
 			if(isMult)
-				gd->playerLs->push_back(GObjFactory::createEntity(GObjFactory::PLAYER, (get_canvas_width() / 2.0f)+ 25, get_canvas_height() * 0.5f, 0, PI / 4.0f, 0.1f));
-		    ui = new UI(gd);
+				gd->playerLs->push_back(GObjFactory::createEntity(GObjFactory::PLAYER, (get_canvas_width() / 3.0f)+ 25, get_canvas_height() * 0.7f, 0, PI / 4.0f, 0.1f));
+		  
+      ui = new UI(gd);
 			break;
 		}
 
