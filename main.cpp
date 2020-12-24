@@ -5,20 +5,49 @@
 #include "UI.h"
 #include <iostream>
 
-
-// temp includes
-#include <vector>
-
 // global variables in main
 graphics::Brush br;
+graphics::Brush bg_br;
 UI* ui = nullptr;
+
+int curr_music;
+const int MENU_MUSIC = 1;
+const int BATTLE_MUSIC = 2;
+const int LOSE_MUSIC = 3;
+const int WIN_MUSIC = 4;
+
+bool isMult = false;
 
 // sgg functions
 void update(float ms)
 {
 	GameData* gd = reinterpret_cast<GameData*> (graphics::getUserData());
+	
+	//choose music and background
+	
+	if (gd->game_state == game_states::GAME && curr_music == MENU_MUSIC) {
+		graphics::playMusic(music_path + "battle_music.mp3", 0.5f);
+		bg_br.texture = "";
+		curr_music = BATTLE_MUSIC;
+	}
+	else if (gd->game_state == game_states::GAME_LOSE && curr_music == BATTLE_MUSIC) {
+		graphics::playMusic(music_path + "defeat_music.mp3", 0.5f, false, 2000);
+		bg_br.texture = image_path + "defeat.png";
+		curr_music = LOSE_MUSIC;
+	}
+	else if (gd->game_state == game_states::GAME_WIN && curr_music == BATTLE_MUSIC) {
+		graphics::playMusic(music_path + "victory_music.mp3", 0.5f, false, 2000);
+		bg_br.texture = image_path + "menu1.png";
+		curr_music = WIN_MUSIC;
+	}
+	else if (gd->game_state == game_states::MENU && (curr_music == WIN_MUSIC || curr_music == LOSE_MUSIC)) { // if (game_states::MENU && (curr_music == WIN_MUSIC || curr_music == LOSE_MUSIC))
+		graphics::playMusic(music_path + "menu_music.mp3", 0.5f);
+		bg_br.texture = image_path + "menu2.png";
+		curr_music = MENU_MUSIC;
+	}
 
 	gd->fps = (int)(1000.0f / ms);
+
 	switch (gd->game_state)
 	{
 	case game_states::TEST: {
@@ -47,14 +76,14 @@ void update(float ms)
 		{
 			gd->game_state = game_states::GAME;
 			gd->curr_playing_level = gd->curr_selected_level == -1 ? -2 : gd->curr_selected_level;
-																																					// 0.1f = fire cooldown
-			gd->playerLs->push_back(GObjFactory::createEntity(GObjFactory::PLAYER, get_canvas_width() / 3.0f, get_canvas_height() * 0.7f, 0, PI / 4.0f, 0.1f));
-			gd->playerLs->push_back(GObjFactory::createEntity(GObjFactory::PLAYER, 2*get_canvas_width() / 3.0f, get_canvas_height() * 0.7f, 0, PI / 4.0f, 0.1f));
-
-			ui = new UI(gd);
+																																	
+			gd->playerLs->push_back(GObjFactory::createEntity(GObjFactory::PLAYER, get_canvas_width() / 3.0f, get_canvas_height() * 0.7f, 0, PI / 4.0f, 0.1f)); // 0.1f = fire cooldown
+			if(isMult)
+				gd->playerLs->push_back(GObjFactory::createEntity(GObjFactory::PLAYER, (get_canvas_width() / 3.0f)+ 25, get_canvas_height() * 0.7f, 0, PI / 4.0f, 0.1f));
+		  
+      ui = new UI(gd);
 			break;
 		}
-
 
 		gd->game_state = ((game_states::OPTIONS * graphics::getKeyState(graphics::scancode_t::SCANCODE_O)) + (gd->game_state * !graphics::getKeyState(graphics::scancode_t::SCANCODE_O)));
 		gd->game_state = ((game_states::CREDITS * graphics::getKeyState(graphics::scancode_t::SCANCODE_C)) + (gd->game_state * !graphics::getKeyState(graphics::scancode_t::SCANCODE_C)));
@@ -164,7 +193,7 @@ void update(float ms)
 
 		bool codes[10] = { graphics::getKeyState(graphics::scancode_t::SCANCODE_0) ,graphics::getKeyState(graphics::scancode_t::SCANCODE_1) ,graphics::getKeyState(graphics::scancode_t::SCANCODE_2) ,
 		graphics::getKeyState(graphics::scancode_t::SCANCODE_3) ,graphics::getKeyState(graphics::scancode_t::SCANCODE_4) ,graphics::getKeyState(graphics::scancode_t::SCANCODE_5),
-			graphics::getKeyState(graphics::scancode_t::SCANCODE_6) ,graphics::getKeyState(graphics::scancode_t::SCANCODE_7) ,graphics::getKeyState(graphics::scancode_t::SCANCODE_8) ,
+		graphics::getKeyState(graphics::scancode_t::SCANCODE_6) ,graphics::getKeyState(graphics::scancode_t::SCANCODE_7) ,graphics::getKeyState(graphics::scancode_t::SCANCODE_8) ,
 		graphics::getKeyState(graphics::scancode_t::SCANCODE_9) };
 
 		for(int i=0; i<10;i++)
@@ -181,6 +210,11 @@ void update(float ms)
 	}
 	case game_states::OP_PLAYER: {
 		gd->game_state = ((game_states::OPTIONS * graphics::getKeyState(graphics::scancode_t::SCANCODE_B)) + (gd->game_state * !graphics::getKeyState(graphics::scancode_t::SCANCODE_B)));
+		
+		if (graphics::getKeyState(graphics::scancode_t::SCANCODE_2))
+			isMult = true;
+		else if (isMult && graphics::getKeyState(graphics::scancode_t::SCANCODE_1))
+			isMult = false;
 
 		break;
 	}
@@ -203,6 +237,10 @@ void draw()
 {
 	GameData* gd = reinterpret_cast<GameData*> (graphics::getUserData());
 	br.texture = "";
+
+	if (bg_br.texture != "")
+		graphics::drawRect(CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2, CANVAS_WIDTH, CANVAS_HEIGHT, bg_br);
+
 	graphics::resetPose();
 	setColor(br, 'G');
 	switch (gd->game_state)
@@ -222,15 +260,13 @@ void draw()
 
 		br.texture = curr_image;
 		graphics::drawRect(CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2, CANVAS_HEIGHT / 4, CANVAS_HEIGHT / 4, br);
-
+		setColor(br, 'L');
 		br.texture = "";
-		graphics::drawText(CANVAS_WIDTH / 50, 4 * CANVAS_HEIGHT / 5, CANVAS_HEIGHT / 8, "Loading:   " + curr_image, br);
+		graphics::drawText(CANVAS_WIDTH / 50, 4 * CANVAS_HEIGHT / 5, CANVAS_HEIGHT / 16, "Loading:   " + curr_image, br);
 		
 		break;
 	}
 	case game_states::MENU: {
-		setColor(br, new float[3]{ 0.0f, 0.0f, 1.0f });
-		graphics::drawRect(CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2, CANVAS_WIDTH, CANVAS_HEIGHT, br);
 
 		setColor(br, new float[3]{ 0.0f, 0.0f, 0.0f });
 		graphics::drawText(CANVAS_WIDTH / 100, CANVAS_HEIGHT / 20, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 30, "<<<  Exit", br);
@@ -275,19 +311,14 @@ void draw()
 		break;
 	}
 	case game_states::GAME_LOSE: {
-		setColor(br, new float[3]{ 0.0f, 0.0f, 1.0f });
-		graphics::drawRect(CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2, CANVAS_WIDTH, CANVAS_HEIGHT, br);
-
 		setColor(br, new float[3]{ 0.0f, 0.0f, 0.0f });
-		graphics::drawText(CANVAS_WIDTH / 6, 2 * CANVAS_HEIGHT / 5, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 10, "you lost!", br);
+		graphics::drawText(CANVAS_WIDTH / 6, 2 * CANVAS_HEIGHT / 5, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 10, "You lost!", br);
 		graphics::drawText(CANVAS_WIDTH / 8, 3 * CANVAS_HEIGHT / 5, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 10, "Back to menu", br);
 
 		// ...
 		break;
 	}
 	case game_states::GAME_WIN: {
-		setColor(br, new float[3]{ 0.0f, 0.0f, 1.0f });
-		graphics::drawRect(CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2, CANVAS_WIDTH, CANVAS_HEIGHT, br);
 
 		setColor(br, new float[3]{ 0.0f, 0.0f, 0.0f });
 		graphics::drawText(CANVAS_WIDTH / 6, 2 * CANVAS_HEIGHT / 5, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 10, "you won!", br);
@@ -297,24 +328,20 @@ void draw()
 		break;
 	}
 	case game_states::OPTIONS: {
-		setColor(br, new float[3]{ 0.0f, 0.0f, 1.0f });
-		graphics::drawRect(CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2, CANVAS_WIDTH, CANVAS_HEIGHT, br);
 
 		setColor(br, new float[3]{ 0.0f, 0.0f, 0.0f });
 
-		graphics::drawText(CANVAS_WIDTH / 100, CANVAS_HEIGHT / 20, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 30, "<<< go Back", br);
-		graphics::drawText(CANVAS_WIDTH / 3, CANVAS_HEIGHT / 7, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 15, "Level select", br);
-
-		// ...
+		graphics::drawText(CANVAS_WIDTH / 100, CANVAS_HEIGHT / 20, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 30, "<<< go Back (B)", br);
+		graphics::drawText(CANVAS_WIDTH / 3, CANVAS_HEIGHT / 5, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 15, "Select Level (L)", br);
+		graphics::drawText(CANVAS_WIDTH / 3, CANVAS_HEIGHT / 3, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 15, "Player Options (P)", br);
+		
 		break;
 	}
 	case game_states::OP_LEVEL: {
-		setColor(br, new float[3]{ 0.0f, 0.0f, 1.0f });
-		graphics::drawRect(CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2, CANVAS_WIDTH, CANVAS_HEIGHT, br);
 
 		setColor(br, new float[3]{ 0.0f, 0.0f, 0.0f });
 
-		graphics::drawText(CANVAS_WIDTH / 100, CANVAS_HEIGHT / 20, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 30, "<<< go Back", br);
+		graphics::drawText(CANVAS_WIDTH / 100, CANVAS_HEIGHT / 20, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 30, "<<< go Back (B)", br);
 
 		gd->curr_active_level == -1
 			? graphics::drawText(CANVAS_WIDTH / 11, 1.7f * CANVAS_HEIGHT / 10, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 20, "use  the  numbers  to  select  a  track", br)
@@ -338,28 +365,29 @@ void draw()
 		break;
 	}
 	case game_states::OP_PLAYER: {
-		setColor(br, new float[3]{ 0.0f, 0.0f, 1.0f });
-		graphics::drawRect(CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2, CANVAS_WIDTH, CANVAS_HEIGHT, br);
 
 		setColor(br, new float[3]{ 0.0f, 0.0f, 0.0f });
+		graphics::drawText(CANVAS_WIDTH / 100, CANVAS_HEIGHT / 10, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 15, "Choose gamemode:", br);
+		graphics::drawText(CANVAS_WIDTH / 100, CANVAS_HEIGHT / 3, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 15, "SinglePlayer (1)", br);
+		graphics::drawText(CANVAS_WIDTH / 100, CANVAS_HEIGHT / 2, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 15, "Multiplayer (2)", br);
+		graphics::drawText(CANVAS_WIDTH / 100, CANVAS_HEIGHT / 20, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 30, "<<< go Back (B)", br);		
 
-		graphics::drawText(CANVAS_WIDTH / 100, CANVAS_HEIGHT / 20, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 30, "<<< go Back", br);
+		if(isMult)
+			graphics::drawText(CANVAS_WIDTH / 100, CANVAS_HEIGHT /1.3f, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 15, "Multiplayer mode selected!", br);
 
 		break;
 	}
 	case game_states::HELP: {
-		setColor(br, new float[3]{ 0.0f, 0.0f, 1.0f });
-		graphics::drawRect(CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2, CANVAS_WIDTH, CANVAS_HEIGHT, br);
 
 		setColor(br, new float[3]{ 0.0f, 0.0f, 0.0f });
-		graphics::drawText(CANVAS_WIDTH / 100, CANVAS_HEIGHT / 20, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 30, "<<<  go Back", br);
+		graphics::drawText(CANVAS_WIDTH / 100, CANVAS_HEIGHT / 20, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 30, "<<<  go Back (B)", br);
 		graphics::drawText(CANVAS_WIDTH / 6, 1.5f * CANVAS_HEIGHT / 13, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 17, "Because mouse and text are", br);
 		graphics::drawText(CANVAS_WIDTH / 6, 2.5f * CANVAS_HEIGHT / 13, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 17, "hard to combine, every input", br);
 		graphics::drawText(CANVAS_WIDTH / 6, 3.5f * CANVAS_HEIGHT / 13, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 17, "is done with the keyboard :)", br);
 		graphics::drawText(CANVAS_WIDTH / 6, 5.5f * CANVAS_HEIGHT / 13, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 17, "In most screens every single", br);
 		graphics::drawText(CANVAS_WIDTH / 6, 6.5f * CANVAS_HEIGHT / 13, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 17, "uppercase letter relates to", br);
 		graphics::drawText(CANVAS_WIDTH / 6, 7.5f * CANVAS_HEIGHT / 13, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 17, "an action hinted by its word", br);
-		graphics::drawText(CANVAS_WIDTH / 6, 9.5f * CANVAS_HEIGHT / 13, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 17, "For example, 'go Back' hints", br);
+		graphics::drawText(CANVAS_WIDTH / 6, 9.5f * CANVAS_HEIGHT / 13, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 17, "For example, 'go Back (B)' hints", br);
 		graphics::drawText(CANVAS_WIDTH / 6, 10.5f * CANVAS_HEIGHT / 13, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 17, "that pressing 'B' goes back", br);
 		graphics::drawText(2 * CANVAS_WIDTH / 5, 12 * CANVAS_HEIGHT / 13, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 17, "Try it!", br);
 		break;
@@ -368,23 +396,22 @@ void draw()
 		break;
 	}
 	case game_states::CREDITS: {
-		setColor(br, new float[3]{ 0.0f, 0.0f, 1.0f });
-		graphics::drawRect(CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2, CANVAS_WIDTH, CANVAS_HEIGHT, br);
 
 		setColor(br, new float[3]{ 0.0f, 0.0f, 0.0f });
 
-		graphics::drawText(1 * CANVAS_WIDTH / 100, CANVAS_HEIGHT / 20, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 30, "<<<  go Back", br);
-		graphics::drawText(40 * CANVAS_WIDTH / 100, 1 * CANVAS_HEIGHT / 7, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 15, "Made by:", br);
-		graphics::drawText(22 * CANVAS_WIDTH / 100, 2 * CANVAS_HEIGHT / 7, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 12, "Dimitris Tsirmpas", br);
-		graphics::drawText(45 * CANVAS_WIDTH / 100, 3 * CANVAS_HEIGHT / 7, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 18, "and", br);
-		graphics::drawText(25 * CANVAS_WIDTH / 100, 4 * CANVAS_HEIGHT / 7, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 12, "Alex Mandelias", br);
-		graphics::drawText(30 * CANVAS_WIDTH / 100, 5 * CANVAS_HEIGHT / 7, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 18, "with the help of the", br);
-		graphics::drawText(33 * CANVAS_WIDTH / 100, 6 * CANVAS_HEIGHT / 7, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 12, "SGG library", br);
+		graphics::drawText(1 * CANVAS_WIDTH / 80, CANVAS_HEIGHT / 20, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 30, "<<<  go Back (B)", br);
+		graphics::drawText(40 * CANVAS_WIDTH / 80, 1 * CANVAS_HEIGHT / 7, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 15, "Made by:", br);
+		graphics::drawText(22 * CANVAS_WIDTH / 200, 2 * CANVAS_HEIGHT / 7, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 12, "Dimitris Tsirmpas and", br);
+		graphics::drawText(25 * CANVAS_WIDTH / 100, 3 * CANVAS_HEIGHT / 7, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 12, "Alex Mandelias", br);
+		graphics::drawText(30 * CANVAS_WIDTH / 100, 4 * CANVAS_HEIGHT / 7, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 18, "with the help of the", br);
+		graphics::drawText(33 * CANVAS_WIDTH / 100, 5 * CANVAS_HEIGHT / 7, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 12, "SGG library.", br);
+		graphics::drawText(33 * CANVAS_WIDTH / 300, 6 * CANVAS_HEIGHT / 7, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 12, "Asset credits can be found", br);
+		graphics::drawText(33 * CANVAS_WIDTH / 150, CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 12,         "in the assets folder.", br);
 		break;
 	}
 	default: {
 		graphics::drawText(40 * CANVAS_WIDTH / 100, 1 * CANVAS_HEIGHT / 7, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 15, "Invalid game state", br);
-		graphics::drawText(20 * CANVAS_WIDTH / 100, 1 * CANVAS_HEIGHT / 7, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 15, "Please exit and inform the develompers", br);
+		graphics::drawText(20 * CANVAS_WIDTH / 100, 1 * CANVAS_HEIGHT / 7, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 15, "Please exit and inform the developers", br);
 	}
 	}
 }
@@ -393,6 +420,7 @@ int main(int argc, char** argv)
 {
 
 	graphics::createWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "1942ripoff");
+	//graphics::setFullScreen(true);
 
 	graphics::setCanvasSize(CANVAS_WIDTH, CANVAS_HEIGHT);
 	graphics::setCanvasScaleMode(graphics::CANVAS_SCALE_FIT);
@@ -406,6 +434,9 @@ int main(int argc, char** argv)
 	graphics::setWindowBackground(br);
 
 	initialize();
+	graphics::playMusic(music_path + "menu_music.mp3", 0.5f, true);
+	curr_music = MENU_MUSIC;
+	bg_br.texture = image_path + "menu2.png";
 	graphics::startMessageLoop();
 
 	return 0;
