@@ -7,12 +7,13 @@
 #include "GObjFactory.h"
 
 GameData::GameData() : fps(0), game_state(0),
-	el(0.0f), sps(7.0f), curr_img(0), images(),
+	el(0.0f), sps(12.0f), curr_img(0), images(),
 	levels(std::unordered_map<int, Level*>()), _waves(std::unordered_map<std::string, Wave*>()),
 	curr_active_level(-1), curr_selected_level(-1),
 	bg_offset(0.0f), height_perc_per_second(0.02f),
 	curr_playing_level(-1), level_transition_timer(set_level_transition_timer()),
-	enemyLs(new list<Entity*>), playerLs(new list<Entity*>), enemyProjLs(new list<Projectile*>), playerProjLs(new list<Projectile*>), effectsLs(new list<VisualEffect*>)
+	enemyLs(new list<Entity*>), playerLs(new list<Entity*>), enemyProjLs(new list<Projectile*>),
+			playerProjLs(new list<Projectile*>), effectsLs(new list<VisualEffect*>), buttons(new list<Button*>)
 	
 {
 	// sets all the user-selectable levels to nullptr
@@ -26,8 +27,18 @@ GameData::GameData() : fps(0), game_state(0),
 		std::cerr << "Warning: Level loading from files failed, loading hardcoded levels" << std::endl;
 		_load_hardcoded_levels();
 	}
-
 	std::cout << "Levels loaded successfully" << std::endl;
+
+	buttons->push_back(new GameStateChangingButton(this, 30.0f, 30.0f, 30.0f, new string(icon_path + "exit.png"), game_states::MENU, game_states::EXIT));
+	buttons->push_back(new GameStateChangingButton(this, 370.0f, 30.0f, 30.0f, new string(icon_path + "help.png"), game_states::MENU, game_states::HELP));
+	buttons->push_back(new GameStateChangingButton(this, 370.0f, 75.0f, 30.0f, new string(icon_path + "options.png"), game_states::MENU, game_states::OPTIONS));
+	buttons->push_back(new GameStateChangingButton(this, 370.0f, 120.0f, 30.0f, new string(icon_path + "credits.png"), game_states::MENU, game_states::CREDITS));
+	buttons->push_back(new GameStateChangingButton(this, 370.0f, 165.0f, 30.0f, new string(icon_path + "test.png"), game_states::MENU, game_states::TEST));
+	buttons->push_back(new GameStateChangingButton(this, 30.0f, 30.0f, 30.0f, new string(icon_path + "back.png"), game_states::HELP, game_states::MENU));
+	buttons->push_back(new GameStateChangingButton(this, 30.0f, 30.0f, 30.0f, new string(icon_path + "back.png"), game_states::CREDITS, game_states::MENU));
+	buttons->push_back(new GameStateChangingButton(this, 30.0f, 30.0f, 30.0f, new string(icon_path + "back.png"), game_states::OPTIONS, game_states::MENU));
+	buttons->push_back(new GameStateChangingButton(this, 30.0f, 30.0f, 30.0f, new string(icon_path + "back.png"), game_states::OP_PLAYER, game_states::OPTIONS));
+	buttons->push_back(new GameStateChangingButton(this, 30.0f, 30.0f, 30.0f, new string(icon_path + "back.png"), game_states::OP_LEVEL, game_states::OPTIONS));
 }
 
 void GameData::updateBackground(float ms)
@@ -46,6 +57,14 @@ void GameData::drawBackground(graphics::Brush& br)
 	graphics::drawRect(cw / 2, ch * (bg_offset - (cw / ch)), cw, cw, br);
 	graphics::drawRect(cw / 2, ch * bg_offset, cw, cw, br);
 	graphics::drawRect(cw / 2, ch * (bg_offset + (cw / ch)), cw, cw, br);
+}
+
+void GameData::click_buttons()
+{
+	for (Button* b : *buttons)
+	{
+		b->execute();
+	}
 }
 
 bool GameData::load_level_data_from_file(const std::string& level_path, const std::string& wave_path) {
