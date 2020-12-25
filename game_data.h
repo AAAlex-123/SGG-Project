@@ -10,6 +10,7 @@
 #include "entity.h"
 #include "visual_effect.h"
 #include "level.h"
+#include "button.h"
 
 // lmao imagine using using
 using namespace std;
@@ -33,6 +34,7 @@ public:
 	list<Entity*>* enemyLs, * playerLs;
 	list<Projectile*>* enemyProjLs, * playerProjLs;
 	list<VisualEffect*>* effectsLs;
+	list<Button*>* buttons;
 
 	// general
 	int fps;
@@ -96,6 +98,9 @@ public:
 	//Checks if any object within the list must be destroyed, and deletes it. Template class must be derived from Drawing.
 	template <class T>
 	void checkAndDelete(list<T*>*);
+
+	//button stuff
+	void click_buttons();
 	
 	void addScore(int scored) {
 		score += scored;
