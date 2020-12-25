@@ -8,7 +8,6 @@
 // global variables in main
 graphics::Brush br;
 graphics::Brush bg_br;
-graphics::MouseState ms;
 UI* ui = nullptr;
 
 int curr_music;
@@ -16,8 +15,6 @@ const int MENU_MUSIC = 1;
 const int BATTLE_MUSIC = 2;
 const int LOSE_MUSIC = 3;
 const int WIN_MUSIC = 4;
-
-bool isMult = false;
 
 // sgg functions
 void update(float ms)
@@ -56,7 +53,8 @@ void update(float ms)
 	switch (gd->game_state)
 	{
 	case game_states::TEST: {
-		// apply other custom settings
+
+		// apply custom settings
 
 
 		gd->game_state = game_states::MENU;
@@ -83,7 +81,7 @@ void update(float ms)
 			gd->curr_playing_level = gd->curr_selected_level == -1 ? -2 : gd->curr_selected_level;
 																																	
 			gd->playerLs->push_back(GObjFactory::createEntity(GObjFactory::PLAYER, get_canvas_width() / 3.0f, get_canvas_height() * 0.7f, 0, PI / 4.0f, 0.1f)); // 0.1f = fire cooldown
-			if(isMult)
+			if(gd->isMult)
 				gd->playerLs->push_back(GObjFactory::createEntity(GObjFactory::PLAYER, (get_canvas_width() / 3.0f)+ 25, get_canvas_height() * 0.7f, 0, PI / 4.0f, 0.1f));
 		  
 			ui = new UI(gd);
@@ -97,6 +95,8 @@ void update(float ms)
 	case game_states::GAME: {
 		// temp
 		gd->game_state = ((game_states::OPTIONS * graphics::getKeyState(graphics::scancode_t::SCANCODE_B)) + (gd->game_state * !graphics::getKeyState(graphics::scancode_t::SCANCODE_B)));
+		
+	// yes there is a button to pause but some prefer to use the keyboard for easier access
 		gd->game_state = ((game_states::PAUSE * graphics::getKeyState(graphics::scancode_t::SCANCODE_P)) + (gd->game_state * !graphics::getKeyState(graphics::scancode_t::SCANCODE_P)));
 
 	// level change logic
@@ -178,12 +178,6 @@ void update(float ms)
 		break;
 	}
 	case game_states::OPTIONS: {
-
-		gd->game_state = ((game_states::OP_LEVEL * graphics::getKeyState(graphics::scancode_t::SCANCODE_L)) + (gd->game_state * !graphics::getKeyState(graphics::scancode_t::SCANCODE_L)));
-		gd->game_state = ((game_states::OP_PLAYER * graphics::getKeyState(graphics::scancode_t::SCANCODE_P)) + (gd->game_state * !graphics::getKeyState(graphics::scancode_t::SCANCODE_P)));
-
-		// ...
-
 		break;
 	}
 	case game_states::OP_LEVEL: {
@@ -206,12 +200,6 @@ void update(float ms)
 		break;
 	}
 	case game_states::OP_PLAYER: {
-		
-		if (graphics::getKeyState(graphics::scancode_t::SCANCODE_2))
-			isMult = true;
-		else if (isMult && graphics::getKeyState(graphics::scancode_t::SCANCODE_1))
-			isMult = false;
-
 		break;
 	}
 	case game_states::EXIT: {
@@ -219,6 +207,7 @@ void update(float ms)
 		exit(0);
 	}
 	case game_states::PAUSE: {
+		// yes there is a button to un-pause but some prefer to use the keyboard for easier access
 		gd->game_state = ((game_states::GAME * graphics::getKeyState(graphics::scancode_t::SCANCODE_U)) + (gd->game_state * !graphics::getKeyState(graphics::scancode_t::SCANCODE_U)));
 
 		// other stuff to do when game is paused
@@ -326,9 +315,8 @@ void draw()
 	case game_states::OPTIONS: {
 
 		setColor(br, new float[3]{ 0.0f, 0.0f, 0.0f });
-		graphics::drawText(CANVAS_WIDTH / 3, CANVAS_HEIGHT / 5, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 15, "Select Level (L)", br);
-		graphics::drawText(CANVAS_WIDTH / 3, CANVAS_HEIGHT / 3, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 15, "Player Options (P)", br);
-		
+		graphics::drawText(CANVAS_WIDTH / 3, 4.0f * CANVAS_HEIGHT / 10, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 15, "Select Level", br);
+		graphics::drawText(CANVAS_WIDTH / 3, 9.0f * CANVAS_HEIGHT / 10, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 15, "Select Players", br);
 		break;
 	}
 	case game_states::OP_LEVEL: {
@@ -358,12 +346,12 @@ void draw()
 	case game_states::OP_PLAYER: {
 
 		setColor(br, new float[3]{ 0.0f, 0.0f, 0.0f });
-		graphics::drawText(CANVAS_WIDTH / 100, CANVAS_HEIGHT / 10, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 15, "Choose gamemode:", br);
-		graphics::drawText(CANVAS_WIDTH / 100, CANVAS_HEIGHT / 3, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 15, "SinglePlayer (1)", br);
-		graphics::drawText(CANVAS_WIDTH / 100, CANVAS_HEIGHT / 2, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 15, "Multiplayer (2)", br);		
+		graphics::drawText(5*CANVAS_WIDTH / 20, CANVAS_HEIGHT / 8, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 15, "Choose gamemode:", br);
+		graphics::drawText(CANVAS_WIDTH / 8, 2 * CANVAS_HEIGHT / 3, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 15, "SinglePlayer", br);
+		graphics::drawText(4.5f * CANVAS_WIDTH / 8, 2 * CANVAS_HEIGHT / 3, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 15, "Multiplayer", br);
 
-		if(isMult)
-			graphics::drawText(CANVAS_WIDTH / 100, CANVAS_HEIGHT /1.3f, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 15, "Multiplayer mode selected!", br);
+		graphics::drawText(4*CANVAS_WIDTH / 32, 5 * CANVAS_HEIGHT / 6, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 15,
+			gd->isMult ? "Multiplayer mode selected!" : "Singleplayer mode selected!", br);
 
 		break;
 	}
