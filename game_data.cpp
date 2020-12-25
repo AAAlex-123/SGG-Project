@@ -35,10 +35,16 @@ GameData::GameData() : fps(0), game_state(0),
 	buttons->push_back(new GameStateChangingButton(this, 370.0f, 75.0f, 30.0f, new string(icon_path + "options.png"), game_states::MENU, game_states::OPTIONS));
 	buttons->push_back(new GameStateChangingButton(this, 370.0f, 120.0f, 30.0f, new string(icon_path + "credits.png"), game_states::MENU, game_states::CREDITS));
 	buttons->push_back(new GameStateChangingButton(this, 370.0f, 165.0f, 30.0f, new string(icon_path + "test.png"), game_states::MENU, game_states::TEST));
+	buttons->push_back(new GameStateChangingButton(this, 370.0f, 30.0f, 30.0f, new string(icon_path + "pause.png"), game_states::GAME, game_states::PAUSE));
+	buttons->push_back(new GameStateChangingButton(this, 370.0f, 30.0f, 30.0f, new string(icon_path + "continue.png"), game_states::PAUSE, game_states::GAME));
 	buttons->push_back(new GameStateChangingButton(this, 30.0f, 30.0f, 30.0f, new string(icon_path + "back.png"), game_states::HELP, game_states::MENU));
 	buttons->push_back(new GameStateChangingButton(this, 30.0f, 30.0f, 30.0f, new string(icon_path + "back.png"), game_states::CREDITS, game_states::MENU));
 	buttons->push_back(new GameStateChangingButton(this, 30.0f, 30.0f, 30.0f, new string(icon_path + "back.png"), game_states::OPTIONS, game_states::MENU));
+	buttons->push_back(new GameStateChangingButton(this, 200.0f, 100.0f, 100.0f, new string(icon_path + "level_select.png"), game_states::OPTIONS, game_states::OP_LEVEL));
+	buttons->push_back(new GameStateChangingButton(this, 200.0f, 350.0f, 100.0f, new string(icon_path + "player_select.png"), game_states::OPTIONS, game_states::OP_PLAYER));
 	buttons->push_back(new GameStateChangingButton(this, 30.0f, 30.0f, 30.0f, new string(icon_path + "back.png"), game_states::OP_PLAYER, game_states::OPTIONS));
+	buttons->push_back(new VariableChangingButton<bool>(this, 112.5f, 200.0f, 125.0f, new string(icon_path + "singleplayer.png"), game_states::OP_PLAYER, &this->isMult, false));
+	buttons->push_back(new VariableChangingButton<bool>(this, 287.5f, 200.0f, 125.0f, new string(icon_path + "multiplayer.png"), game_states::OP_PLAYER, &this->isMult, true));
 	buttons->push_back(new GameStateChangingButton(this, 30.0f, 30.0f, 30.0f, new string(icon_path + "back.png"), game_states::OP_LEVEL, game_states::OPTIONS));
 }
 
