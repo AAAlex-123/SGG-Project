@@ -1,7 +1,7 @@
 #include "UI.h"
 
 UI::UI(GameData* gd) :
-	players(new Entity* [2]{ nullptr, nullptr }), width(get_canvas_width()), height(get_canvas_height()), gd(gd)
+	width(get_canvas_width()), height(get_canvas_height()), gd(gd)
 {
 	initializeBrushes();
 }
@@ -29,11 +29,8 @@ inline void UI::initializeBrushes() {
 
 void UI::drawPlayerPanel(const Entity* player, float x_pos) {
 
-	setColor(std_br, 'L'); //black
-
 	//draw Text
-	char text[4] = { 'P', x_pos == 0.0f ? '1' : '2', ':', '\0' };	//:)
-	graphics::drawText(x_pos, height - 80, 20, text, std_br);
+	graphics::drawText(x_pos, height - 80, 20, "Player: ", std_br);
 	graphics::drawText(x_pos, height - 50, 20, "Bullets:", std_br);
 	graphics::drawText(x_pos, height - 15, 20, "HP", std_br);
 
@@ -65,8 +62,22 @@ void UI::drawPlayerPanel(const Entity* player, float x_pos) {
 }
 
 void UI::drawDestroyedPanel(float x_pos) {
-	//draw big-ass X
-	//draw default dead drawings
+
+	//draw Text
+	graphics::drawText(x_pos, height - 80, 20, "Player: ", std_br);
+	graphics::drawText(x_pos, height - 50, 20, "Bullets:", std_br);
+	graphics::drawText(x_pos, height - 15, 20, "HP", std_br);
+
+	//draw Player icon
+	bg_br.texture = image_path + "skull.png";
+	graphics::drawRect(x_pos + 100, height - 80, 30, 30, bg_br);
+
+	//draw empty healthbar
+	graphics::drawRect(x_pos + 75, height - 20, 150, 20, health_br);
+
+	//draw X
+	bg_br.texture = image_path + "X.png";
+	graphics::drawRect((width+x_pos)/2, height - 47, 95, 95, bg_br);
 }
 
 void UI::draw() {
@@ -89,6 +100,8 @@ void UI::draw() {
 
 	//draw Panels
 	drawPlayerPanel(gd->playerLs->front(), 0);
-	if (gd->playerLs->size()>1)
+	if (gd->playerLs->size() == 1)
+		drawDestroyedPanel(width - 175);
+	else
 		drawPlayerPanel(gd->playerLs->back(), width - 175);
 }
