@@ -46,6 +46,9 @@ public:
 	int curr_img;
 	vector<string> images;
 
+	// players
+	bool isMult = false;
+
 	// levels
 	unordered_map<int, Level*> levels;
 	unordered_map<string, Wave*> _waves;
