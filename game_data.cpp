@@ -5,6 +5,7 @@
 #include <fstream>
 
 #include "GObjFactory.h"
+#include "constants.h"
 
 GameData::GameData() : fps(0), game_state(0),
 	el(0.0f), sps(12.0f), curr_img(0), images(),
