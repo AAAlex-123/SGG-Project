@@ -27,6 +27,8 @@ private:
 	// callback in case reading from file fails
 	void _load_hardcoded_levels();
 
+	void create_buttons();
+
 	int score;
 
 public:
