@@ -13,18 +13,18 @@ private:
 	// :knife:
 	static bool atLeastOne;
 
-	const static int player_sp = 150;
-	const static int player_w = 15;
-	const static int player_h = 33;
-	const static int player_hp = 100;
-
 	const static int b_plane_sp = 100;
-	const static int b_plane_size = 30;
+	const static int b_plane_size = 20;
 	const static int b_plane_dmg = 35;
-	const static int b_plane_hp = 30;
+	const static int b_plane_hp = 20;
 	const static int b_plane_score = 100;
 
-	const static int b_proj_sp = 250;
+	const static int player_sp = 150;
+	const static int player_w = (int) b_plane_size * 1.5;
+	const static int player_h = (int) b_plane_size * 3;
+	const static int player_hp = 100;
+
+	const static int b_proj_sp = 350;
 	const static int b_proj_size = 10;
 	const static int b_proj_dmg = 10;
 
