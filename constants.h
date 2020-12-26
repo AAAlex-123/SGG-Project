@@ -27,6 +27,7 @@ enum game_states
 	HELP = 8,
 	EXIT = 9,
 	PAUSE = 12,
+	RESET = 13,
 };
 
 // function declarations
