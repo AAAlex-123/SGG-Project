@@ -39,14 +39,14 @@ void UI::drawPlayerPanel(const Entity* player, float x_pos) {
 
 	bg_br.texture = *(player->getSprite());
 	graphics::setOrientation(90.f);
-	graphics::drawRect(x_pos + 100, height - 80, 20, 40, bg_br);
+	graphics::drawRect(x_pos + 100, height - 80, 20, box_height, bg_br);
 
 	//draw Projectile icon
 	bg_br.texture = *(player->getProjectile()->getSprite());
 	graphics::setOrientation(0.f);
-	graphics::drawRect(x_pos + 90,  height - 50, 20, 40, bg_br);
-	graphics::drawRect(x_pos + 100, height - 50, 20, 40, bg_br);
-	graphics::drawRect(x_pos + 110, height - 50, 20, 40, bg_br);
+	graphics::drawRect(x_pos + 90,  height - 50, 20, box_height, bg_br);
+	graphics::drawRect(x_pos + 100, height - 50, 20, box_height, bg_br);
+	graphics::drawRect(x_pos + 110, height - 50, 20, box_height, bg_br);
 
 	//draw healthbar
 	health_br.outline_opacity = 0.f;
@@ -77,7 +77,7 @@ void UI::drawDestroyedPanel(float x_pos) {
 
 	//draw X
 	bg_br.texture = image_path + "X.png";
-	graphics::drawRect((width+x_pos)/2, height - 47, 95, 95, bg_br);
+	graphics::drawRect((width+x_pos)/2, height - box_height - 7, 95, 95, bg_br);
 }
 
 void UI::draw() {
@@ -85,7 +85,7 @@ void UI::draw() {
 	//draw UI box
 	setColor(bg_br, new float[3]{ 0.8f, 0.4f, 0.1f });
 	bg_br.texture = "";
-	graphics::drawRect(width / 2, height - 40, width, 110, bg_br);
+	graphics::drawRect(width / 2, height - box_height, width, 110, bg_br);
 
 	//draw Score
 	graphics::drawText(width / 2 - 75, 60, 30, "Score: " + std::to_string(gd->getScore()), std_br);
@@ -100,8 +100,9 @@ void UI::draw() {
 
 	//draw Panels
 	drawPlayerPanel(gd->playerLs->front(), 0);
-	if (gd->playerLs->size() == 1)
+	if (gd->playerLs->size() == 1 && gd->isMult)
 		drawDestroyedPanel(width - 175);
-	else
+	else if (gd->isMult)
 		drawPlayerPanel(gd->playerLs->back(), width - 175);
 }
+
