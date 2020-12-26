@@ -16,7 +16,6 @@ const int BATTLE_MUSIC = 2;
 const int LOSE_MUSIC = 3;
 const int WIN_MUSIC = 4;
 
-bool isMult = false;
 
 // sgg functions
 void update(float ms)
@@ -78,7 +77,7 @@ void update(float ms)
 			gd->curr_playing_level = gd->curr_selected_level == -1 ? -2 : gd->curr_selected_level;
 																																	
 			gd->playerLs->push_back(GObjFactory::createEntity(GObjFactory::PLAYER, get_canvas_width() / 3.0f, get_canvas_height() * 0.7f, 0, PI / 4.0f, 0.1f)); // 0.1f = fire cooldown
-			if(isMult)
+			if(gd->isMult)
 				gd->playerLs->push_back(GObjFactory::createEntity(GObjFactory::PLAYER, (get_canvas_width() / 3.0f)+ 25, get_canvas_height() * 0.7f, 0, PI / 4.0f, 0.1f));
 		  
       ui = new UI(gd);
@@ -212,9 +211,9 @@ void update(float ms)
 		gd->game_state = ((game_states::OPTIONS * graphics::getKeyState(graphics::scancode_t::SCANCODE_B)) + (gd->game_state * !graphics::getKeyState(graphics::scancode_t::SCANCODE_B)));
 		
 		if (graphics::getKeyState(graphics::scancode_t::SCANCODE_2))
-			isMult = true;
-		else if (isMult && graphics::getKeyState(graphics::scancode_t::SCANCODE_1))
-			isMult = false;
+			gd->isMult = true;
+		else if (gd->isMult && graphics::getKeyState(graphics::scancode_t::SCANCODE_1))
+			gd->isMult = false;
 
 		break;
 	}
@@ -372,7 +371,7 @@ void draw()
 		graphics::drawText(CANVAS_WIDTH / 100, CANVAS_HEIGHT / 2, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 15, "Multiplayer (2)", br);
 		graphics::drawText(CANVAS_WIDTH / 100, CANVAS_HEIGHT / 20, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 30, "<<< go Back (B)", br);		
 
-		if(isMult)
+		if(gd->isMult)
 			graphics::drawText(CANVAS_WIDTH / 100, CANVAS_HEIGHT /1.3f, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 15, "Multiplayer mode selected!", br);
 
 		break;
@@ -438,7 +437,7 @@ int main(int argc, char** argv)
 	curr_music = MENU_MUSIC;
 	bg_br.texture = image_path + "menu2.png";
 	graphics::startMessageLoop();
-
+	graphics::destroyWindow();
 	return 0;
 }
 
