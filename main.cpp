@@ -81,8 +81,8 @@ void update(float ms)
 			gd->curr_playing_level = gd->curr_selected_level == -1 ? -2 : gd->curr_selected_level;
 																																	
 			gd->playerLs->push_back(GObjFactory::createEntity(GObjFactory::PLAYER, get_canvas_width() / 3.0f, get_canvas_height() * 0.7f, 0, PI / 4.0f, 0.1f)); // 0.1f = fire cooldown
-			if(gd->isMult)
-				gd->playerLs->push_back(GObjFactory::createEntity(GObjFactory::PLAYER, (get_canvas_width() / 3.0f)+ 25, get_canvas_height() * 0.7f, 0, PI / 4.0f, 0.1f));
+			if (gd->isMult)
+				gd->playerLs->push_back(GObjFactory::createEntity(GObjFactory::PLAYER, 2 * (get_canvas_width() / 3.0f), get_canvas_height() * 0.7f, 0, PI / 4.0f, 0.1f));
 		  
 			ui = new UI(gd);
 			break;
@@ -93,9 +93,7 @@ void update(float ms)
 		break;
 	}
 	case game_states::GAME: {
-		// temp
-		gd->game_state = ((game_states::OPTIONS * graphics::getKeyState(graphics::scancode_t::SCANCODE_B)) + (gd->game_state * !graphics::getKeyState(graphics::scancode_t::SCANCODE_B)));
-		
+	
 	// yes there is a button to pause but some prefer to use the keyboard for easier access
 		gd->game_state = ((game_states::PAUSE * graphics::getKeyState(graphics::scancode_t::SCANCODE_P)) + (gd->game_state * !graphics::getKeyState(graphics::scancode_t::SCANCODE_P)));
 
@@ -163,18 +161,21 @@ void update(float ms)
 		}
 		break;
 	}
-	case game_states::GAME_LOSE: {
-		gd->game_state = ((game_states::MENU * graphics::getKeyState(graphics::scancode_t::SCANCODE_B)) + (gd->game_state * !graphics::getKeyState(graphics::scancode_t::SCANCODE_B)));
-
-		// ...
-
+	case game_states::GAME_LOSE:
+	case game_states::GAME_WIN: {
 		break;
 	}
-	case game_states::GAME_WIN: {
-		gd->game_state = ((game_states::MENU * graphics::getKeyState(graphics::scancode_t::SCANCODE_B)) + (gd->game_state * !graphics::getKeyState(graphics::scancode_t::SCANCODE_B)));
+	case game_states::RESET: {
 
-		// ...
+		delete gd;
 
+		GameData* gd = new GameData();
+		gd->game_state = game_states::MENU;
+		graphics::setUserData((void*)gd);
+
+		GObjFactory::reset();
+
+		gd->game_state = game_states::MENU;
 		break;
 	}
 	case game_states::OPTIONS: {
@@ -304,12 +305,14 @@ void draw()
 		break;
 	}
 	case game_states::GAME_WIN: {
-
 		setColor(br, new float[3]{ 0.0f, 0.0f, 0.0f });
 		graphics::drawText(CANVAS_WIDTH / 6, 2 * CANVAS_HEIGHT / 5, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 10, "you won!", br);
 		graphics::drawText(CANVAS_WIDTH / 8, 3 * CANVAS_HEIGHT / 5, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 10, "Back to menu", br);
 
 		// ...
+		break;
+	}
+	case game_states::RESET: {
 		break;
 	}
 	case game_states::OPTIONS: {
