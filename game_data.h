@@ -43,6 +43,9 @@ public:
 	const float sps;
 	int curr_img;
 	vector<string> images;
+	
+	// players
+	bool isMult = false;
 
 	// levels
 	unordered_map<int, Level*> levels;
