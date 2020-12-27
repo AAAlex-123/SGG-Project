@@ -30,10 +30,6 @@ VisualEffect* Entity::getDestructionVisualEffect() const {
 	return GObjFactory::createVisualEffect(GObjFactory::EXPLOSION_1, x, y, 0.0f, 1.0f, 18.0f);
 }
 
-void Entity::setProjectile(int proj_type) {
-	this->curr_projectile = proj_type;
-}
-
 void Entity::draw() {
 	br.texture = shadow;
 	br.fill_opacity = 0.6f;
