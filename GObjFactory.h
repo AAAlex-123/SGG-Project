@@ -53,8 +53,9 @@ public:
 	const static int PLAYER = 0, SIMPLE_ENEMY = 1, ROTATING_ENEMY = 2, ACCELERATING_ENEMY = 3, TANK_ENEMY = 4, BOMB = 5, AIM = 6;
 	const static int NOEFFECT = 404, EXPLOSION_1 = 100, EXPLOSION_2 = 200, SMOKE = 300;
 
-	static void reset() { zero = true; one = two = false; }
-	//static void remove_player() { if }
+	static void reset() { zero = true; one = two = false; players[0] = players[1] = nullptr; }
+	// use when someone has died and the targeting planes shouldn't target them
+	static void remove_player(int p) { players[!p] = players[p]; players[p] = nullptr; zero = false; one = true; two = false; }
 
 	static Entity* createEntity(int type, float x, float y, float angle, float dangle = 0.0f, float cooldown = 0.0f);
 	// might be used for creating stuff at run-time from game_data where the Drawing* is known (powerups?)
