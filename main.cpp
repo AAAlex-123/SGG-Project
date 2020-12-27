@@ -166,14 +166,12 @@ void update(float ms)
 		break;
 	}
 	case game_states::RESET: {
+		GObjFactory::reset();
 
 		delete gd;
 
 		GameData* gd = new GameData();
-		gd->game_state = game_states::MENU;
 		graphics::setUserData((void*)gd);
-
-		GObjFactory::reset();
 
 		gd->game_state = game_states::MENU;
 		break;
@@ -435,6 +433,9 @@ void initialize()
 	gd->game_state = game_states::LOAD;
 
 	graphics::setUserData((void*)gd);
+	
+	// random seed for Factory homing enemies randomness
+	srand((unsigned int)gd);
 
 	// load stuff
 	if (!graphics::setFont(font))
