@@ -24,9 +24,7 @@ Entity* GObjFactory::createEntity(int type, float x, float y, float angle, float
 	case GObjFactory::ROTATING_ENEMY: return createRotatingEnemy(x, y, angle);
 	case GObjFactory::ACCELERATING_ENEMY: return createAcceleratingEnemy(x, y, angle);
 	case GObjFactory::TANK_ENEMY: return createTankEnemy(x, y, angle);
-	case GObjFactory::BOMB: {
-		return createBomb(x, y, angle, players[rand() % ((int)one + (int)two)]);
-	}
+	case GObjFactory::BOMB: return createBomb(x, y, angle, players[rand() % ((int)one + (int)two)]);
 	case GObjFactory::AIM: return createAimingEnemy(x, y, angle);
 	default:
 		std::cerr << "Invalid constant, creating enemy1 as placeholder" << std::endl;
@@ -34,6 +32,7 @@ Entity* GObjFactory::createEntity(int type, float x, float y, float angle, float
 	}
 }
 
+// uncomment below if a targeting entity must be created at runtime, when followee is known
 //Entity* GObjFactory::createEntity(int type, float x, float y, float angle, Drawing* followee) {
 //	switch (type) {
 //	case GObjFactory::BOMB: return createBomb(x, y, angle, followee);
@@ -80,11 +79,11 @@ Entity* GObjFactory::createTankEnemy(float x, float y, float angle) {
 }
 
 Entity* GObjFactory::createBomb(float x, float y, float angle, Drawing* followee) {													  // this one as well vvv
-	return new Entity(x, y, angle, b_plane_sp * 0.5f, b_plane_size * 1.5f, b_plane_size * 1.5f, new string(image_path + "bomb"), new HomingPath(followee, 0.05f, new Path()), b_plane_dmg * 3.0f, b_plane_hp * 3.0f, b_plane_score * 2.0f, GObjFactory::HEAVY_BULLET);
+	return new Entity(x, y, angle, b_plane_sp * 0.5f, b_plane_size * 1.5f, b_plane_size * 1.5f, new string(image_path + "suicide_plane"), new HomingPath(followee, 0.05f, new Path()), b_plane_dmg * 3.0f, b_plane_hp * 3.0f, b_plane_score * 2.0f, GObjFactory::HEAVY_BULLET);
 }
 
 Entity* GObjFactory::createAimingEnemy(float x, float y, float angle) {																// this one as well vvv
-	return new Entity(x, y, angle, b_plane_sp * 0.5f, b_plane_size * 1.5f, b_plane_size * 1.5f, new string(image_path + "bomb"), new TargetedFiringPath(1.0f, new Path()), b_plane_dmg * 3.0f, b_plane_hp * 3.0f, b_plane_score * 2.0f, GObjFactory::HEAVY_BULLET);
+	return new Entity(x, y, angle, b_plane_sp * 0.5f, b_plane_size * 1.5f, b_plane_size * 1.5f, new string(image_path + "aim_plane"), new TargetedFiringPath(1.0f, new Path()), b_plane_dmg * 3.0f, b_plane_hp * 3.0f, b_plane_score * 2.0f, GObjFactory::HEAVY_BULLET);
 }
 
 
