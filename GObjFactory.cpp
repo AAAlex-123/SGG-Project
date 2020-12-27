@@ -1,6 +1,6 @@
 #include "GObjFactory.h"
 #include "Path.h"
-#include "entity.h"
+#include "Player.h"
 #include "projectile.h"
 #include "visual_effect.h"
 #include <iostream>
@@ -9,15 +9,16 @@ using namespace std;
 
 // spaghetti that will stay here forever
 bool GObjFactory::atLeastOne = false;
+const float GObjFactory::pl_dangle = PI / 8.0f;
 const Keyset GObjFactory::pl1_kset = Keyset(key::SCANCODE_W, key::SCANCODE_S, key::SCANCODE_A, key::SCANCODE_D, key::SCANCODE_Q, key::SCANCODE_E, key::SCANCODE_X);
 const Keyset GObjFactory::pl2_kset = Keyset(key::SCANCODE_UP, key::SCANCODE_DOWN, key::SCANCODE_LEFT, key::SCANCODE_RIGHT, key::SCANCODE_Z, key::SCANCODE_C, key::SCANCODE_SPACE);
 //unused: Keyset(key::SCANCODE_T, key::SCANCODE_G, key::SCANCODE_F, key::SCANCODE_H, key::SCANCODE_R, key::SCANCODE_Y, key::SCANCODE_B);
 
 // ===== ENTITY =====
 
-Entity* GObjFactory::createEntity(int type, float x, float y, float angle, float dangle, float cooldown) {
+Entity* GObjFactory::createEntity(int type, float x, float y, float angle) {
 	switch (type) {
-	case GObjFactory::PLAYER: return createPlayer(x, y, angle, dangle, cooldown);
+	case GObjFactory::PLAYER: return createPlayer(x, y, angle, pl_dangle);
 	case GObjFactory::SIMPLE_ENEMY: return createSimpleEnemy(x, y, angle);
 	case GObjFactory::ROTATING_ENEMY: return createRotatingEnemy(x, y, angle);
 	case GObjFactory::ACCELERATING_ENEMY: return createAcceleratingEnemy(x, y, angle);
@@ -28,13 +29,13 @@ Entity* GObjFactory::createEntity(int type, float x, float y, float angle, float
 	}
 }
 
-Entity* GObjFactory::createPlayer(float x, float y, float angle, float dangle, float cooldown) {
+Entity* GObjFactory::createPlayer(float x, float y, float angle, float dangle) {
 	if (!atLeastOne) {
 		atLeastOne = true;
-		return new Entity(x, y, angle, player_sp, player_w, player_h, new string(image_path + "player1"), new KeyboardPath(dangle, cooldown, pl1_kset), INT_MAX, player_hp, 0, GObjFactory::STANDARD_BULLET);
+		return new Player(x, y, angle, player_sp, player_w, player_h, new string(image_path + "player1"), dangle, 0.1f, pl1_kset, player_hp, GObjFactory::STANDARD_BULLET);
 	}
 	else
-		return new Entity(x, y, angle, player_sp, player_w, player_h, new string(image_path + "player2"), new KeyboardPath(dangle, cooldown, pl2_kset), INT_MAX, player_hp, 0, GObjFactory::STANDARD_BULLET);
+		return new Player(x, y, angle, player_sp, player_w, player_h, new string(image_path + "player2"), dangle, 0.1f, pl2_kset, player_hp, GObjFactory::STANDARD_BULLET);
 }
 
 Entity* GObjFactory::createSimpleEnemy(float x,float y, float angle) {
