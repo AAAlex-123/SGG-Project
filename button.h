@@ -4,8 +4,6 @@
 
 class GameData;
 
-// not really, drawing has more stuff that button doesn't need
-// but gd->draw() would like this inheritance to happen
 class Button : public Drawing
 {
 protected:
@@ -13,6 +11,9 @@ protected:
 	int targetGS;
 	bool clicked;
 	graphics::MouseState ms;
+	
+	// this one is specified by subclasses
+	virtual void execute_() const = 0;
 
 public:
 	Button(GameData*, float, float, float, std::string*, int targetGS);
@@ -22,8 +23,6 @@ public:
 
 	// this one is called
 	virtual void execute() const final;
-	// this one is specified by subclasses
-	virtual void execute_() const = 0;
 
 	// so inheritance works lmao
 	virtual operator bool() const override { return true; }
