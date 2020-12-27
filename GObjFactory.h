@@ -6,6 +6,7 @@
 class Entity;
 class Projectile;
 class VisualEffect;
+class Powerup;
 
 // A Factory class that's used to assemble and produce all game objects in the game.
 class GObjFactory {
@@ -23,6 +24,7 @@ private:
 	const static int player_w = (int) b_plane_size * 1.5;
 	const static int player_h = (int) b_plane_size * 3;
 	const static int player_hp = 100;
+	const static float pl_dangle;
 
 	const static int b_proj_sp = 350;
 	const static int b_proj_size = 10;
@@ -31,7 +33,7 @@ private:
 	const static Keyset pl1_kset;
 	const static Keyset pl2_kset;
 
-	static Entity* createPlayer(float x, float y, float angle, float dangle, float cooldown);
+	static Entity* createPlayer(float x, float y, float angle, float dangle);
 
 	static Entity* createSimpleEnemy(float x, float y, float angle);
 	static Entity* createRotatingEnemy(float x, float y, float angle);
@@ -51,7 +53,7 @@ public:
 	const static int PLAYER = 0, SIMPLE_ENEMY = 1, ROTATING_ENEMY = 2, ACCELERATING_ENEMY = 3, TANK_ENEMY = 4;
 	const static int NOEFFECT = 404, EXPLOSION_1 = 100, EXPLOSION_2 = 200, SMOKE = 300;
 
-	static Entity* createEntity(int type, float x, float y, float angle, float dangle = 0.0f, float cooldown = 0.0f);
+	static Entity* createEntity(int type, float x, float y, float angle);
 	static Projectile* createProjectile(int type, float x, float y, float angle);
 	// fps not needed when creating VisualEffects with only 1 sprite
 	static VisualEffect* createVisualEffect(int type, float x, float y, float angle, float duration, float fps = 0.0f);
