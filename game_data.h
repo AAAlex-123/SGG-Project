@@ -10,6 +10,7 @@
 #include "entity.h"
 #include "visual_effect.h"
 #include "level.h"
+#include "button.h"
 
 // lmao imagine using using
 using namespace std;
@@ -26,6 +27,8 @@ private:
 	// callback in case reading from file fails
 	void _load_hardcoded_levels();
 
+	void create_buttons();
+
 	int score;
 
 public:
@@ -33,6 +36,7 @@ public:
 	list<Entity*>* enemyLs, * playerLs;
 	list<Projectile*>* enemyProjLs, * playerProjLs;
 	list<VisualEffect*>* effectsLs;
+	list<Button*>* buttons;
 
 	// general
 	int fps;
@@ -43,6 +47,9 @@ public:
 	const float sps;
 	int curr_img;
 	vector<string> images;
+
+	// players
+	bool isMult = false;
 
 	// levels
 	unordered_map<int, Level*> levels;
@@ -96,6 +103,9 @@ public:
 	//Checks if any object within the list must be destroyed, and deletes it. Template class must be derived from Drawing.
 	template <class T>
 	void checkAndDelete(list<T*>*);
+
+	//button stuff
+	void click_buttons();
 	
 	void addScore(int scored) {
 		score += scored;

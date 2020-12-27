@@ -13,15 +13,15 @@ Drawing::Drawing(float xpos, float ypos, float angle, float vel, float width,flo
 }
 
 void Drawing::draw() {
-	br.fill_opacity = 1.0f;
-	setColor(br, 'W');
+	// uncomment below if last are uncommented
+	//br.fill_opacity = 1.0f;
+	//setColor(br, 'W');
 	br.texture = sprites[curr_sprite];
 	graphics::setOrientation(angle / (2 * PI) * 360);
 	graphics::drawRect(this->x, this->y, this->width, this->height, br);
 
-
-	setColor(br, 'R');
-	graphics::drawDisk(x, y, std::min(width, height) / 2.0f, br);
+	//setColor(br, 'R');
+	//graphics::drawDisk(x, y, std::min(width, height) / 2.0f, br);
 }
 
 Drawing::~Drawing() {

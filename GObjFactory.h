@@ -51,9 +51,10 @@ public:
 	const static int PLAYER = 0, SIMPLE_ENEMY = 1, ROTATING_ENEMY = 2, ACCELERATING_ENEMY = 3, TANK_ENEMY = 4;
 	const static int NOEFFECT = 404, EXPLOSION_1 = 100, EXPLOSION_2 = 200, SMOKE = 300;
 
+	static void reset() { atLeastOne = false; }
+
 	static Entity* createEntity(int type, float x, float y, float angle, float dangle = 0.0f, float cooldown = 0.0f);
 	static Projectile* createProjectile(int type, float x, float y, float angle);
 	// fps not needed when creating VisualEffects with only 1 sprite
 	static VisualEffect* createVisualEffect(int type, float x, float y, float angle, float duration, float fps = 0.0f);
 };
-

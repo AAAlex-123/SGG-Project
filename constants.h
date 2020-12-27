@@ -6,6 +6,9 @@ const short WINDOW_WIDTH = 1200;
 const short WINDOW_HEIGHT = 600;
 const float CANVAS_WIDTH = 400.0f;
 const float CANVAS_HEIGHT = 500.0f;
+// maps window to canvas or the inverse; used at the end of main.cpp
+const float w2c = CANVAS_HEIGHT / WINDOW_HEIGHT;
+const float c2w = 1.0f / w2c;
 
 // enum
 enum game_states
@@ -23,6 +26,8 @@ enum game_states
 	LEVEL_TRANSITION = 7,
 	HELP = 8,
 	EXIT = 9,
+	PAUSE = 12,
+	RESET = 13,
 };
 
 // function declarations

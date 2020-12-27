@@ -37,7 +37,7 @@ Entity* GObjFactory::createPlayer(float x, float y, float angle, float dangle, f
 		return new Entity(x, y, angle, player_sp, player_w, player_h, new string(image_path + "player2"), new KeyboardPath(dangle, cooldown, pl2_kset), INT_MAX, player_hp, 0, GObjFactory::STANDARD_BULLET);
 }
 
-Entity* GObjFactory::createSimpleEnemy(float x,float y, float angle) {
+Entity* GObjFactory::createSimpleEnemy(float x, float y, float angle) {
 	//	changes these numberes:					vvv					 vvv				  vvv													  vvv							   vvv				  vvv			        vvv			and this vvv bullet
 	return new Entity(x, y, angle, b_plane_sp * 1.0f, b_plane_size * 1.0f, b_plane_size * 1.0f, new string(image_path + "plane1"), new FiringPath(1.0f, new Path()), b_plane_dmg * 1.0f, b_plane_hp * 1.0f, b_plane_score * 1.0f, GObjFactory::STANDARD_BULLET);
 }
@@ -102,7 +102,7 @@ VisualEffect* GObjFactory::createExplosion1(float x, float y, float angle, float
 
 VisualEffect* GObjFactory::createSmoke(float x, float y, float angle, float duration) {
 	return new VisualEffect(x, y, angle, 0, 10,
-		new string[1]{ image_path + "smoke.png" 
+		new string[1]{ image_path + "smoke.png"
 		}, 1, duration, 0.01f);
 }
 
