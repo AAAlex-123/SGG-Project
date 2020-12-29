@@ -29,7 +29,7 @@ public:
 
 	virtual void draw() override;
 	// Returns a projectile of type `curr_projectile` using the friend GObjFactory class
-	Projectile* getProjectile() const;
+	Projectile* getProjectile(Drawing*) const;
 	VisualEffect* getFireVisualEffect() const;
 	VisualEffect* getDestructionVisualEffect() const override;
 

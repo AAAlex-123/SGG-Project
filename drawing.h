@@ -16,7 +16,7 @@ protected:
 	Path* movement; //movement across the screen
 
 public:
-	Drawing(float xpos, float ypos, float angle, float vel, float width,float height, const std::string* sprites, Path*);
+	Drawing(float xpos, float ypos, float angle, float vel, float width, float height, const std::string* sprites, Path* = new StaticPath());
 
 	// Updates the entities state (movement etc.)
 	virtual void update(float) = 0;

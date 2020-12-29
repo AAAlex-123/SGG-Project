@@ -3,6 +3,8 @@
 
 typedef graphics::scancode_t key;
 
+class Drawing;
+
 //Interface for all Path classes
 //Path is a Decorated Strategy changing its parent class' position, angle and velocity
 class Path {
@@ -24,7 +26,7 @@ public:
 private:
 	// raw velocity change per second
 	const float dvel;
-	Path* _path;
+	Path* const _path;
 };
 
 // Decorator that changes the angle
@@ -37,7 +39,7 @@ public:
 private:
 	// % of a full rotation per second
 	const float dangle;
-	Path* _path;
+	Path* const _path;
 };
 
 // Standalone Path that responds to Keyboard
@@ -64,8 +66,37 @@ public:
 private:
 	const float period;
 	float elapsed;
-	Path* _path;
+	Path* const _path;
 };
+
+// Decorator that returns bool if the object should fire
+class TargetedFiringPath : public Path {
+public:
+	TargetedFiringPath(float period, Path* p) : period(period), elapsed(0), _path(p)
+	{}
+	virtual bool move(float& x, float& y, float& angle, float& vel, float ms) override;
+
+private:
+	const float period;
+	float elapsed;
+	Path* const _path;
+};
+
+// Decorator that changes angle to follow an entity
+class HomingPath : public Path {
+public:
+	HomingPath(Drawing* followee, float perc, Path* p)
+		: followee(followee), perc(perc), _path(p)
+	{}
+	virtual bool move(float& x, float& y, float& angle, float& vel, float ms) override;
+
+private:
+	const Drawing* const followee;
+	// percentage of angle turn relative to target, 0-1
+	const float perc;
+	Path* const _path;
+};
+
 
 // Standalone Path that has no movement
 class StaticPath : public Path {

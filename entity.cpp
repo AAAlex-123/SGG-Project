@@ -18,8 +18,11 @@ bool Entity::hasFired() const {
 	return _hasFired;
 }
 
-Projectile* Entity::getProjectile() const {
-	return GObjFactory::createProjectile(curr_projectile, x - (radius*sin(angle)), y - (radius*cos(angle)), angle);
+Projectile* Entity::getProjectile(Drawing* d) const {
+	if (typeid(*movement) == typeid(TargetedFiringPath))
+		return GObjFactory::createProjectile(curr_projectile, x - (radius * sin(angle)), y - (radius * cos(angle)), 
+			atan2((d->get_x() - x), (d->get_y() - y)) + PI);
+	return GObjFactory::createProjectile(curr_projectile, x - (radius * sin(angle)), y - (radius * cos(angle)), angle);
 }
 
 VisualEffect* Entity::getFireVisualEffect() const {

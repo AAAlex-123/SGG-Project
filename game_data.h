@@ -11,6 +11,7 @@
 #include "visual_effect.h"
 #include "level.h"
 #include "Powerup.h"
+#include "button.h"
 
 // lmao imagine using using
 using namespace std;
@@ -27,6 +28,8 @@ private:
 	// callback in case reading from file fails
 	void _load_hardcoded_levels();
 
+	void create_buttons();
+
 	int score;
 
 public:
@@ -35,6 +38,7 @@ public:
 	list<Projectile*>* enemyProjLs, * playerProjLs;
 	list<VisualEffect*>* effectsLs;
 	list<Powerup*>* powerupLs;
+	list<Button*>* buttons;
 
 	// general
 	int fps;
@@ -46,6 +50,9 @@ public:
 	int curr_img;
 	vector<string> images;
 	
+	// players
+	bool isMult = false;
+
 	// players
 	bool isMult = false;
 
@@ -103,6 +110,9 @@ public:
 	//Checks if any object within the list must be destroyed, and deletes it. Template class must be derived from Drawing.
 	template <class T>
 	void checkAndDelete(list<T*>*);
+
+	//button stuff
+	void click_buttons();
 	
 	void addScore(int scored) {
 		score += scored;
@@ -146,9 +156,13 @@ void GameData::fire(list<T*>* ls) const {
 				isPlayer |= pl == en;	// fancy
 
 			if (isPlayer) {
-				playerProjLs->push_back(en->getProjectile());
+				playerProjLs->push_back(en->getProjectile(nullptr));
 			} else {
-				enemyProjLs->push_back(en->getProjectile());
+				enemyProjLs->push_back(en->getProjectile(
+					rand() % (playerLs->size()) == 0
+					? playerLs->front()
+					: playerLs->back()
+				));
 			}
 			effectsLs->push_back(en->getFireVisualEffect());
 		}

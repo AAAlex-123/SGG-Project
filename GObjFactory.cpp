@@ -1,15 +1,18 @@
 #include "GObjFactory.h"
 #include "Path.h"
 #include "Player.h"
+#include "drawing.h"
+#include "entity.h"
 #include "projectile.h"
 #include "visual_effect.h"
 #include <iostream>
 
 using namespace std;
 
-// spaghetti that will stay here forever
-bool GObjFactory::atLeastOne = false;
 const float GObjFactory::pl_dangle = PI / 8.0f;
+// spaghetti that will not stay here forever
+bool GObjFactory::zero = true, GObjFactory::one = false, GObjFactory::two = false;
+Entity** GObjFactory::players = new Entity*[2]{ nullptr, nullptr };
 const Keyset GObjFactory::pl1_kset = Keyset(key::SCANCODE_W, key::SCANCODE_S, key::SCANCODE_A, key::SCANCODE_D, key::SCANCODE_Q, key::SCANCODE_E, key::SCANCODE_X);
 const Keyset GObjFactory::pl2_kset = Keyset(key::SCANCODE_UP, key::SCANCODE_DOWN, key::SCANCODE_LEFT, key::SCANCODE_RIGHT, key::SCANCODE_Z, key::SCANCODE_C, key::SCANCODE_SPACE);
 //unused: Keyset(key::SCANCODE_T, key::SCANCODE_G, key::SCANCODE_F, key::SCANCODE_H, key::SCANCODE_R, key::SCANCODE_Y, key::SCANCODE_B);
@@ -23,6 +26,8 @@ Entity* GObjFactory::createEntity(int type, float x, float y, float angle) {
 	case GObjFactory::ROTATING_ENEMY: return createRotatingEnemy(x, y, angle);
 	case GObjFactory::ACCELERATING_ENEMY: return createAcceleratingEnemy(x, y, angle);
 	case GObjFactory::TANK_ENEMY: return createTankEnemy(x, y, angle);
+	case GObjFactory::BOMB: return createBomb(x, y, angle, players[rand() % ((int)one + (int)two)]);
+	case GObjFactory::AIM: return createAimingEnemy(x, y, angle);
 	default:
 		std::cerr << "Invalid constant, creating enemy1 as placeholder" << std::endl;
 		return createSimpleEnemy(x, y, angle);
@@ -37,6 +42,16 @@ Entity* GObjFactory::createPlayer(float x, float y, float angle, float dangle) {
 	else
 		return new Player(x, y, angle, player_sp, player_w, player_h, new string(image_path + "player2"), dangle, 0.1f, pl2_kset, player_hp, GObjFactory::STANDARD_BULLET);
 }
+
+// uncomment below if a targeting entity must be created at runtime, when followee is known
+//Entity* GObjFactory::createEntity(int type, float x, float y, float angle, Drawing* followee) {
+//	switch (type) {
+//	case GObjFactory::BOMB: return createBomb(x, y, angle, followee);
+//	default:
+//		std::cerr << "Invalid constant, creating bomb as placeholder" << std::endl;
+//		return createBomb(x, y, angle, followee);
+//	}
+//}
 
 Entity* GObjFactory::createSimpleEnemy(float x,float y, float angle) {
 	return new Entity(x, y, angle, b_plane_sp * 1.0f, b_plane_size * 1.0f, b_plane_size * 1.0f, new string(image_path + "plane1"), new FiringPath(1.0f, new Path()), b_plane_dmg * 1.0f, b_plane_hp * 1.0f, b_plane_score * 1.0f, GObjFactory::STANDARD_BULLET);
@@ -53,6 +68,15 @@ Entity* GObjFactory::createAcceleratingEnemy(float x, float y, float angle) {
 Entity* GObjFactory::createTankEnemy(float x, float y, float angle) {
 	return new Entity(x, y, angle, b_plane_sp * 0.4f, b_plane_size * 1.f, b_plane_size * 2.f, new string(image_path + "balloon"), new FiringPath(900.f, new Path()), b_plane_dmg * 3.0f, b_plane_hp * 3.0f, b_plane_score * 2.0f, GObjFactory::HEAVY_BULLET);
 }
+
+Entity* GObjFactory::createBomb(float x, float y, float angle, Drawing* followee) {													  // this one as well vvv
+	return new Entity(x, y, angle, b_plane_sp * 0.5f, b_plane_size * 1.5f, b_plane_size * 1.5f, new string(image_path + "suicide_plane"), new HomingPath(followee, 0.05f, new Path()), b_plane_dmg * 3.0f, b_plane_hp * 3.0f, b_plane_score * 2.0f, GObjFactory::HEAVY_BULLET);
+}
+
+Entity* GObjFactory::createAimingEnemy(float x, float y, float angle) {																// this one as well vvv
+	return new Entity(x, y, angle, b_plane_sp * 0.5f, b_plane_size * 1.5f, b_plane_size * 1.5f, new string(image_path + "aim_plane"), new TargetedFiringPath(1.0f, new Path()), b_plane_dmg * 3.0f, b_plane_hp * 3.0f, b_plane_score * 2.0f, GObjFactory::HEAVY_BULLET);
+}
+
 
 // ===== PROJECTILE =====
 
@@ -101,7 +125,7 @@ VisualEffect* GObjFactory::createExplosion1(float x, float y, float angle, float
 
 VisualEffect* GObjFactory::createSmoke(float x, float y, float angle, float duration) {
 	return new VisualEffect(x, y, angle, 0, 40,
-		new string[1]{ image_path + "expl6.png" 
+		new string[1]{ image_path + "smoke.png"
 		}, 1, duration, 0.01f);
 }
 

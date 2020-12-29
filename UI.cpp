@@ -41,8 +41,9 @@ void UI::drawPlayerPanel(const Entity* player, float x_pos) {
 	graphics::setOrientation(90.f);
 	graphics::drawRect(x_pos + 100, height - 80, 20, box_height, bg_br);
 
+
 	//draw Projectile icon
-	bg_br.texture = *(player->getProjectile()->getSprite());
+	bg_br.texture = *(player->getProjectile(nullptr)->getSprite());
 	graphics::setOrientation(0.f);
 	graphics::drawRect(x_pos + 90,  height - 50, 20, box_height, bg_br);
 	graphics::drawRect(x_pos + 100, height - 50, 20, box_height, bg_br);
@@ -97,6 +98,9 @@ void UI::draw() {
 
 	//draw Level
 	graphics::drawText(width / 75, 2 * width / 20 + 20, ((width + height) / 2) / 35, "Level " + std::to_string(-gd->curr_playing_level - 1), std_br);
+
+	//draw pause text
+	graphics::drawText(4*width / 5, 2 * width / 20 + 20, ((width + height) / 2) / 35, "Pause (P)", std_br);
 
 	//draw Panels
 	drawPlayerPanel(gd->playerLs->front(), 0);
