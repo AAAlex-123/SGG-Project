@@ -20,8 +20,8 @@ void Drawing::draw() {
 	graphics::drawRect(this->x, this->y, this->width, this->height, br);
 
 
-	setColor(br, 'R');
-	graphics::drawDisk(x, y, std::min(width, height) / 2.0f, br);
+	//setColor(br, 'R');
+	//graphics::drawDisk(x, y, std::min(width, height) / 2.0f, br);
 }
 
 Drawing::~Drawing() {
