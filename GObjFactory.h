@@ -3,6 +3,7 @@
 
 // See "entity.h" for why the factory pattern was neccesary here
 
+class Drawing;
 class Entity;
 class Projectile;
 class VisualEffect;
@@ -10,8 +11,8 @@ class VisualEffect;
 // A Factory class that's used to assemble and produce all game objects in the game.
 class GObjFactory {
 private:
-	// :knife:
-	static bool atLeastOne;
+	static bool zero, one, two;
+	static Entity** players;
 
 	const static int player_sp = 150;
 	const static int player_w = 15;
@@ -32,11 +33,12 @@ private:
 	const static Keyset pl2_kset;
 
 	static Entity* createPlayer(float x, float y, float angle, float dangle, float cooldown);
-
 	static Entity* createSimpleEnemy(float x, float y, float angle);
 	static Entity* createRotatingEnemy(float x, float y, float angle);
 	static Entity* createAcceleratingEnemy(float x, float y, float angle);
 	static Entity* createTankEnemy(float x, float y, float angle);
+	static Entity* createBomb(float x, float y, float angle, Drawing*);
+	static Entity* createAimingEnemy(float x, float y, float angle);
 
 	static Projectile* createStandardBullet(float x, float y, float angle);
 	static Projectile* createHeavyBullet(float x, float y, float angle);
@@ -48,12 +50,16 @@ private:
 
 public:
 	const static int STANDARD_BULLET = 10, HEAVY_BULLET = 11, LIGHT_BULLET = 12;
-	const static int PLAYER = 0, SIMPLE_ENEMY = 1, ROTATING_ENEMY = 2, ACCELERATING_ENEMY = 3, TANK_ENEMY = 4;
+	const static int PLAYER = 0, SIMPLE_ENEMY = 1, ROTATING_ENEMY = 2, ACCELERATING_ENEMY = 3, TANK_ENEMY = 4, BOMB = 5, AIM = 6;
 	const static int NOEFFECT = 404, EXPLOSION_1 = 100, EXPLOSION_2 = 200, SMOKE = 300;
 
-	static void reset() { atLeastOne = false; }
+	static void reset() { zero = true; one = two = false; players[0] = players[1] = nullptr; }
+	// use when someone has died and the targeting planes shouldn't target them
+	static void remove_player(int p) { players[!p] = players[p]; players[p] = nullptr; zero = false; one = true; two = false; }
 
 	static Entity* createEntity(int type, float x, float y, float angle, float dangle = 0.0f, float cooldown = 0.0f);
+	// might be used for creating stuff at run-time from game_data where the Drawing* is known (powerups?)
+	// static Entity* createEntity(int type, float x, float y, float angle, Drawing* followee);
 	static Projectile* createProjectile(int type, float x, float y, float angle);
 	// fps not needed when creating VisualEffects with only 1 sprite
 	static VisualEffect* createVisualEffect(int type, float x, float y, float angle, float duration, float fps = 0.0f);
