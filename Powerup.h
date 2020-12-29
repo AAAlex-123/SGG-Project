@@ -23,7 +23,7 @@ public:
 	}
 
 	virtual VisualEffect* getDestructionVisualEffect() const override {
-		return GObjFactory::createVisualEffect(GObjFactory::EXPLOSION_1, x, y, 0.0f, 1.0f, 18.0f); //obviously change this later
+		return GObjFactory::createVisualEffect(GObjFactory::NOEFFECT, x, y, 0.0f, 1.0f, 18.0f); //obviously change this later
 	}
 };
 
