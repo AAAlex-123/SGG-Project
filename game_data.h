@@ -10,6 +10,7 @@
 #include "entity.h"
 #include "visual_effect.h"
 #include "level.h"
+#include "Powerup.h"
 
 // lmao imagine using using
 using namespace std;
@@ -33,6 +34,7 @@ public:
 	list<Entity*>* enemyLs, * playerLs;
 	list<Projectile*>* enemyProjLs, * playerProjLs;
 	list<VisualEffect*>* effectsLs;
+	list<Powerup*>* powerupLs;
 
 	// general
 	int fps;
@@ -78,6 +80,8 @@ public:
 	{
 		if (levels[curr_playing_level]->can_spawn())
 			enemyLs->push_back(levels[curr_playing_level]->spawn());
+		if (levels[curr_playing_level]->can_spawn_p())
+			powerupLs->push_back(levels[curr_playing_level]->spawn_p());
 	}
 	
 	//Updates all objects within the list. Template class must be derived from Drawing.
