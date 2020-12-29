@@ -194,13 +194,13 @@ bool GameData::_load_levels_from_file(const std::string& level_path)
 		{
 			if (match[1] == "Health")
 				levels[curr_level_id]->add_powerup(stof(match[5]), new HealthPowerup(
-					get_canvas_width() * stof(match[2]), get_canvas_height() * stof(match[3]), stof(match[4])));
+					get_canvas_width() * stof(match[2]), get_canvas_height() * stof(match[3]), stof(match[4]) / 180 * PI));
 			else if (match[1] == "Projectile")
 				levels[curr_level_id]->add_powerup(stof(match[5]), new ProjectilePowerup(
-					get_canvas_width() * stof(match[2]), get_canvas_height() * stof(match[3]), stof(match[4])));
+					get_canvas_width() * stof(match[2]), get_canvas_height() * stof(match[3]), stof(match[4]) / 180 * PI));
 			else if (match[1] == "Points")
 				levels[curr_level_id]->add_powerup(stof(match[5]), new PointsPowerup(
-					get_canvas_width() * stof(match[2]), get_canvas_height() * stof(match[3]), stof(match[4])));
+					get_canvas_width() * stof(match[2]), get_canvas_height() * stof(match[3]), stof(match[4]) / 180 * PI));
 			else
 			{
 				std::cerr << "Error: Powerup with name '" << match[1] << "' not found" << std::endl;
