@@ -67,17 +67,16 @@ Projectile* GObjFactory::createProjectile(int type, float x, float y, float angl
 	}
 }
 
-Projectile* GObjFactory::createStandardBullet(float x, float y, float angle) {
-	// change these numbers:					   vvv				   vvv																	  
+Projectile* GObjFactory::createStandardBullet(float x, float y, float angle) {			   																  
 	return new Projectile(x, y, angle, b_proj_sp * 1.0f, b_proj_size * 1.0f, new string(image_path + "bullet1.png"), new Path(), b_proj_dmg * 1);
 }
 
 Projectile* GObjFactory::createHeavyBullet(float x, float y, float angle) {
-	return new Projectile(x, y, angle, b_proj_sp * 0.8f, b_proj_size * 3.0f, new string(image_path + "bullet1.png"), new Path(), b_proj_dmg * 3);
+	return new Projectile(x, y, angle, b_proj_sp * 0.7f, b_proj_size * 1.2f, new string(image_path + "bullet3.png"), new Path(), b_proj_dmg * 3);
 }
 
 Projectile* GObjFactory::createLightBullet(float x, float y, float angle) {
-	return new Projectile(x, y, angle, b_proj_sp * 1.5f, b_proj_size * 0.8f, new string(image_path + "bullet1.png"), new Path(), (int) b_proj_dmg * 0.5);
+	return new Projectile(x, y, angle, b_proj_sp * 1.5f, b_proj_size * 0.8f, new string(image_path + "bullet2.png"), new Path(), (int) b_proj_dmg * 0.5);
 }
 
 // ===== VISUAL EFFECT =====
@@ -101,8 +100,8 @@ VisualEffect* GObjFactory::createExplosion1(float x, float y, float angle, float
 }
 
 VisualEffect* GObjFactory::createSmoke(float x, float y, float angle, float duration) {
-	return new VisualEffect(x, y, angle, 0, 10,
-		new string[1]{ image_path + "smoke.png" 
+	return new VisualEffect(x, y, angle, 0, 40,
+		new string[1]{ image_path + "expl6.png" 
 		}, 1, duration, 0.01f);
 }
 
