@@ -111,6 +111,7 @@ void update(float ms)
 		gd->update(ms, gd->playerLs);
 		gd->update(ms, gd->playerProjLs);
 		gd->update(ms, gd->effectsLs);
+		gd->update(ms, gd->powerupLs);
 		
 		gd->updateLevel(ms);
 		gd->updateBackground(ms);
@@ -119,6 +120,7 @@ void update(float ms)
 		gd->checkCollisions(gd->enemyProjLs, gd->playerLs);
 		gd->checkCollisions(gd->playerProjLs, gd->enemyLs);
 		gd->checkCollisions(gd->enemyLs, gd->playerLs);
+		gd->checkCollisions(gd->playerLs, gd->powerupLs);
 
 	//fire
 		gd->fire(gd->playerLs);
@@ -133,6 +135,7 @@ void update(float ms)
 		gd->checkAndDelete(gd->playerLs);
 		gd->checkAndDelete(gd->playerProjLs);
 		gd->checkAndDelete(gd->effectsLs);
+		gd->checkAndDelete(gd->powerupLs);
 
 		break;
 	}
@@ -289,6 +292,7 @@ void draw()
 		gd->draw(gd->playerLs);
 		gd->draw(gd->playerProjLs);
 		gd->draw(gd->effectsLs);
+		gd->draw(gd->powerupLs);
 		ui->draw();
 		break;
 	}
