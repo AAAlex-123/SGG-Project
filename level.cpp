@@ -6,8 +6,10 @@
 // ===== LEVEL =====
 
 Level::Level(int id, const std::string& desc)
-	: _id(id), _desc(desc), waves(new std::unordered_set<std::pair<float, Wave*>*>),
-	enemy_queue(new std::queue<Entity*>), _total_time(0.0f)
+	: _id(id), _desc(desc),
+	waves(new std::unordered_set<std::pair<float, Wave*>*>), enemy_queue(new std::queue<Entity*>),
+	powerups(new std::unordered_set<std::pair<float, Powerup*>*>), powerup_queue(new std::queue<Powerup*>),
+	_total_time(0.0f)
 {
 	if (id == -1)
 	{
@@ -22,7 +24,7 @@ Level::Level(int id, const std::string& desc)
 void Level::update(float ms)
 {
 	// indicates end of level, no update should happen
-	if (waves->empty())
+	if (waves->empty() && powerups->empty())
 		return;
 
 	_total_time += (ms / 1000.0f);
@@ -47,6 +49,17 @@ void Level::update(float ms)
 			}
 		}
 	}
+
+	for (auto iter = powerups->begin(); iter != powerups->end(); ++iter)
+	{
+		if (_total_time >= (*iter)->first)
+		{
+			powerup_queue->push((*iter)->second);
+			iter = powerups->erase(iter);
+			if (iter == powerups->end())
+				break;
+		}
+	}
 }
 
 bool Level::can_spawn()
@@ -62,14 +75,33 @@ Entity* Level::spawn()
 	return return_val;
 }
 
+bool Level::can_spawn_p()
+{
+	return (!powerup_queue->empty());
+}
+
+Powerup* Level::spawn_p()
+{
+	std::cout << "actually spawning" << std::endl;
+	// return the first enemy of the queue
+	Powerup* return_val = powerup_queue->front();
+	powerup_queue->pop();
+	return return_val;
+}
+
 void Level::add_wave(float time, Wave* w)
 {
 	waves->insert(new std::pair<float, Wave*>(time, w));
 }
 
+void Level::add_powerup(float time, Powerup* p)
+{
+	powerups->insert(new std::pair<float, Powerup*>(time, p));
+}
+
 Level::operator bool() const
 {
-	return !(waves->empty() && enemy_queue->empty());
+	return !(waves->empty() && enemy_queue->empty() && powerups->empty() && powerup_queue->empty());
 }
 
 std::string Level::to_file_string()
