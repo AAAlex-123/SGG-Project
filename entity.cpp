@@ -26,15 +26,11 @@ Projectile* Entity::getProjectile(Drawing* d) const {
 }
 
 VisualEffect* Entity::getFireVisualEffect() const {
-	return GObjFactory::createVisualEffect(GObjFactory::SMOKE, x - (radius * sin(angle)), y - (radius * cos(angle)), angle, 0.3f);
+	return GObjFactory::createVisualEffect(GObjFactory::SMOKE, x - (radius * sin(angle)), y - (radius * cos(angle)), angle, 0.06f);
 }
 
 VisualEffect* Entity::getDestructionVisualEffect() const {
 	return GObjFactory::createVisualEffect(GObjFactory::EXPLOSION_1, x, y, 0.0f, 1.0f, 18.0f);
-}
-
-void Entity::setProjectile(int proj_type) {
-	this->curr_projectile = proj_type;
 }
 
 void Entity::draw() {

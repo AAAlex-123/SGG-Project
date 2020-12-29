@@ -15,7 +15,7 @@ GameData::GameData()
 	bg_offset(0.0f), height_perc_per_second(0.02f),
 	curr_playing_level(-1), level_transition_timer(set_level_transition_timer()),
 	enemyLs(new list<Entity*>), playerLs(new list<Entity*>), enemyProjLs(new list<Projectile*>),
-	playerProjLs(new list<Projectile*>), effectsLs(new list<VisualEffect*>), buttons(new list<Button*>)
+	playerProjLs(new list<Projectile*>), effectsLs(new list<VisualEffect*>),  powerupLs(new list<Powerup*>), buttons(new list<Button*>)
 {
 	// sets all the user-selectable levels to nullptr
 	// to check later if a user-selectable level has been
@@ -203,9 +203,10 @@ bool GameData::_load_levels_from_file(const std::string& level_path)
 	// regex patterns
 	std::string rs1("Level\\((-?\\d+), \"(.*)\"\\)");
 	std::string rs2("wave (.*?) (.*)");
+	std::string rs3("(.*?)Powerup\\((.*?), (.*?), (.*?)\\) (.*?)");
 
 	// regex objects
-	std::regex r1, r2, eof, comment;
+	std::regex r1, r2, r3, eof, comment;
 
 	int curr_level_id = 0, line = 0;
 
@@ -214,6 +215,7 @@ bool GameData::_load_levels_from_file(const std::string& level_path)
 		// construct regexes ...
 		r1 = std::regex("^" + std::to_string(line) + "   " + rs1 + "$");
 		r2 = std::regex("^" + std::to_string(line) + "   " + rs2 + "$");
+		r3 = std::regex("^" + std::to_string(line) + "   " + rs3 + "$");
 		eof = std::regex("^" + std::to_string(line) + "$");
 		comment = std::regex("^" + std::to_string(line) + "//");
 
@@ -232,6 +234,24 @@ bool GameData::_load_levels_from_file(const std::string& level_path)
 				return false;
 			}
 			levels[curr_level_id]->add_wave(stof(match[2]), new Wave(*_waves[match[1]]));
+		}
+		// powerup declaration
+		else if (std::regex_search(contents, match, r3))
+		{
+			if (match[1] == "Health")
+				levels[curr_level_id]->add_powerup(stof(match[5]), new HealthPowerup(
+					get_canvas_width() * stof(match[2]), get_canvas_height() * stof(match[3]), stof(match[4]) / 180 * PI));
+			else if (match[1] == "Projectile")
+				levels[curr_level_id]->add_powerup(stof(match[5]), new ProjectilePowerup(
+					get_canvas_width() * stof(match[2]), get_canvas_height() * stof(match[3]), stof(match[4]) / 180 * PI));
+			else if (match[1] == "Points")
+				levels[curr_level_id]->add_powerup(stof(match[5]), new PointsPowerup(
+					get_canvas_width() * stof(match[2]), get_canvas_height() * stof(match[3]), stof(match[4]) / 180 * PI));
+			else
+			{
+				std::cerr << "Error: Powerup with name '" << match[1] << "' not found" << std::endl;
+				return false;
+			}
 		}
 		// eof
 		else if (std::regex_search(contents, match, eof))

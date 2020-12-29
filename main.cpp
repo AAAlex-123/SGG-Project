@@ -79,10 +79,11 @@ void update(float ms)
 		{
 			gd->game_state = game_states::GAME;
 			gd->curr_playing_level = gd->curr_selected_level == -1 ? -2 : gd->curr_selected_level;
-																																	
-			gd->playerLs->push_back(GObjFactory::createEntity(GObjFactory::PLAYER, get_canvas_width() / 3.0f, get_canvas_height() * 0.7f, 0, PI / 4.0f, 0.1f)); // 0.1f = fire cooldown
-			if (gd->isMult)
-				gd->playerLs->push_back(GObjFactory::createEntity(GObjFactory::PLAYER, 2 * (get_canvas_width() / 3.0f), get_canvas_height() * 0.7f, 0, PI / 4.0f, 0.1f));
+
+			gd->playerLs->push_back(GObjFactory::createEntity(GObjFactory::PLAYER, get_canvas_width() / 3.0f, get_canvas_height() * 0.7f, 0)); // 0.1f = fire cooldown
+			if(gd->isMult)
+				gd->playerLs->push_back(GObjFactory::createEntity(GObjFactory::PLAYER, 2 * get_canvas_width() / 3.0f, get_canvas_height() * 0.7f, 0));
+
 		  
 			ui = new UI(gd);
 			break;
@@ -110,6 +111,7 @@ void update(float ms)
 		gd->update(ms, gd->playerLs);
 		gd->update(ms, gd->playerProjLs);
 		gd->update(ms, gd->effectsLs);
+		gd->update(ms, gd->powerupLs);
 		
 		gd->updateLevel(ms);
 		gd->updateBackground(ms);
@@ -118,6 +120,7 @@ void update(float ms)
 		gd->checkCollisions(gd->enemyProjLs, gd->playerLs);
 		gd->checkCollisions(gd->playerProjLs, gd->enemyLs);
 		gd->checkCollisions(gd->enemyLs, gd->playerLs);
+		gd->checkCollisions(gd->playerLs, gd->powerupLs);
 
 	//fire
 		gd->fire(gd->playerLs);
@@ -132,6 +135,7 @@ void update(float ms)
 		gd->checkAndDelete(gd->playerLs);
 		gd->checkAndDelete(gd->playerProjLs);
 		gd->checkAndDelete(gd->effectsLs);
+		gd->checkAndDelete(gd->powerupLs);
 
 		break;
 	}
@@ -274,6 +278,7 @@ void draw()
 		gd->draw(gd->playerLs);
 		gd->draw(gd->playerProjLs);
 		gd->draw(gd->effectsLs);
+		gd->draw(gd->powerupLs);
 		ui->draw();
 		break;
 	}
@@ -353,7 +358,6 @@ void draw()
 
 		graphics::drawText(4*CANVAS_WIDTH / 32, 5 * CANVAS_HEIGHT / 6, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 15,
 			gd->isMult ? "Multiplayer mode selected!" : "Singleplayer mode selected!", br);
-
 		break;
 	}
 	case game_states::HELP: {
@@ -422,7 +426,7 @@ int main(int argc, char** argv)
 	curr_music = MENU_MUSIC;
 	bg_br.texture = image_path + "menu2.png";
 	graphics::startMessageLoop();
-
+	graphics::destroyWindow();
 	return 0;
 }
 

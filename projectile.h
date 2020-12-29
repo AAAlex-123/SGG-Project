@@ -14,5 +14,7 @@ public:
 
 	virtual VisualEffect* getDestructionVisualEffect() const;
 	
+	virtual void hit(GameObject* o2) override;
+
 	virtual ~Projectile();
 };

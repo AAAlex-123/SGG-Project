@@ -10,6 +10,7 @@
 #include "entity.h"
 #include "visual_effect.h"
 #include "level.h"
+#include "Powerup.h"
 #include "button.h"
 
 // lmao imagine using using
@@ -36,6 +37,7 @@ public:
 	list<Entity*>* enemyLs, * playerLs;
 	list<Projectile*>* enemyProjLs, * playerProjLs;
 	list<VisualEffect*>* effectsLs;
+	list<Powerup*>* powerupLs;
 	list<Button*>* buttons;
 
 	// general
@@ -47,6 +49,9 @@ public:
 	const float sps;
 	int curr_img;
 	vector<string> images;
+	
+	// players
+	bool isMult = false;
 
 	// players
 	bool isMult = false;
@@ -82,6 +87,8 @@ public:
 	{
 		if (levels[curr_playing_level]->can_spawn())
 			enemyLs->push_back(levels[curr_playing_level]->spawn());
+		if (levels[curr_playing_level]->can_spawn_p())
+			powerupLs->push_back(levels[curr_playing_level]->spawn_p());
 	}
 	
 	//Updates all objects within the list. Template class must be derived from Drawing.

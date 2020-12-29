@@ -6,6 +6,7 @@
 class Wave;
 class Spawnpoint;
 class Entity;
+class Powerup;
 
 // defines a set of waves and their timings
 class Level
@@ -18,21 +19,27 @@ private:
 	// the time of each wave corresponds to the amount of time that will pass
 	// from level start before the wave starts
 	std::unordered_set<std::pair<float, Wave*>*>* waves;
+	std::unordered_set<std::pair<float, Powerup*>*>* powerups;
 	// queue of enemies to be spawned (look at Wave::update() for why it is a queue)
 	std::queue<Entity*>* enemy_queue;
+	std::queue<Powerup*>* powerup_queue;
 
 	float _total_time;
 
 public:
 	Level(int, const std::string&);
 
-	// update level time and wave time
+	// update level and wave time
 	void update(float ms);
-	// delegate spawning to the waves
+	// delegate entity spawning to the waves
 	bool can_spawn();
 	Entity* spawn();
+	// handle powerup spawning
+	bool can_spawn_p();
+	Powerup* spawn_p();
 
 	void add_wave(float, Wave*);
+	void add_powerup(float, Powerup*);
 
 	// used by level selection to display info and select level
 	int id() { return _id; }

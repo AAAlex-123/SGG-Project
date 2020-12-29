@@ -10,7 +10,7 @@ class Projectile;
 
 //Interface for all interactive objects that can spawn other objects. Built using composition.
 class Entity : public GameObject {
-private:
+protected:
 	int curr_projectile;
 	bool _hasFired;
 
@@ -32,9 +32,6 @@ public:
 	Projectile* getProjectile(Drawing*) const;
 	VisualEffect* getFireVisualEffect() const;
 	VisualEffect* getDestructionVisualEffect() const override;
-
-	// Changes the projectile type
-	void setProjectile(int proj_type);
 
 	virtual ~Entity();
 };

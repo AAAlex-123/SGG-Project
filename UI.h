@@ -5,9 +5,7 @@
 
 class UI {
 private:
-	bool isMult;
 	const float width, height;
-	Entity** players;
 	graphics::Brush health_br, std_br, bg_br;
 	const GameData* const gd;
 	int new_fps = 40;
@@ -17,7 +15,7 @@ private:
 	void initializeBrushes();
 
 public:
+	static const int box_height = 40;
 	UI(GameData* gd);
-
 	void draw();
 };

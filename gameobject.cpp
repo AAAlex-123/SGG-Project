@@ -6,7 +6,7 @@ GameObject::GameObject(float xpos, float ypos, float angle, float vel, float wid
 	damage(damage), max_health(max_health), score(score), radius(std::min(width, height) / 2), curr_health(max_health)
 {}
 
-void GameObject::hit(const GameObject& o2) {
+void GameObject::hit(GameObject* o2) {
 	this->curr_health -= o2.damage;
 }
 

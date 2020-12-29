@@ -9,7 +9,7 @@ protected:
 	const int damage, score, max_health;
 	const float radius;
 	int curr_health;
-	void hit(const GameObject& o2);
+	virtual void hit(GameObject* o2);
 
 public:
 	GameObject(float xpos, float ypos, float angle, float vel, float width,float height, const std::string* sprite, Path*, int damage, int health, int score);
