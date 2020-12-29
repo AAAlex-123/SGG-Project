@@ -3,7 +3,7 @@
 #include "Player.h"
 #include "GObjFactory.h"
 
-//All the methods here are supposed to be in line so they are declared only in the header file
+//All the methods here are supposed to be in-line so they are declared only in the header file
 
 class Powerup :public GameObject{
 protected:
