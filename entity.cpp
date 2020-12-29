@@ -23,7 +23,7 @@ Projectile* Entity::getProjectile() const {
 }
 
 VisualEffect* Entity::getFireVisualEffect() const {
-	return GObjFactory::createVisualEffect(GObjFactory::SMOKE, x - (radius * sin(angle)), y - (radius * cos(angle)), angle, 0.3f);
+	return GObjFactory::createVisualEffect(GObjFactory::SMOKE, x - (radius * sin(angle)), y - (radius * cos(angle)), angle, 0.06f);
 }
 
 VisualEffect* Entity::getDestructionVisualEffect() const {
