@@ -13,6 +13,7 @@ class Powerup;
 class GObjFactory {
 private:
 	static bool zero, one, two;
+	static bool atLeastOne;
 	static Entity** players;
 
 	const static int b_plane_sp = 100;
@@ -22,7 +23,7 @@ private:
 	const static int b_plane_score = 100;
 
 	const static int player_sp = 150;
-	const static int player_w = (int) b_plane_size * 1.5;
+	const static int player_w = (int) (b_plane_size * 1.5f);
 	const static int player_h = (int) b_plane_size * 3;
 	const static int player_hp = 100;
 	const static float pl_dangle;
