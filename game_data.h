@@ -53,9 +53,6 @@ public:
 	// players
 	bool isMult = false;
 
-	// players
-	bool isMult = false;
-
 	// levels
 	unordered_map<int, Level*> levels;
 	unordered_map<string, Wave*> _waves;
