@@ -12,6 +12,7 @@ using namespace std;
 const float GObjFactory::pl_dangle = PI / 8.0f;
 // spaghetti that will not stay here forever
 bool GObjFactory::zero = true, GObjFactory::one = false, GObjFactory::two = false;
+bool GObjFactory::atLeastOne = false;
 Entity** GObjFactory::players = new Entity*[2]{ nullptr, nullptr };
 const Keyset GObjFactory::pl1_kset = Keyset(key::SCANCODE_W, key::SCANCODE_S, key::SCANCODE_A, key::SCANCODE_D, key::SCANCODE_Q, key::SCANCODE_E, key::SCANCODE_X);
 const Keyset GObjFactory::pl2_kset = Keyset(key::SCANCODE_UP, key::SCANCODE_DOWN, key::SCANCODE_LEFT, key::SCANCODE_RIGHT, key::SCANCODE_Z, key::SCANCODE_C, key::SCANCODE_SPACE);

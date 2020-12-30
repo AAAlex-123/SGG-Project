@@ -26,8 +26,8 @@ public:
 	// Returns false if the object is not alive; i.e. it must be destroyed
 	virtual operator bool() const = 0;
 
-	virtual float get_x() { return x; }
-	virtual float get_y() { return y; }
+	float get_x() const { return x; }
+	float get_y() const { return y; }
 
 	virtual ~Drawing();
 };

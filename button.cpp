@@ -13,7 +13,7 @@ void Button::update(float not_used_lmao)
 		graphics::getMouseState(ms);
 		if (ms.button_left_pressed)
 		{
-			clicked = (((abs(mouse_x(ms.cur_pos_x) - x) <= width)) && (abs(mouse_y(ms.cur_pos_y) - y) <= height));
+			clicked = (((abs(mouse_x((float)ms.cur_pos_x) - x) <= width)) && (abs(mouse_y((float)ms.cur_pos_y) - y) <= height));
 		}
 	}
 }

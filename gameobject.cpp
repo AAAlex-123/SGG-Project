@@ -7,13 +7,13 @@ GameObject::GameObject(float xpos, float ypos, float angle, float vel, float wid
 {}
 
 void GameObject::hit(GameObject* o2) {
-	this->curr_health -= o2.damage;
+	this->curr_health -= o2->damage;
 }
 
 void GameObject::collides(GameObject* o2) {
 	if ((((o2->x - this->x) * (o2->x - this->x)) + ((o2->y - this->y) * (o2->y - this->y))) < (this->radius + o2->radius) * (this->radius + o2->radius)) {
-		hit(*(o2));
-		o2->hit(*this);
+		hit(o2);
+		o2->hit(this);
 	}
 }
 
