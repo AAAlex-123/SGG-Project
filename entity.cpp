@@ -3,9 +3,9 @@
 #include <cmath>
 
 Entity::Entity(float xpos, float ypos, float angle, float vel, float width,float height, const std::string* sprite_name, Path* path,
-	int damage, int health,int score, int proj_type) :
+	int damage, int health,int score, int proj_type, bool can_target) :
 	GameObject(xpos, ypos, angle, vel, width,height, new std::string((*sprite_name) + ".png"), path, damage, health,score),
-	curr_projectile(proj_type), _hasFired(false)
+	curr_projectile(proj_type), _hasFired(false), targeting(can_target)
 {
 	this->shadow = std::string(*sprite_name + "_shadow.png");
 }
@@ -18,10 +18,23 @@ bool Entity::hasFired() const {
 	return _hasFired;
 }
 
-Projectile* Entity::getProjectile(Drawing* d) const {
-	if (typeid(*movement) == typeid(TargetedFiringPath))
-		return GObjFactory::createProjectile(curr_projectile, x - (radius * sin(angle)), y - (radius * cos(angle)), 
-			atan2((d->get_x() - x), (d->get_y() - y)) + PI);
+inline double Entity::distance(float x1, float y1, float x2, float y2) { //function instead of method?
+	return sqrt(pow((x2 - x1), 2) + pow((y2 - y1), 2));
+}
+
+Entity* Entity::find_target(const std::list<Entity*>* ls) const {
+	if (ls->size() == 1)
+		return ls->front();
+	else {
+		Entity* pl1 = ls->front();
+		Entity* pl2 = ls->back();
+		return (distance(pl1->get_x(), pl1->get_y(), this->x, this->y) <= distance(pl2->get_x(), pl2->get_y(), this->x, this->y)) ? pl1 : pl2;
+	}
+}
+
+Projectile* Entity::getProjectile() const {
+	Entity* d = find_target(GObjFactory::getPlayerData());
+	float angle = targeting ? atan2((d->get_x() - x), (d->get_y() - y)) + PI : this->angle;
 	return GObjFactory::createProjectile(curr_projectile, x - (radius * sin(angle)), y - (radius * cos(angle)), angle);
 }
 
