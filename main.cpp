@@ -233,8 +233,6 @@ void draw()
 	if (bg_br.texture != "")
 		graphics::drawRect(CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2, CANVAS_WIDTH, CANVAS_HEIGHT, bg_br);
 
-	setColor(br, 'G');
-	graphics::drawText(0.0f, 50.0f, 15, std::to_string(gd->fps), br);
 
 	switch (gd->game_state)
 	{
