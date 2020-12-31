@@ -152,15 +152,11 @@ void GameData::fire(list<T*>* ls) const {
 			for (Entity* pl : *playerLs)
 				isPlayer |= pl == en;	// fancy
 
-			if (isPlayer) {
-				playerProjLs->push_back(en->getProjectile(nullptr));
-			} else {
-				enemyProjLs->push_back(en->getProjectile(
-					rand() % (playerLs->size()) == 0
-					? playerLs->front()
-					: playerLs->back()
-				));
-			}
+			if (isPlayer) 
+				playerProjLs->push_back(en->getProjectile());
+			else 
+				enemyProjLs->push_back(en->getProjectile());
+			
 			effectsLs->push_back(en->getFireVisualEffect());
 		}
 	}
