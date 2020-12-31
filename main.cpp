@@ -79,7 +79,7 @@ void update(float ms)
 		{
 			gd->game_state = game_states::GAME;
 			gd->curr_playing_level = gd->curr_selected_level == -1 ? -2 : gd->curr_selected_level;
-
+			GObjFactory::setPlayerData(gd->playerLs);
 			gd->playerLs->push_back(GObjFactory::createEntity(GObjFactory::PLAYER, get_canvas_width() / 3.0f, get_canvas_height() * 0.7f, 0)); // 0.1f = fire cooldown
 			if(gd->isMult)
 				gd->playerLs->push_back(GObjFactory::createEntity(GObjFactory::PLAYER, 2 * get_canvas_width() / 3.0f, get_canvas_height() * 0.7f, 0));
