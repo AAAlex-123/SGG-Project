@@ -5,8 +5,8 @@
 #include "UI.h"
 #include <iostream>
 #include <thread>
-#include <mutex>
-#include <condition_variable>
+//#include <mutex>
+//#include <condition_variable>
 
 // global variables in main
 graphics::Brush br;
@@ -21,8 +21,6 @@ const int WIN_MUSIC = 4;
 
 std::thread updateThread;
 std::thread collisionThread;
-std::mutex m;
-std::condition_variable cv;
 bool th_1_start = false;
 bool th_2_start = false;
 bool th_1_done = false;
@@ -32,10 +30,10 @@ bool game_over = false;
 //thread functions
 void updateAndSpawn(GameData* gd, float ms) {
 	while (!game_over) {
-		std::unique_lock<std::mutex>lk(m);
-		std::cout << "Im almost in uwu" <<std::endl;
-		cv.wait(lk, [] {return th_1_start;});
-		std::cout << "Im in uwu" << std::endl;
+		//std::unique_lock<std::mutex>lk(m1);
+		//cv.wait(lk, [] {return th_1_start;});
+		while (!th_1_start)
+			;
 		gd->update(ms, gd->enemyLs);
 		gd->update(ms, gd->enemyProjLs);
 		gd->update(ms, gd->playerLs);
@@ -50,15 +48,17 @@ void updateAndSpawn(GameData* gd, float ms) {
 
 		th_1_done = true;
 		th_1_start = false;
-		lk.unlock();
-		cv.notify_all();
+		//lk.unlock();
+		//cv.notify_all();
 	}	
 }
 
 void checkAndFire(GameData* gd) {
 	while (!game_over) {
-		std::unique_lock<std::mutex>lk(m);
-		cv.wait(lk, [] {return th_2_start;});
+		//std::unique_lock<std::mutex>lk(m2);
+		//cv.wait(lk, [] {return th_2_start;});
+		while (!th_2_start)
+			;
 		gd->checkCollisions(gd->enemyProjLs, gd->playerLs);
 		gd->checkCollisions(gd->playerProjLs, gd->enemyLs);
 		gd->checkCollisions(gd->enemyLs, gd->playerLs);
@@ -69,8 +69,8 @@ void checkAndFire(GameData* gd) {
 		
 		th_2_done = true;
 		th_2_start = false;
-		lk.unlock();
-		cv.notify_all();
+		//lk.unlock();
+		//cv.notify_all();
 	}
 }
 
@@ -165,26 +165,13 @@ void update(float ms)
 			gd->game_state = game_states::LEVEL_TRANSITION;
 		}
 
-	//start threads
-		{
-			std::cout << "I am starting the other 2 idiots" << std::endl;
-			std::lock_guard<std::mutex> lk(m);
-			th_1_start = true;
-			th_2_start = true;
-			std::cout << "goooooooooooo" << std::endl;
-		}
-		cv.notify_all();
+		th_1_start = true;
+		th_2_start = true;
+		while (!(th_1_done && th_2_done))
+			;
+		th_1_done = false;
+		th_2_done = false;
 
-	// wait for threads
-		{
-			std::unique_lock<std::mutex> lk(m);
-			cv.wait(lk, [] {return (th_1_done && th_2_done);});
-			th_1_done = false;
-			th_2_done = false;
-		}
-		cv.notify_all();
-		
-		
 
 	//delete
 		//these are kept separate to the concurrent threads as they change *all* their data during their execution
