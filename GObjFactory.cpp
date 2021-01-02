@@ -69,7 +69,7 @@ Entity* GObjFactory::createSimpleEnemy(float x,float y, float angle) {
 }
 
 Entity* GObjFactory::createRotatingEnemy(float x, float y, float angle) {																					     
-	return new Entity(x, y, angle, player_sp * 0.4f, player_w, player_h, new string(image_path + "plane3"), new TargetedFiringPath(0.3f, new RotatingPath(1.0f / 4.0f, new Path())), (int) b_plane_dmg * 1.5f, (int) b_plane_hp * 1.5f, (int) b_plane_score * 0.5, GObjFactory::LIGHT_BULLET, true);
+	return new Entity(x, y, angle, player_sp * 0.4f, player_w, player_h, new string(image_path + "plane3"), new TargetedFiringPath(0.3f, new RotatingPath(1.0f / 4.0f, new Path())), (int) b_plane_dmg * 1.5f, (int) b_plane_hp * 1.5f, (int) b_plane_score * 0.5, GObjFactory::LIGHT_BULLET);
 }
 
 Entity* GObjFactory::createAcceleratingEnemy(float x, float y, float angle) {																					 
