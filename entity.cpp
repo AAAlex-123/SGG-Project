@@ -2,7 +2,7 @@
 #include "GObjFactory.h"
 #include <cmath>
 
-Entity::Entity(float xpos, float ypos, float angle, float vel, float width,float height, const std::string* sprite_name, Path* path,
+Entity::Entity(float xpos, float ypos, float angle, float vel, float width,float height, const std::string* sprite_name, FiringPath* path,
 	int damage, int health,int score, int proj_type, bool can_target) :
 	GameObject(xpos, ypos, angle, vel, width,height, new std::string((*sprite_name) + ".png"), path, damage, health,score),
 	curr_projectile(proj_type), _hasFired(false), targeting(can_target)
@@ -18,23 +18,10 @@ bool Entity::hasFired() const {
 	return _hasFired;
 }
 
-inline double Entity::distance(float x1, float y1, float x2, float y2) { //function instead of method?
-	return sqrt(pow((x2 - x1), 2) + pow((y2 - y1), 2));
-}
-
-Entity* Entity::find_target(const std::list<Entity*>* ls) const {
-	if (ls->size() == 1)
-		return ls->front();
-	else {
-		Entity* pl1 = ls->front();
-		Entity* pl2 = ls->back();
-		return (distance(pl1->get_x(), pl1->get_y(), this->x, this->y) <= distance(pl2->get_x(), pl2->get_y(), this->x, this->y)) ? pl1 : pl2;
-	}
-}
-
 Projectile* Entity::getProjectile() const {
-	Entity* d = find_target(GObjFactory::getPlayerData());
-	float angle = targeting ? atan2((d->get_x() - x), (d->get_y() - y)) + PI : this->angle;
+	// this is a very frequently called method so we can't afford the runtime cost of dynamic_cast
+	// since we know from the constructor the path is ALWAYS a firing path there shouldn't be any case where this goes wrong
+	float angle = static_cast<FiringPath*>(movement)->getProjAngle(x,y);
 	return GObjFactory::createProjectile(curr_projectile, x - (radius * sin(angle)), y - (radius * cos(angle)), angle);
 }
 
