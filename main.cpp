@@ -4,6 +4,9 @@
 #include "game_data.h"
 #include "UI.h"
 #include <iostream>
+#include <thread>
+#include <mutex>
+#include <condition_variable>
 
 // global variables in main
 graphics::Brush br;
@@ -15,6 +18,61 @@ const int MENU_MUSIC = 1;
 const int BATTLE_MUSIC = 2;
 const int LOSE_MUSIC = 3;
 const int WIN_MUSIC = 4;
+
+std::thread updateThread;
+std::thread collisionThread;
+std::mutex m;
+std::condition_variable cv;
+bool th_1_start = false;
+bool th_2_start = false;
+bool th_1_done = false;
+bool th_2_done = false;
+bool game_over = false;
+
+//thread functions
+void updateAndSpawn(GameData* gd, float ms) {
+	while (!game_over) {
+		std::unique_lock<std::mutex>lk(m);
+		std::cout << "Im almost in uwu" <<std::endl;
+		cv.wait(lk, [] {return th_1_start;});
+		std::cout << "Im in uwu" << std::endl;
+		gd->update(ms, gd->enemyLs);
+		gd->update(ms, gd->enemyProjLs);
+		gd->update(ms, gd->playerLs);
+		gd->update(ms, gd->playerProjLs);
+		gd->update(ms, gd->effectsLs);
+		gd->update(ms, gd->powerupLs);
+
+		gd->updateLevel(ms);
+		gd->updateBackground(ms);
+
+		gd->spawn();
+
+		th_1_done = true;
+		th_1_start = false;
+		lk.unlock();
+		cv.notify_all();
+	}	
+}
+
+void checkAndFire(GameData* gd) {
+	while (!game_over) {
+		std::unique_lock<std::mutex>lk(m);
+		cv.wait(lk, [] {return th_2_start;});
+		gd->checkCollisions(gd->enemyProjLs, gd->playerLs);
+		gd->checkCollisions(gd->playerProjLs, gd->enemyLs);
+		gd->checkCollisions(gd->enemyLs, gd->playerLs);
+		gd->checkCollisions(gd->playerLs, gd->powerupLs);
+		gd->fire(gd->playerLs);
+		gd->fire(gd->enemyLs);
+
+		
+		th_2_done = true;
+		th_2_start = false;
+		lk.unlock();
+		cv.notify_all();
+	}
+}
 
 // sgg functions
 void update(float ms)
@@ -84,7 +142,9 @@ void update(float ms)
 			if(gd->isMult)
 				gd->playerLs->push_back(GObjFactory::createEntity(GObjFactory::PLAYER, 2 * get_canvas_width() / 3.0f, get_canvas_height() * 0.7f, 0));
 
-		  
+			//start threads here
+			updateThread = std::thread(updateAndSpawn, gd, ms);
+			collisionThread = std::thread(checkAndFire, gd);
 			ui = new UI(gd);
 			break;
 		}
@@ -105,31 +165,30 @@ void update(float ms)
 			gd->game_state = game_states::LEVEL_TRANSITION;
 		}
 
-	//update
-		gd->update(ms, gd->enemyLs);
-		gd->update(ms, gd->enemyProjLs);
-		gd->update(ms, gd->playerLs);
-		gd->update(ms, gd->playerProjLs);
-		gd->update(ms, gd->effectsLs);
-		gd->update(ms, gd->powerupLs);
+	//start threads
+		{
+			std::cout << "I am starting the other 2 idiots" << std::endl;
+			std::lock_guard<std::mutex> lk(m);
+			th_1_start = true;
+			th_2_start = true;
+			std::cout << "goooooooooooo" << std::endl;
+		}
+		cv.notify_all();
+
+	// wait for threads
+		{
+			std::unique_lock<std::mutex> lk(m);
+			cv.wait(lk, [] {return (th_1_done && th_2_done);});
+			th_1_done = false;
+			th_2_done = false;
+		}
+		cv.notify_all();
 		
-		gd->updateLevel(ms);
-		gd->updateBackground(ms);
-
-	//check collisions
-		gd->checkCollisions(gd->enemyProjLs, gd->playerLs);
-		gd->checkCollisions(gd->playerProjLs, gd->enemyLs);
-		gd->checkCollisions(gd->enemyLs, gd->playerLs);
-		gd->checkCollisions(gd->playerLs, gd->powerupLs);
-
-	//fire
-		gd->fire(gd->playerLs);
-		gd->fire(gd->enemyLs);
-
-	//spawn new enemies
-		gd->spawn();
 		
+
 	//delete
+		//these are kept separate to the concurrent threads as they change *all* their data during their execution
+		//so a mutex wouldn't make sense.
 		gd->checkAndDelete(gd->enemyLs);
 		gd->checkAndDelete(gd->enemyProjLs);
 		gd->checkAndDelete(gd->playerLs);
@@ -166,7 +225,9 @@ void update(float ms)
 		break;
 	}
 	case game_states::GAME_LOSE:
+		game_over = true;
 	case game_states::GAME_WIN: {
+		game_over = true;
 		break;
 	}
 	case game_states::RESET: {
