@@ -57,8 +57,6 @@ protected:
 	const float period;
 	float elapsed;
 	Path* const _path;
-
-private:
 	float curr_angle;
 };
 
