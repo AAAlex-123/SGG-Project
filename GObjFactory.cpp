@@ -69,7 +69,7 @@ Entity* GObjFactory::createSimpleEnemy(float x,float y, float angle) {
 }
 
 Entity* GObjFactory::createRotatingEnemy(float x, float y, float angle) {																					     
-	return new Entity(x, y, angle, player_sp * 0.4f, player_w, player_h, new string(image_path + "plane3"), new FiringPath(0.3f, new RotatingPath(1.0f / 4.0f, new Path())), (int) b_plane_dmg * 1.5f, (int) b_plane_hp * 1.5f, (int) b_plane_score * 0.5, GObjFactory::LIGHT_BULLET, true);
+	return new Entity(x, y, angle, player_sp * 0.4f, player_w, player_h, new string(image_path + "plane3"), new TargetedFiringPath(0.3f, new RotatingPath(1.0f / 4.0f, new Path())), (int) b_plane_dmg * 1.5f, (int) b_plane_hp * 1.5f, (int) b_plane_score * 0.5, GObjFactory::LIGHT_BULLET, true);
 }
 
 Entity* GObjFactory::createAcceleratingEnemy(float x, float y, float angle) {																					 
@@ -82,7 +82,7 @@ Entity* GObjFactory::createTankEnemy(float x, float y, float angle) {
 
 Entity* GObjFactory::createHomingEnemy(float x, float y, float angle) {
 	Entity* target = rand() % (playerLs->size()) == 0 ? playerLs->front() : playerLs->back();
-	return new Entity(x, y, angle, b_plane_sp * 0.3f, b_plane_size * 0.8f, b_plane_size * 0.8f, new string(image_path + "plane2"), new HomingPath(target,0.5f, new AcceleratingPath(100.0f, new Path())), (int) b_plane_dmg * 0.8f, (int) b_plane_hp * 0.4f, b_plane_score * 3, GObjFactory::STANDARD_BULLET);
+	return new Entity(x, y, angle, b_plane_sp * 0.3f, b_plane_size * 0.8f, b_plane_size * 0.8f, new string(image_path + "plane2"), new FiringPath(0.5f,new HomingPath(target,0.5f, new AcceleratingPath(100.0f, new Path()))), (int) b_plane_dmg * 0.8f, (int) b_plane_hp * 0.4f, b_plane_score * 3, GObjFactory::STANDARD_BULLET);
 }
 
 
