@@ -43,7 +43,7 @@ void UI::drawPlayerPanel(const Entity* player, float x_pos) {
 
 
 	//draw Projectile icon
-	bg_br.texture = *(player->getProjectile(nullptr)->getSprite());
+	bg_br.texture = *(player->getProjectile()->getSprite());
 	graphics::setOrientation(0.f);
 	graphics::drawRect(x_pos + 90,  height - 50, 20, box_height, bg_br);
 	graphics::drawRect(x_pos + 100, height - 50, 20, box_height, bg_br);
