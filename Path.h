@@ -1,9 +1,11 @@
 #pragma once
 #include "globals.h"
+#include <list>
 
 typedef graphics::scancode_t key;
 
 class Drawing;
+class Entity;
 
 //Interface for all Path classes
 //Path is a Decorated Strategy changing its parent class' position, angle and velocity
@@ -42,44 +44,46 @@ private:
 	Path* const _path;
 };
 
-// Standalone Path that responds to Keyboard
-class KeyboardPath : public Path {
+// Decorator that returns bool if the object should fire
+class FiringPath : public Path {
 public:
-	KeyboardPath(float dangle, float cooldown, Keyset keyset) : dangle(dangle), cooldown(cooldown), remaining(0.0f), keyset(keyset)
+	FiringPath(float period, Path* p) : period(period), elapsed(0), _path(p),curr_angle(0)
+	{}
+	virtual bool move(float& x, float& y, float& angle, float& vel, float ms) override;
+
+	virtual float getProjAngle(float x, float y);
+
+protected:
+	const float period;
+	float elapsed;
+	Path* const _path;
+	float curr_angle;
+};
+
+// Standalone Path that responds to Keyboard
+class KeyboardPath : public FiringPath {
+public:
+	KeyboardPath(float dangle, float cooldown, Keyset keyset) : FiringPath(cooldown, this),dangle(dangle), remaining(0.0f), keyset(keyset)
 	{}
 	virtual bool move(float& x, float& y, float& angle, float& vel, float ms) override;
 
 private:
 	// % of a full rotation per second
-	const float dangle, cooldown;
+	const float dangle;
 	float remaining;
 	const Keyset keyset;
 };
 
 // Decorator that returns bool if the object should fire
-class FiringPath : public Path {
+class TargetedFiringPath : public FiringPath {
 public:
-	FiringPath(float period, Path* p) : period(period), elapsed(0), _path(p)
+	TargetedFiringPath(float period, Path* p) : FiringPath(period,p)
 	{}
-	virtual bool move(float& x, float& y, float& angle, float& vel, float ms) override;
+	virtual float getProjAngle(float x, float y) override;
 
 private:
-	const float period;
-	float elapsed;
-	Path* const _path;
-};
-
-// Decorator that returns bool if the object should fire
-class TargetedFiringPath : public Path {
-public:
-	TargetedFiringPath(float period, Path* p) : period(period), elapsed(0), _path(p)
-	{}
-	virtual bool move(float& x, float& y, float& angle, float& vel, float ms) override;
-
-private:
-	const float period;
-	float elapsed;
-	Path* const _path;
+	Entity* find_target(float x, float y, const std::list<Entity*>* ls) const;
+	static double distance(float x1, float y1, float x2, float y2);
 };
 
 // Decorator that changes angle to follow an entity

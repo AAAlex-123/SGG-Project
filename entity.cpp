@@ -2,13 +2,11 @@
 #include "GObjFactory.h"
 #include <cmath>
 
-Entity::Entity(float xpos, float ypos, float angle, float vel, float width,float height, const std::string* sprite_name, Path* path,
+Entity::Entity(float xpos, float ypos, float angle, float vel, float width,float height, const std::string* sprite_name, FiringPath* path,
 	int damage, int health,int score, int proj_type) :
 	GameObject(xpos, ypos, angle, vel, width,height, new std::string((*sprite_name) + ".png"), path, damage, health,score),
-	curr_projectile(proj_type), _hasFired(false)
-{
-	this->shadow = std::string(*sprite_name + "_shadow.png");
-}
+	curr_projectile(proj_type), _hasFired(false), shadow(std::string(*sprite_name + "_shadow.png"))
+{}
 
 void Entity::update(float ms) {
 	this->_hasFired = movement->move(this->x, this->y, this->angle, this->vel, ms);
@@ -18,10 +16,13 @@ bool Entity::hasFired() const {
 	return _hasFired;
 }
 
-Projectile* Entity::getProjectile(Drawing* d) const {
-	if (typeid(*movement) == typeid(TargetedFiringPath))
-		return GObjFactory::createProjectile(curr_projectile, x - (radius * sin(angle)), y - (radius * cos(angle)), 
-			atan2((d->get_x() - x), (d->get_y() - y)) + PI);
+Projectile* Entity::getProjectile() const {
+	// this is a very frequently called method so we can't afford the runtime cost of dynamic_cast
+	// since we know from the constructor the path is ALWAYS a firing path there shouldn't be any case where this goes wrong
+	
+	// what the comments above are trying to say, is that their author thinks typeid is bad, so he decided to remove it
+	// by introducing some questionable design decisions
+	float angle = static_cast<FiringPath*>(movement)->getProjAngle(x,y);
 	return GObjFactory::createProjectile(curr_projectile, x - (radius * sin(angle)), y - (radius * cos(angle)), angle);
 }
 
@@ -41,6 +42,7 @@ void Entity::draw() {
 	br.fill_opacity = 1.0f;
 	Drawing::draw();
 }
+
 Entity::~Entity() {
 	if (curr_health <= 0)
 		graphics::playSound(sound_path + "entitydeath.mp3",0.5f);

@@ -14,10 +14,10 @@ protected:
 	int curr_projectile;
 	bool _hasFired;
 
-	Entity(float xpos, float ypos, float angle, float vel, float width, float height, const std::string* sprite_name, Path*,
+	Entity(float xpos, float ypos, float angle, float vel, float width, float height, const std::string* sprite_name, FiringPath*,
 		int damage, int health, int score, int proj_type);
-
 	friend class GObjFactory; //allow creation of entities only to the factory
+
 	std::string shadow;
 
 public:
@@ -29,7 +29,7 @@ public:
 
 	virtual void draw() override;
 	// Returns a projectile of type `curr_projectile` using the friend GObjFactory class
-	Projectile* getProjectile(Drawing*) const;
+	Projectile* getProjectile() const;
 	VisualEffect* getFireVisualEffect() const;
 	VisualEffect* getDestructionVisualEffect() const override;
 
