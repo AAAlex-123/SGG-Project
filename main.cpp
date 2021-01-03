@@ -29,48 +29,58 @@ bool game_over = false;
 
 //thread functions
 void updateAndSpawn(GameData* gd, float ms) {
-	while (!game_over) {
-		//std::unique_lock<std::mutex>lk(m1);
-		//cv.wait(lk, [] {return th_1_start;});
-		while (!th_1_start)
-			;
-		gd->update(ms, gd->enemyLs);
-		gd->update(ms, gd->enemyProjLs);
-		gd->update(ms, gd->playerLs);
-		gd->update(ms, gd->playerProjLs);
-		gd->update(ms, gd->effectsLs);
-		gd->update(ms, gd->powerupLs);
+	while (1) {
+		while (!game_over) {
+			//std::unique_lock<std::mutex>lk(m1);
+			//cv.wait(lk, [] {return th_1_start;});
+			while (!th_1_start)
+				if (game_over)
+					goto end1;
+			gd->update(ms, gd->enemyLs);
+			gd->update(ms, gd->enemyProjLs);
+			gd->update(ms, gd->playerLs);
+			gd->update(ms, gd->playerProjLs);
+			gd->update(ms, gd->effectsLs);
+			gd->update(ms, gd->powerupLs);
 
-		gd->updateLevel(ms);
-		gd->updateBackground(ms);
+			gd->updateLevel(ms);
+			gd->updateBackground(ms);
 
-		gd->spawn();
+			gd->spawn();
 
-		th_1_done = true;
-		th_1_start = false;
-		//lk.unlock();
-		//cv.notify_all();
-	}	
+			th_1_done = true;
+			th_1_start = false;
+			//lk.unlock();
+			//cv.notify_all();
+		}
+	end1:
+		;
+	}
 }
 
 void checkAndFire(GameData* gd) {
-	while (!game_over) {
-		//std::unique_lock<std::mutex>lk(m2);
-		//cv.wait(lk, [] {return th_2_start;});
-		while (!th_2_start)
-			;
-		gd->checkCollisions(gd->enemyProjLs, gd->playerLs);
-		gd->checkCollisions(gd->playerProjLs, gd->enemyLs);
-		gd->checkCollisions(gd->enemyLs, gd->playerLs);
-		gd->checkCollisions(gd->playerLs, gd->powerupLs);
-		gd->fire(gd->playerLs);
-		gd->fire(gd->enemyLs);
+	while (1) {
+		while (!game_over) {
+			//std::unique_lock<std::mutex>lk(m2);
+			//cv.wait(lk, [] {return th_2_start;});
+			while (!th_2_start)
+				if (game_over)
+					goto end2;
+			gd->checkCollisions(gd->enemyProjLs, gd->playerLs);
+			gd->checkCollisions(gd->playerProjLs, gd->enemyLs);
+			gd->checkCollisions(gd->enemyLs, gd->playerLs);
+			gd->checkCollisions(gd->playerLs, gd->powerupLs);
+			gd->fire(gd->playerLs);
+			gd->fire(gd->enemyLs);
 
-		
-		th_2_done = true;
-		th_2_start = false;
-		//lk.unlock();
-		//cv.notify_all();
+
+			th_2_done = true;
+			th_2_start = false;
+			//lk.unlock();
+			//cv.notify_all();
+		}
+	end2:
+		;
 	}
 }
 
@@ -142,10 +152,14 @@ void update(float ms)
 			if(gd->isMult)
 				gd->playerLs->push_back(GObjFactory::createEntity(GObjFactory::PLAYER, 2 * get_canvas_width() / 3.0f, get_canvas_height() * 0.7f, 0));
 
-			//start threads here
-			updateThread = std::thread(updateAndSpawn, gd, ms);
-			collisionThread = std::thread(checkAndFire, gd);
+			// start threads only the first time they game starts
+			if (!updateThread.joinable())
+				updateThread = std::thread(updateAndSpawn, gd, ms);
+			if (!collisionThread.joinable())
+				collisionThread = std::thread(checkAndFire, gd);
 			ui = new UI(gd);
+			// continue the infinite loop of the thread
+			game_over = false;
 			break;
 		}
 
@@ -212,12 +226,17 @@ void update(float ms)
 		break;
 	}
 	case game_states::GAME_LOSE:
-		game_over = true;
 	case game_states::GAME_WIN: {
+		th_1_start = false;
+		th_2_start = false;
 		game_over = true;
 		break;
 	}
 	case game_states::RESET: {
+
+		//updateThread.join();
+		//collisionThread.join();
+
 		GObjFactory::reset();
 
 		delete gd;
