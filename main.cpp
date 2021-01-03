@@ -28,14 +28,26 @@ bool th_2_done = false;
 bool game_over = false;
 
 //thread functions
-void updateAndSpawn(GameData* gd, float ms) {
-	while (1) {
-		while (!game_over) {
+void updateAndSpawn(GameData* starting_gd, float ms) {
+	bool gd_changed = false;
+	GameData* gd = starting_gd;
+
+	while (true) {
 			//std::unique_lock<std::mutex>lk(m1);
 			//cv.wait(lk, [] {return th_1_start;});
-			while (!th_1_start)
-				if (game_over)
-					goto end1;
+		while (!th_1_start) 
+			if (game_over) 
+				gd_changed = true;
+			
+		
+				
+		if (!game_over) {
+
+			if (gd_changed) {
+				gd = reinterpret_cast<GameData*>(graphics::getUserData());
+				gd_changed = false;
+			}
+
 			gd->update(ms, gd->enemyLs);
 			gd->update(ms, gd->enemyProjLs);
 			gd->update(ms, gd->playerLs);
@@ -50,22 +62,32 @@ void updateAndSpawn(GameData* gd, float ms) {
 
 			th_1_done = true;
 			th_1_start = false;
-			//lk.unlock();
-			//cv.notify_all();
 		}
-	end1:
-		;
+
+				
+		//lk.unlock();
+		//cv.notify_all();
 	}
 }
 
-void checkAndFire(GameData* gd) {
-	while (1) {
-		while (!game_over) {
-			//std::unique_lock<std::mutex>lk(m2);
-			//cv.wait(lk, [] {return th_2_start;});
-			while (!th_2_start)
-				if (game_over)
-					goto end2;
+void checkAndFire(GameData* starting_gd) {
+	bool gd_changed = false;
+	GameData* gd = starting_gd;
+
+	while (true) {
+		//std::unique_lock<std::mutex>lk(m1);
+		//cv.wait(lk, [] {return th_1_start;});
+		while (!th_2_start) 
+			if (game_over) 
+				gd_changed = true;		
+
+		if (!game_over) {
+
+			if (gd_changed) {
+				gd = reinterpret_cast<GameData*>(graphics::getUserData());
+				gd_changed = false;
+			}
+
 			gd->checkCollisions(gd->enemyProjLs, gd->playerLs);
 			gd->checkCollisions(gd->playerProjLs, gd->enemyLs);
 			gd->checkCollisions(gd->enemyLs, gd->playerLs);
@@ -73,14 +95,11 @@ void checkAndFire(GameData* gd) {
 			gd->fire(gd->playerLs);
 			gd->fire(gd->enemyLs);
 
-
 			th_2_done = true;
 			th_2_start = false;
 			//lk.unlock();
 			//cv.notify_all();
 		}
-	end2:
-		;
 	}
 }
 
@@ -88,9 +107,9 @@ void checkAndFire(GameData* gd) {
 void update(float ms)
 {
 	GameData* gd = reinterpret_cast<GameData*> (graphics::getUserData());
-	
+
 	//choose music and background
-	
+
 	// :knife:
 	if (gd->game_state == game_states::GAME && curr_music == MENU_MUSIC) {
 		graphics::playMusic(music_path + "battle_music.mp3", 0.5f);
@@ -126,7 +145,7 @@ void update(float ms)
 
 
 		gd->game_state = game_states::MENU;
-		
+
 		break;
 	}
 	case game_states::LOAD: {
@@ -149,7 +168,7 @@ void update(float ms)
 			gd->curr_playing_level = gd->curr_selected_level == -1 ? -2 : gd->curr_selected_level;
 			GObjFactory::setPlayerData(gd->playerLs);
 			gd->playerLs->push_back(GObjFactory::createEntity(GObjFactory::PLAYER, get_canvas_width() / 3.0f, get_canvas_height() * 0.7f, 0)); // 0.1f = fire cooldown
-			if(gd->isMult)
+			if (gd->isMult)
 				gd->playerLs->push_back(GObjFactory::createEntity(GObjFactory::PLAYER, 2 * get_canvas_width() / 3.0f, get_canvas_height() * 0.7f, 0));
 
 			// start threads only the first time they game starts
@@ -168,11 +187,11 @@ void update(float ms)
 		break;
 	}
 	case game_states::GAME: {
-	
-	// yes there is a button to pause but some prefer to use the keyboard for easier access
+
+		// yes there is a button to pause but some prefer to use the keyboard for easier access
 		gd->game_state = ((game_states::PAUSE * graphics::getKeyState(graphics::scancode_t::SCANCODE_P)) + (gd->game_state * !graphics::getKeyState(graphics::scancode_t::SCANCODE_P)));
 
-	// level change logic
+		// level change logic
 		if ((!(*gd->levels[gd->curr_playing_level])) && (gd->enemyLs->empty()) && (gd->enemyProjLs->empty()))
 		{
 			gd->level_transition_timer = gd->set_level_transition_timer();
@@ -187,9 +206,9 @@ void update(float ms)
 		th_2_done = false;
 
 
-	//delete
-		//these are kept separate to the concurrent threads as they change *all* their data during their execution
-		//so a mutex wouldn't make sense.
+		//delete
+			//these are kept separate to the concurrent threads as they change *all* their data during their execution
+			//so a mutex wouldn't make sense.
 		gd->checkAndDelete(gd->enemyLs);
 		gd->checkAndDelete(gd->enemyProjLs);
 		gd->checkAndDelete(gd->playerLs);
@@ -257,9 +276,9 @@ void update(float ms)
 		graphics::getKeyState(graphics::scancode_t::SCANCODE_6) ,graphics::getKeyState(graphics::scancode_t::SCANCODE_7) ,graphics::getKeyState(graphics::scancode_t::SCANCODE_8) ,
 		graphics::getKeyState(graphics::scancode_t::SCANCODE_9) };
 
-		for(int i=0; i<10;i++)
+		for (int i = 0; i < 10;i++)
 			gd->curr_active_level = (i * (codes[i] && gd->levels[i])) + (gd->curr_active_level * !codes[i] && gd->levels[i]);
-		
+
 
 		gd->curr_selected_level = (gd->curr_active_level * graphics::getKeyState(graphics::scancode_t::SCANCODE_S)) + (gd->curr_selected_level * !graphics::getKeyState(graphics::scancode_t::SCANCODE_S));
 
@@ -304,9 +323,9 @@ void draw()
 	switch (gd->game_state)
 	{
 	case game_states::TEST: {
-		
+
 		// ...
-		
+
 		break;
 	}
 	case game_states::LOAD: {
@@ -321,7 +340,7 @@ void draw()
 		setColor(br, 'L');
 		br.texture = "";
 		graphics::drawText(CANVAS_WIDTH / 50, 4 * CANVAS_HEIGHT / 5, CANVAS_HEIGHT / 16, "Loading:   " + curr_image, br);
-		
+
 		break;
 	}
 	case game_states::MENU: {
@@ -347,7 +366,7 @@ void draw()
 		ui->draw();
 		break;
 	}
-	case game_states::LEVEL_TRANSITION: {	
+	case game_states::LEVEL_TRANSITION: {
 		// do some drawing while waiting for next level
 		gd->drawBackground(br);
 		gd->draw(gd->playerLs);
@@ -417,11 +436,11 @@ void draw()
 	case game_states::OP_PLAYER: {
 
 		setColor(br, new float[3]{ 0.0f, 0.0f, 0.0f });
-		graphics::drawText(5*CANVAS_WIDTH / 20, CANVAS_HEIGHT / 8, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 15, "Choose gamemode:", br);
+		graphics::drawText(5 * CANVAS_WIDTH / 20, CANVAS_HEIGHT / 8, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 15, "Choose gamemode:", br);
 		graphics::drawText(CANVAS_WIDTH / 8, 2 * CANVAS_HEIGHT / 3, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 15, "SinglePlayer", br);
 		graphics::drawText(4.5f * CANVAS_WIDTH / 8, 2 * CANVAS_HEIGHT / 3, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 15, "Multiplayer", br);
 
-		graphics::drawText(4*CANVAS_WIDTH / 32, 5 * CANVAS_HEIGHT / 6, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 15,
+		graphics::drawText(4 * CANVAS_WIDTH / 32, 5 * CANVAS_HEIGHT / 6, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 15,
 			gd->isMult ? "Multiplayer mode selected!" : "Singleplayer mode selected!", br);
 		break;
 	}
@@ -458,7 +477,7 @@ void draw()
 		graphics::drawText(30 * CANVAS_WIDTH / 100, 4 * CANVAS_HEIGHT / 7, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 18, "with the help of the", br);
 		graphics::drawText(33 * CANVAS_WIDTH / 100, 5 * CANVAS_HEIGHT / 7, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 12, "SGG library.", br);
 		graphics::drawText(33 * CANVAS_WIDTH / 300, 6 * CANVAS_HEIGHT / 7, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 12, "Asset credits can be found", br);
-		graphics::drawText(33 * CANVAS_WIDTH / 150, CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 12,         "in the assets folder.", br);
+		graphics::drawText(33 * CANVAS_WIDTH / 150, CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 12, "in the assets folder.", br);
 		break;
 	}
 	default: {
@@ -502,7 +521,7 @@ void initialize()
 	gd->game_state = game_states::LOAD;
 
 	graphics::setUserData((void*)gd);
-	
+
 	// random seed for Factory homing enemies randomness
 	srand((unsigned int)gd);
 
