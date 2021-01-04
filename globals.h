@@ -17,6 +17,26 @@ const std::string music_path = asset_path + "\\music\\";
 const std::string level_path = ".\\levels.txt";
 const std::string wave_path = ".\\waves.txt";
 
+// enum
+enum game_states
+{
+	TEST = -2,
+	LOAD = -1,
+	CREDITS = 0,
+	MENU = 1,
+	GAME = 2,
+	GAME_LOSE = 10,
+	GAME_WIN = 11,
+	OPTIONS = 4,
+	OP_LEVEL = 5,
+	OP_PLAYER = 6,
+	LEVEL_TRANSITION = 7,
+	HELP = 8,
+	EXIT = 9,
+	PAUSE = 12,
+	RESET = 13,
+};
+
 float get_canvas_height();
 float get_canvas_width();
 
