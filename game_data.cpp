@@ -57,7 +57,6 @@ void GameData::create_buttons()
 	buttons->push_back(new GameStateChangingButton(this, 370.0f, 30.0f, 30.0f, new string(icon_path + "help.png"), game_states::MENU, game_states::HELP));
 	buttons->push_back(new GameStateChangingButton(this, 370.0f, 75.0f, 30.0f, new string(icon_path + "options.png"), game_states::MENU, game_states::OPTIONS));
 	buttons->push_back(new GameStateChangingButton(this, 370.0f, 120.0f, 30.0f, new string(icon_path + "credits.png"), game_states::MENU, game_states::CREDITS));
-	buttons->push_back(new GameStateChangingButton(this, 370.0f, 165.0f, 30.0f, new string(icon_path + "test.png"), game_states::MENU, game_states::TEST));
 	// game
 	buttons->push_back(new GameStateChangingButton(this, 370.0f, 30.0f, 30.0f, new string(icon_path + "pause.png"), game_states::GAME, game_states::PAUSE));
 	// === temp ===
