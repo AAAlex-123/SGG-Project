@@ -115,7 +115,9 @@ void checkAndFire(GameData* starting_gd) {
 void update(float ms)
 {
 	GameData* gd = reinterpret_cast<GameData*> (graphics::getUserData());
-	*global_ms = ms;
+#ifndef no_threads
+	* global_ms = ms;
+#endif // !nothreads
 
 	//choose music and background
 	if (gd->game_state == game_states::GAME && curr_music == MENU_MUSIC) {
