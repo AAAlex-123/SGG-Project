@@ -485,7 +485,23 @@ void draw()
 		graphics::drawText(20 * CANVAS_WIDTH / 100, 1 * CANVAS_HEIGHT / 7, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 15, "Please exit and inform the developers", br);
 	}
 	}
+
+	setColor(br, 'G');
+	graphics::MouseState ms;
+	graphics::getMouseState(ms);
+	graphics::drawRect(mouse_x(ms.cur_pos_x), mouse_y(ms.cur_pos_y), 30, 30, br);
+
 	gd->draw(gd->buttons);
+}
+
+void resize(int new_w, int new_h)
+{
+	WINDOW_WIDTH = new_w;
+	WINDOW_HEIGHT = new_h;
+	w2c = (WINDOW_HEIGHT - CANVAS_HEIGHT) < (WINDOW_WIDTH - CANVAS_WIDTH)
+		? CANVAS_HEIGHT / WINDOW_HEIGHT
+		: CANVAS_WIDTH / WINDOW_WIDTH;
+	c2w = 1.0f / w2c;
 }
 
 int main(int argc, char** argv)
@@ -499,6 +515,7 @@ int main(int argc, char** argv)
 
 	graphics::setDrawFunction(draw);
 	graphics::setUpdateFunction(update);
+	graphics::setResizeFunction(resize);
 
 	br.fill_color[0] = 0.5f;
 	br.fill_color[1] = 0.7f;
@@ -521,7 +538,7 @@ void initialize()
 	gd->game_state = game_states::LOAD;
 
 	graphics::setUserData((void*)gd);
-
+	
 	// random seed for Factory homing enemies randomness
 	srand((unsigned int)gd);
 
@@ -540,7 +557,5 @@ float get_canvas_width() { return CANVAS_WIDTH; }
 float get_canvas_height() { return CANVAS_HEIGHT; }
 
 // spaghetti but it works
-float mouse_x(float mx) { return (mx - ((WINDOW_WIDTH - (CANVAS_WIDTH * c2w)) / 2)) * w2c; }
-
-// height is always 100% so just map window height to canvas height
-float mouse_y(float my) { return my * w2c; }
+float mouse_x(float mx) { return (mx - ((WINDOW_WIDTH  - (CANVAS_WIDTH * c2w))  / 2)) * w2c; }
+float mouse_y(float my) { return (my - ((WINDOW_HEIGHT - (CANVAS_HEIGHT * c2w)) / 2)) * w2c; }
