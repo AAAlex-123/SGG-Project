@@ -5,8 +5,8 @@
 #include "UI.h"
 #include <iostream>
 #include <thread>
-//#include <mutex>
-//#include <condition_variable>
+
+//#define no_threads
 
 // global variables in main
 graphics::Brush br;
@@ -19,25 +19,38 @@ const int BATTLE_MUSIC = 2;
 const int LOSE_MUSIC = 3;
 const int WIN_MUSIC = 4;
 
+#ifndef no_threads
 std::thread updateThread;
 std::thread collisionThread;
+
 bool th_1_start = false;
 bool th_2_start = false;
 bool th_1_done = false;
 bool th_2_done = false;
 bool game_over = false;
+bool terminate_all = false;
+
+float tortellini = 0; //this is needed to initialize the global pointer
+float* global_ms = &tortellini;
+
+
+
+
+//Note: The thread decisions below could have been done with <condition_variable> ( e.g cv.wait(), cv.notify_all())
+//but it's probably overkill for something as simple as starting and stopping 2 threads
 
 //thread functions
-void updateAndSpawn(GameData* starting_gd, float ms) {
+void updateAndSpawn(GameData* starting_gd, float* const ms) {
 	bool gd_changed = false;
 	GameData* gd = starting_gd;
 
 	while (true) {
-			//std::unique_lock<std::mutex>lk(m1);
-			//cv.wait(lk, [] {return th_1_start;});
-		while (!th_1_start) 
-			if (game_over) 
+		while (!th_1_start) {
+			if (game_over)
 				gd_changed = true;
+			//if (terminate_all) //putting this condition on the while loop itself doesn't seem to work for some reason
+				//return;
+		}
 			
 		
 				
@@ -48,25 +61,20 @@ void updateAndSpawn(GameData* starting_gd, float ms) {
 				gd_changed = false;
 			}
 
-			gd->update(ms, gd->enemyLs);
-			gd->update(ms, gd->enemyProjLs);
-			gd->update(ms, gd->playerLs);
-			gd->update(ms, gd->playerProjLs);
-			gd->update(ms, gd->effectsLs);
-			gd->update(ms, gd->powerupLs);
-
-			gd->updateLevel(ms);
-			gd->updateBackground(ms);
-
 			gd->spawn();
+			gd->update(*ms, gd->enemyLs);
+			gd->update(*ms, gd->enemyProjLs);
+			gd->update(*ms, gd->playerLs);
+			gd->update(*ms, gd->playerProjLs);
+			gd->update(*ms, gd->effectsLs);
+			gd->update(*ms, gd->powerupLs);
+
+			gd->updateLevel(*ms);
+			gd->updateBackground(*ms);
 
 			th_1_done = true;
 			th_1_start = false;
 		}
-
-				
-		//lk.unlock();
-		//cv.notify_all();
 	}
 }
 
@@ -75,11 +83,12 @@ void checkAndFire(GameData* starting_gd) {
 	GameData* gd = starting_gd;
 
 	while (true) {
-		//std::unique_lock<std::mutex>lk(m1);
-		//cv.wait(lk, [] {return th_1_start;});
-		while (!th_2_start) 
-			if (game_over) 
-				gd_changed = true;		
+		while (!th_1_start) {
+			if (game_over)
+				gd_changed = true;
+			//if (terminate_all)
+				//return;
+		}
 
 		if (!game_over) {
 
@@ -97,20 +106,18 @@ void checkAndFire(GameData* starting_gd) {
 
 			th_2_done = true;
 			th_2_start = false;
-			//lk.unlock();
-			//cv.notify_all();
 		}
 	}
 }
+#endif // no_threads
 
 // sgg functions
 void update(float ms)
 {
 	GameData* gd = reinterpret_cast<GameData*> (graphics::getUserData());
+	*global_ms = ms;
 
 	//choose music and background
-
-	// :knife:
 	if (gd->game_state == game_states::GAME && curr_music == MENU_MUSIC) {
 		graphics::playMusic(music_path + "battle_music.mp3", 0.5f);
 		bg_br.texture = "";
@@ -123,15 +130,14 @@ void update(float ms)
 	}
 	else if (gd->game_state == game_states::GAME_WIN && curr_music == BATTLE_MUSIC) {
 		graphics::playMusic(music_path + "victory_music.mp3", 0.5f, false, 2000);
-		bg_br.texture = image_path + "menu1.png";
+		bg_br.texture = image_path + "win.png";
 		curr_music = WIN_MUSIC;
 	}
 	else if (gd->game_state == game_states::MENU && (curr_music == WIN_MUSIC || curr_music == LOSE_MUSIC)) { // if (game_states::MENU && (curr_music == WIN_MUSIC || curr_music == LOSE_MUSIC))
 		graphics::playMusic(music_path + "menu_music.mp3", 0.5f);
-		bg_br.texture = image_path + "menu2.png";
+		bg_br.texture = image_path + "menu.png";
 		curr_music = MENU_MUSIC;
 	}
-	// :knife:
 
 	gd->fps = (int)(1000.0f / ms);
 	gd->update(ms, gd->buttons);
@@ -139,15 +145,6 @@ void update(float ms)
 
 	switch (gd->game_state)
 	{
-	case game_states::TEST: {
-
-		// apply custom settings
-
-
-		gd->game_state = game_states::MENU;
-
-		break;
-	}
 	case game_states::LOAD: {
 		gd->el += ms;
 
@@ -171,18 +168,19 @@ void update(float ms)
 			if (gd->isMult)
 				gd->playerLs->push_back(GObjFactory::createEntity(GObjFactory::PLAYER, 2 * get_canvas_width() / 3.0f, get_canvas_height() * 0.7f, 0));
 
+#ifndef no_threads
 			// start threads only the first time they game starts
 			if (!updateThread.joinable())
-				updateThread = std::thread(updateAndSpawn, gd, ms);
+				updateThread = std::thread(updateAndSpawn, gd, global_ms);
 			if (!collisionThread.joinable())
 				collisionThread = std::thread(checkAndFire, gd);
-			ui = new UI(gd);
 			// continue the infinite loop of the thread
 			game_over = false;
+#endif
+			ui = new UI(gd);
+
 			break;
 		}
-
-		// ...
 
 		break;
 	}
@@ -198,17 +196,42 @@ void update(float ms)
 			gd->game_state = game_states::LEVEL_TRANSITION;
 		}
 
+#ifndef no_threads
 		th_1_start = true;
 		th_2_start = true;
 		while (!(th_1_done && th_2_done))
 			;
 		th_1_done = false;
 		th_2_done = false;
+#endif
+#ifdef no_threads
+		//update
+		gd->update(ms, gd->enemyLs);
+		gd->update(ms, gd->enemyProjLs);
+		gd->update(ms, gd->playerLs);
+		gd->update(ms, gd->playerProjLs);
+		gd->update(ms, gd->effectsLs);
 
+		gd->updateLevel(ms);
+		gd->updateBackground(ms);
 
-		//delete
-			//these are kept separate to the concurrent threads as they change *all* their data during their execution
-			//so a mutex wouldn't make sense.
+		//check collisions
+		gd->checkCollisions(gd->enemyProjLs, gd->playerLs);
+		gd->checkCollisions(gd->playerProjLs, gd->enemyLs);
+		gd->checkCollisions(gd->enemyLs, gd->playerLs);
+
+		//fire
+		gd->fire(gd->playerLs);
+		gd->fire(gd->enemyLs);
+
+		//spawn new enemies
+		gd->spawn();
+
+#endif
+
+	//delete
+		//these are kept separate to the concurrent threads as they change *all* their data during their execution
+		//so a mutex wouldn't make sense.
 		gd->checkAndDelete(gd->enemyLs);
 		gd->checkAndDelete(gd->enemyProjLs);
 		gd->checkAndDelete(gd->playerLs);
@@ -246,16 +269,14 @@ void update(float ms)
 	}
 	case game_states::GAME_LOSE:
 	case game_states::GAME_WIN: {
+#ifndef no_threads
 		th_1_start = false;
 		th_2_start = false;
 		game_over = true;
+#endif // !no_threads
 		break;
 	}
 	case game_states::RESET: {
-
-		//updateThread.join();
-		//collisionThread.join();
-
 		GObjFactory::reset();
 
 		delete gd;
@@ -292,6 +313,17 @@ void update(float ms)
 		break;
 	}
 	case game_states::EXIT: {
+
+#ifndef no_threads
+		if (ui != nullptr) { //if game had started
+			terminate_all = true;
+			updateThread.join();
+			std::cout << "updateThread terminated" << std::endl;
+			collisionThread.join();
+			std::cout << "collisionThread terminated" << std::endl;
+		}
+#endif // !no_threads		
+
 		graphics::destroyWindow();
 		exit(0);
 	}
@@ -322,12 +354,6 @@ void draw()
 
 	switch (gd->game_state)
 	{
-	case game_states::TEST: {
-
-		// ...
-
-		break;
-	}
 	case game_states::LOAD: {
 		setColor(br, 'W');
 
@@ -348,8 +374,9 @@ void draw()
 		setColor(br, new float[3]{ 0.0f, 0.0f, 0.0f });
 		graphics::drawText(CANVAS_WIDTH / 4, CANVAS_HEIGHT / 4, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 10, "Welcome!", br);
 		graphics::drawText(CANVAS_WIDTH / 8, 3 * CANVAS_HEIGHT / 5, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 10, "Press S to start!", br);
+		graphics::drawText(CANVAS_WIDTH / 8, CANVAS_HEIGHT / 1.4f, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 10, "Click the cog button", br);
+		graphics::drawText(CANVAS_WIDTH / 8, CANVAS_HEIGHT / 1.2f, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 10, "for more options", br);
 
-		// ...
 
 		break;
 	}
@@ -384,19 +411,13 @@ void draw()
 		break;
 	}
 	case game_states::GAME_LOSE: {
-		setColor(br, new float[3]{ 0.0f, 0.0f, 0.0f });
+		setColor(br, new float[3]{ 1.0f, 1.0f, 1.0f });
 		graphics::drawText(CANVAS_WIDTH / 6, 2 * CANVAS_HEIGHT / 5, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 10, "You lost!", br);
-		graphics::drawText(CANVAS_WIDTH / 8, 3 * CANVAS_HEIGHT / 5, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 10, "Back to menu", br);
-
-		// ...
 		break;
 	}
 	case game_states::GAME_WIN: {
 		setColor(br, new float[3]{ 0.0f, 0.0f, 0.0f });
-		graphics::drawText(CANVAS_WIDTH / 6, 2 * CANVAS_HEIGHT / 5, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 10, "you won!", br);
-		graphics::drawText(CANVAS_WIDTH / 8, 3 * CANVAS_HEIGHT / 5, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 10, "Back to menu", br);
-
-		// ...
+		graphics::drawText(CANVAS_WIDTH / 6, 2 * CANVAS_HEIGHT / 5, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 10, "Υou won!", br);
 		break;
 	}
 	case game_states::RESET: {
@@ -525,7 +546,7 @@ int main(int argc, char** argv)
 	initialize();
 	graphics::playMusic(music_path + "menu_music.mp3", 0.5f, true);
 	curr_music = MENU_MUSIC;
-	bg_br.texture = image_path + "menu2.png";
+	bg_br.texture = image_path + "menu.png";
 	graphics::startMessageLoop();
 	graphics::destroyWindow();
 	return 0;
@@ -548,8 +569,6 @@ void initialize()
 
 	if (!load_images_from_file(image_path))
 		std::cerr << "Unable to load images from: " << image_path << std::endl;
-
-	// ...
 }
 
 // nothing to see below here
