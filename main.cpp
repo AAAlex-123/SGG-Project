@@ -33,10 +33,7 @@ bool terminate_all = false;
 float tortellini = 0; //this is needed to initialize the global pointer
 float* global_ms = &tortellini;
 
-
-
-
-//Note: The thread decisions below could have been done with <condition_variable> ( e.g cv.wait(), cv.notify_all())
+//Note: The thread decisions below could have been implemented with <condition_variable> ( e.g cv.wait(), cv.notify_all())
 //but it's probably overkill for something as simple as starting and stopping 2 threads
 
 //thread functions
@@ -48,7 +45,7 @@ void updateAndSpawn(GameData* starting_gd, float* const ms) {
 		while (!th_1_start) {
 			if (game_over)
 				gd_changed = true;
-			if (terminate_all)
+			if (terminate_all) //putting this condition on the while loop itself doesn't seem to work for some reason
 				return;
 		}
 			
@@ -109,7 +106,7 @@ void checkAndFire(GameData* starting_gd) {
 		}
 	}
 }
-#endif // no_threads
+#endif
 
 // sgg functions
 void update(float ms)
@@ -315,17 +312,13 @@ void update(float ms)
 		break;
 	}
 	case game_states::EXIT: {
-
 #ifndef no_threads
 		if (ui != nullptr) { //if game had started
 			terminate_all = true;
 			updateThread.join();
-			std::cout << "updateThread terminated" << std::endl;
 			collisionThread.join();
-			std::cout << "collisionThread terminated" << std::endl;
 		}
-#endif // !no_threads		
-
+#endif 
 		graphics::destroyWindow();
 		exit(0);
 	}
@@ -408,18 +401,20 @@ void draw()
 		graphics::resetPose();
 		setColor(br, 'L');
 		graphics::drawText(0.2f * get_canvas_width(), 0.3f * get_canvas_height(), 20,
-			"next level in: " + std::to_string(gd->level_transition_timer), br);
+			"next level in: " + std::to_string(gd->level_transition_timer * 1000), br);
 		ui->draw();
 		break;
 	}
 	case game_states::GAME_LOSE: {
 		setColor(br, new float[3]{ 1.0f, 1.0f, 1.0f });
 		graphics::drawText(CANVAS_WIDTH / 6, 2 * CANVAS_HEIGHT / 5, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 10, "You lost!", br);
+		graphics::drawText(CANVAS_WIDTH / 6, CANVAS_HEIGHT / 2, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 10, "Final score: " + to_string(gd->getScore()), br);
 		break;
 	}
 	case game_states::GAME_WIN: {
-		setColor(br, new float[3]{ 0.0f, 0.0f, 0.0f });
+		setColor(br, new float[3]{ 1.0f, 1.0f, 1.0f });
 		graphics::drawText(CANVAS_WIDTH / 6, 2 * CANVAS_HEIGHT / 5, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 10, "Υou won!", br);
+		graphics::drawText(CANVAS_WIDTH / 6, CANVAS_HEIGHT / 2, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 10, "Final score: " + to_string(gd->getScore()), br);
 		break;
 	}
 	case game_states::RESET: {
@@ -470,12 +465,19 @@ void draw()
 	case game_states::HELP: {
 
 		setColor(br, new float[3]{ 0.0f, 0.0f, 0.0f });
-		graphics::drawText(CANVAS_WIDTH / 6, 3.5f * CANVAS_HEIGHT / 13, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 17, "Because mouse and text are", br);
-		graphics::drawText(CANVAS_WIDTH / 6, 4.5f * CANVAS_HEIGHT / 13, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 17, "hard to combine, most input", br);
-		graphics::drawText(CANVAS_WIDTH / 6, 5.5f * CANVAS_HEIGHT / 13, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 17, "is done with the keyboard  :)", br);
-		graphics::drawText(CANVAS_WIDTH / 6, 7.5f * CANVAS_HEIGHT / 13, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 17, "All letters in parentheses will,", br);
-		graphics::drawText(CANVAS_WIDTH / 6, 8.5f * CANVAS_HEIGHT / 13, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 17, "when that one key is pressed,", br);
-		graphics::drawText(CANVAS_WIDTH / 6, 9.5f * CANVAS_HEIGHT / 13, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 17, "perform the described action", br);
+		graphics::drawText(CANVAS_WIDTH / 10, 2.5f * CANVAS_HEIGHT / 13, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 17, "Player 1:", br);
+		graphics::drawText(CANVAS_WIDTH / 10, 3.5f * CANVAS_HEIGHT / 13, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 17, "WASD to move, X to fire, QE to spin", br);
+		graphics::drawText(CANVAS_WIDTH / 10, 5.5f * CANVAS_HEIGHT / 13, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 17, "Player 2:", br);
+		graphics::drawText(CANVAS_WIDTH / 10, 6.5f * CANVAS_HEIGHT / 13, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 17, "arrows to move, SPACE to fire, ZC to spin", br);
+		graphics::drawText(CANVAS_WIDTH / 10, 8.5f * CANVAS_HEIGHT / 13, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 17, "Pick up powerups by running into them.", br);
+		graphics::drawText(CANVAS_WIDTH / 10, 9.5f * CANVAS_HEIGHT / 13, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 17, "Gain score by killing enemies.", br);
+
+		br.outline_opacity = 0.f;
+		br.texture = string(image_path + "player1.png");
+		graphics::drawRect(CANVAS_WIDTH / 10, CANVAS_HEIGHT - 80, 40, 80, br);
+		br.texture = string(image_path + "player2.png");
+		graphics::drawRect(CANVAS_WIDTH-(CANVAS_WIDTH / 10), CANVAS_HEIGHT - 80, 40, 80, br);
+		br.texture = "";
 		break;
 	}
 	case game_states::EXIT: {
@@ -487,7 +489,6 @@ void draw()
 
 		graphics::drawText(4 * get_canvas_width() / 5, 2 * get_canvas_height() / 20 + 20, ((get_canvas_width() + get_canvas_width()) / 2) / 35, "Unpause (U)", br);
 
-		// other stuff to draw when game is paused
 		break;
 	}
 	case game_states::CREDITS: {
@@ -508,12 +509,6 @@ void draw()
 		graphics::drawText(20 * CANVAS_WIDTH / 100, 1 * CANVAS_HEIGHT / 7, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 15, "Please exit and inform the developers", br);
 	}
 	}
-
-	setColor(br, 'G');
-	graphics::MouseState ms;
-	graphics::getMouseState(ms);
-	graphics::drawRect(mouse_x(ms.cur_pos_x), mouse_y(ms.cur_pos_y), 30, 30, br);
-
 	gd->draw(gd->buttons);
 }
 
@@ -529,9 +524,8 @@ void resize(int new_w, int new_h)
 
 int main(int argc, char** argv)
 {
-
-	graphics::createWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "1942ripoff");
-	//graphics::setFullScreen(true);
+	graphics::createWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "1917");
+	graphics::setFullScreen(true);
 
 	graphics::setCanvasSize(CANVAS_WIDTH, CANVAS_HEIGHT);
 	graphics::setCanvasScaleMode(graphics::CANVAS_SCALE_FIT);
@@ -573,10 +567,7 @@ void initialize()
 		std::cerr << "Unable to load images from: " << image_path << std::endl;
 }
 
-// nothing to see below here
-float get_canvas_width() { return CANVAS_WIDTH; }
-float get_canvas_height() { return CANVAS_HEIGHT; }
-
-// spaghetti but it works
-float mouse_x(float mx) { return (mx - ((WINDOW_WIDTH  - (CANVAS_WIDTH * c2w))  / 2)) * w2c; }
-float mouse_y(float my) { return (my - ((WINDOW_HEIGHT - (CANVAS_HEIGHT * c2w)) / 2)) * w2c; }
+inline float get_canvas_width() { return CANVAS_WIDTH; }
+inline float get_canvas_height() { return CANVAS_HEIGHT; }
+inline float mouse_x(float mx) { return (mx - ((WINDOW_WIDTH  - (CANVAS_WIDTH * c2w))  / 2)) * w2c; }
+inline float mouse_y(float my) { return (my - ((WINDOW_HEIGHT - (CANVAS_HEIGHT * c2w)) / 2)) * w2c; }
