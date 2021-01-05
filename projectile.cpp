@@ -5,9 +5,8 @@
 
 Projectile::Projectile(float xpos, float ypos, float angle, float vel, float radius, std::string* sprites, Path* p, int damage) :
 	GameObject(xpos, ypos, angle, vel, radius,radius, sprites, p, damage, 1,0) //width == height -> square
-{
-	graphics::playSound(sound_path + "fire.mp3", 0.2f, false);
-}
+{}
+
 
 void Projectile::update(float ms){
 	this->movement->move(this->x, this->y, this->angle, this->vel, ms);
