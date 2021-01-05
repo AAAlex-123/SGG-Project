@@ -148,6 +148,7 @@ void GameData::fire(list<T*>* ls) const {
 	for (Entity* en : *ls) {
 
 		if (en->hasFired()) {
+			graphics::playSound(sound_path + "fire.mp3", 0.04f, false);
 			//check if projectile was launched by a player
 			for (Entity* pl : *playerLs)
 				isPlayer |= pl == en;	// fancy
