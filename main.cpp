@@ -48,8 +48,8 @@ void updateAndSpawn(GameData* starting_gd, float* const ms) {
 		while (!th_1_start) {
 			if (game_over)
 				gd_changed = true;
-			//if (terminate_all) //putting this condition on the while loop itself doesn't seem to work for some reason
-				//return;
+			if (terminate_all)
+				return;
 		}
 			
 		
@@ -86,8 +86,8 @@ void checkAndFire(GameData* starting_gd) {
 		while (!th_2_start) {
 			if (game_over)
 				gd_changed = true;
-			//if (terminate_all)
-				//return;
+			if (terminate_all)
+				return;
 		}
 
 		if (!game_over) {
