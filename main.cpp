@@ -401,7 +401,7 @@ void draw()
 		graphics::resetPose();
 		setColor(br, 'L');
 		graphics::drawText(0.2f * get_canvas_width(), 0.3f * get_canvas_height(), 20,
-			"next level in: " + std::to_string(gd->level_transition_timer * 1000), br);
+			"Next level in: " + std::to_string(gd->level_transition_timer * 1000), br);
 		ui->draw();
 		break;
 	}
@@ -485,7 +485,7 @@ void draw()
 	}
 	case game_states::PAUSE: {
 
-		graphics::drawText(CANVAS_WIDTH / 6, 2.5f * CANVAS_HEIGHT / 13, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 17, "game is paused rn", br);
+		graphics::drawText(CANVAS_WIDTH / 6, 2.5f * CANVAS_HEIGHT / 13, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 17, "Game paused...", br);
 
 		graphics::drawText(4 * get_canvas_width() / 5, 2 * get_canvas_height() / 20 + 20, ((get_canvas_width() + get_canvas_width()) / 2) / 35, "Unpause (U)", br);
 
