@@ -524,8 +524,8 @@ void resize(int new_w, int new_h)
 
 int main(int argc, char** argv)
 {
-	graphics::createWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "1917");
-	graphics::setFullScreen(true);
+	graphics::createWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "1942ripoff");
+	//graphics::setFullScreen(true);
 
 	graphics::setCanvasSize(CANVAS_WIDTH, CANVAS_HEIGHT);
 	graphics::setCanvasScaleMode(graphics::CANVAS_SCALE_FIT);
@@ -569,5 +569,6 @@ void initialize()
 
 inline float get_canvas_width() { return CANVAS_WIDTH; }
 inline float get_canvas_height() { return CANVAS_HEIGHT; }
-inline float mouse_x(float mx) { return (mx - ((WINDOW_WIDTH  - (CANVAS_WIDTH * c2w))  / 2)) * w2c; }
-inline float mouse_y(float my) { return (my - ((WINDOW_HEIGHT - (CANVAS_HEIGHT * c2w)) / 2)) * w2c; }
+
+float mouse_x(float mx) { return (mx - ((WINDOW_WIDTH  - (CANVAS_WIDTH * c2w))  / 2)) * w2c; }
+float mouse_y(float my) { return (my - ((WINDOW_HEIGHT - (CANVAS_HEIGHT * c2w)) / 2)) * w2c; }
