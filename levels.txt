@@ -5,12 +5,6 @@
 4// Level declarations are the same used by the constructor
 5// \line_no\   Level(\id:n\, \desc:str\)
 6// \line_no\   wave \desc:str\ \time:f\
-7   Level(-2, "testing1: s-s-c")
-8   wave aim 0
-9   wave circles 1
-10//   wave bomb 20
-11   Level(-3, "testing2: r-c-fs")
-12   wave random 0
-13   wave circles 16
-14   wave fast-shower 34
-15
+7   Level(-2, "testing")
+8   wave shower-r 0
+9
