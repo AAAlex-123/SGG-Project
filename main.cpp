@@ -83,7 +83,7 @@ void checkAndFire(GameData* starting_gd) {
 	GameData* gd = starting_gd;
 
 	while (true) {
-		while (!th_1_start) {
+		while (!th_2_start) {
 			if (game_over)
 				gd_changed = true;
 			//if (terminate_all)
