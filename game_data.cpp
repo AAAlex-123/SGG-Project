@@ -6,6 +6,8 @@
 
 #include "GObjFactory.h"
 
+using namespace std;
+
 GameData::GameData()
 	: fps(0), game_state(0),
 	el(0.0f), sps(20.0f), curr_img(0), images(),
