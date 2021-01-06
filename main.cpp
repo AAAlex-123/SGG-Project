@@ -106,6 +106,16 @@ void checkAndFire(GameData* starting_gd) {
 		}
 	}
 }
+
+void closeThreads() {
+	if (ui != nullptr) { //if game had started
+		terminate_all = true;
+		updateThread.join();
+		collisionThread.join();
+	}
+	graphics::destroyWindow();
+	exit(0);
+}
 #endif
 
 // sgg functions
@@ -312,15 +322,8 @@ void update(float ms)
 		break;
 	}
 	case game_states::EXIT: {
-#ifndef no_threads
-		if (ui != nullptr) { //if game had started
-			terminate_all = true;
-			updateThread.join();
-			collisionThread.join();
-		}
-#endif 
-		graphics::destroyWindow();
-		exit(0);
+		std::terminate();
+		break;
 	}
 	case game_states::PAUSE: {
 		// yes there is a button to un-pause but some prefer to use the keyboard for easier access
@@ -524,6 +527,7 @@ void resize(int new_w, int new_h)
 
 int main(int argc, char** argv)
 {
+	std::set_terminate(closeThreads);
 	graphics::createWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "1917");
 	graphics::setFullScreen(true);
 
@@ -569,5 +573,5 @@ void initialize()
 
 inline float get_canvas_width() { return CANVAS_WIDTH; }
 inline float get_canvas_height() { return CANVAS_HEIGHT; }
-inline float mouse_x(float mx) { return (mx - ((WINDOW_WIDTH  - (CANVAS_WIDTH * c2w))  / 2)) * w2c; }
-inline float mouse_y(float my) { return (my - ((WINDOW_HEIGHT - (CANVAS_HEIGHT * c2w)) / 2)) * w2c; }
+float mouse_x(float mx) { return (mx - ((WINDOW_WIDTH  - (CANVAS_WIDTH * c2w))  / 2)) * w2c; }
+float mouse_y(float my) { return (my - ((WINDOW_HEIGHT - (CANVAS_HEIGHT * c2w)) / 2)) * w2c; }
