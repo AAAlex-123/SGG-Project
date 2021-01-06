@@ -5,27 +5,116 @@
 4// Level declarations are the same used by the constructor
 5// \line_no\   Level(\id:n\, \desc:str\)
 6// \line_no\   wave \desc:str\ \time:f\
-7   Level(-2, "testing")
-8//   wave donuts 0
-9//   wave half-circles-t-s 0
-10//   wave tank-u 0
-11//   wave simple-u-h 0
-12//   wave simple-u-e 0
-13//   wave simple-u-m 0
-14//   wave half-circles-s-s 0
-15//   wave tank-l 0
-16//   wave tank-r 0
-17//   wave simple-l-h 0
-18//   wave simple-l-m 0
-19//   wave simple-l-e 0
-20//   wave simple-r-h 0
-21//   wave simple-r-m 0
-22//   wave simple-r-e 0
-23//   wave balloons-e 0
-24//   wave balloons-m 0
-25//   wave balloons-h 0
-26//   wave accel-v-e 0
-27//   wave accel-v-h 0
-28//   wave accel-h-e 0
-29//   wave accel-h-h 0
-30
+7//
+8//
+9//
+10   Level(-9, "a new begining")
+11   wave simple-u-e 0
+12   wave simple-u-e 17
+13   wave simple-u-m 34
+14//
+15//
+16//
+17//
+18   HealthPowerup(0.5f, 0.1f, -180.0f) 55
+19//
+20   Level(-3, "watch out")
+21   wave accel-v-e 0
+22   wave simple-r-m 20
+23   wave accel-v-e 48
+24   wave simple-l-m 70
+25//
+26//
+27//
+28   PointsPowerup(0.5f, 0.1f, -180.0f) 90
+29//
+30   Level(-4, "getting harder")
+31   wave simple-r-m 0
+32   wave accel-v-e 25
+33   wave simple-u-m 40
+34   wave accel-v-e 60
+35   wave simple-u-e 75
+36   wave tank-u 90
+37//
+38   HealthPowerup(0.3f, 0.1f, 0.0f) 110
+39   PointsPowerup(0.7f, 0.2f, -180.0f) 112
+40   Level(-5, "can you handle more?")
+41   wave simple-u-e 0
+42   wave accel-v-e 5
+43   wave tank-l 20
+44   wave simple-r-m 25
+45   wave donuts 45
+46//
+47//
+48//
+49//
+50   Level(-6, "the semi-final boss - wip")
+51   ProjectilePowerup(0.6f, 0.1f, -180.0f) 60
+52   HealthPowerup(0.4f, 0.2f, -180.0f) 62
+53//
+54//
+55//
+56//
+57//
+58//
+59//
+60   Level(-7, "getting rolling")
+61   ProjectilePowerup(0.7f, 0.2f, -180.0f) 0
+62   HealthPowerup(0.3f, 0.1f, -180.0f) 1
+63   HealthPowerup(0.5f, 0.2f, -180.0f) 2
+64   wave balloons-e 0
+65   wave simple-u-m 12
+66   wave donuts 25
+67   wave tank-l 45
+68   wave tank-r 45
+69   wave accel-h-e 65
+70   Level(-8, "t i t l e")
+71   wave simple-u-h 0
+72   wave tank-u 15
+73   wave balloons-m 22
+74   wave donuts 30
+75   wave accel-h-h 45
+76   wave half-circles-u 55
+77   wave balloons-m 55
+78   HealthPowerup(0.5f, 0.2f, -180.0f) 70
+79   ProjectilePowerup(0.5f, 0.1f, -180.0f) 71
+80   Level(-2, "wip")
+81   wave balloons-h 0
+82   wave tank-u 0
+83   wave simple-l-h 10
+84   wave simple-r-h 10
+85   wave half-circles-s 20
+86   wave tank-l 25
+87   wave simple-l-h 30
+88   wave donuts 35
+89   HealthPowerup(0.5f, 0.2f, -180.0f) 2
+90   ProjectilePowerup(0.5f, 0.5f, -180.0f) 0
+91   ProjectilePowerup(0.5f, 0.5f, -180.0f) 0
+92   Level(-10, "wip")
+93//
+94//
+95//
+96//
+97//
+98//
+99//
+100   Level(-11, "the final boss - wip")
+101//
+102//
+103//
+104//
+105//
+106//
+107//
+108//
+109//
+110
+
+--- File parsing stopped at '110' ---
+Available waves:
+ - wave simple-u/l/r-e/m/h
+ - wave accel-v/h-e/h
+ - wave balloons-e/m/h
+ - wave tank-u/l/r
+ - wave donuts
+ - wave half-circles-u/s
