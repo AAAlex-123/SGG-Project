@@ -1,6 +1,7 @@
 #pragma once
 #include "entity.h"
 #include "globals.h"
+#include <iostream>
 
 class Player final : public Entity{
 
@@ -12,14 +13,17 @@ public:
 	{}
 
 	// Changes the projectile type
-	void setProjectile(int proj_type) {
-		this->curr_projectile = proj_type;
+	void incrementProjectile() {
+		if (++curr_projectile > 12)
+			curr_projectile = 12;
 	}
 
 	void addHealth(int health) {
-		curr_health = (curr_health + health > max_health) ? max_health : curr_health + health;
+		if (max_health - curr_health < health)
+			max_health += (max_health - curr_health) + health;
+
+		curr_health += health;
 	}
 
 	virtual ~Player() = default;
 };
-
