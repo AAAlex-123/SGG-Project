@@ -1,14 +1,23 @@
 #include "game_data.h"
-
+#include "GObjFactory.h"
 #include <iostream>
 #include <regex>
 #include <fstream>
 
-#include "GObjFactory.h"
+using namespace std;
+
+GameData::Stats GameData::game_stats = Stats();
+array<GameData::Achievement const *, 4> GameData::achievements = {
+	new GameData::Achievement("Kill 100 total enemies", image_path + "achievement_1.png", "Kill a total of 100 enemies of any type.",Stats::ALL,100),
+	new GameData::Achievement("Destroy 20 balloons", image_path + "achievement_2.png", "Balloons are well-protected floating enemies.",Stats::BALLOON,20),
+	new GameData::Achievement("Destroy an American airship", image_path + "achievement_3.png","American airships are well armoured and have excellent targeting.",Stats::AIRSHIP,100),
+	new GameData::Achievement("Destroy 50 british fighters", image_path + "achievement_4.png","You can recognise British fighters by their black color.",Stats::BLACK_PLANE,100)
+};
+
 
 GameData::GameData()
 	: fps(0), game_state(0),
-	el(0.0f), sps(12.0f), curr_img(0), images(),
+	el(0.0f), sps(20.0f), curr_img(0), images(),
 	levels(std::unordered_map<int, Level*>()), _waves(std::unordered_map<std::string, Wave*>()),
 	curr_active_level(-1), curr_selected_level(-1),
 	bg_offset(0.0f), height_perc_per_second(0.02f),
@@ -295,10 +304,13 @@ void GameData::_load_hardcoded_levels()
 	
 /*	ABOUT LEVEL ID
 	=>	no level can have an id of -1 (because -1 is the default)
+
 	=>	levels selectable by users must have id 0-9 inclusive
 		(see update::OP_LEVEL case for selectable levels)
+
 	=>	levels not be selectable by users must have any other id
 		(see above and also l1 and update::TEST case)
+
 	=>	level id should always match its key in the levels map (see below)
 */
 	levels[l1->id()] = l1;
@@ -311,6 +323,28 @@ void GameData::_load_hardcoded_levels()
 	levels[l6->id()] = l6;
 }
 
+Level* GameData::get_next_level() {
+	Level* return_val = levels[curr_playing_level - 1];
+	if (!return_val)
+		levels.erase(curr_playing_level - 1);
+	return return_val;
+}
+
+void GameData::addScore(int scored) {
+	score += scored;
+}
+
+int GameData::getScore() const {
+	return score;
+}
+
+void GameData::spawn() {
+	if (levels[curr_playing_level]->can_spawn())
+		enemyLs->push_back(levels[curr_playing_level]->spawn());
+	if (levels[curr_playing_level]->can_spawn_p())
+		powerupLs->push_back(levels[curr_playing_level]->spawn_p());
+}
+
 GameData::~GameData() {
 	deleteList(playerLs);
 	deleteList(enemyLs);
@@ -318,4 +352,54 @@ GameData::~GameData() {
 	deleteList(playerProjLs);
 	deleteList(effectsLs);
 	deleteList(buttons);
+}
+
+//=======INNER CLASSES========
+
+int GameData::Stats::find_type(const Entity const* en) const {
+	const std::string name = *en->getSprite();
+	if (name == "plane1.png")
+		return BASIC_PLANE;
+	else if (name == "plane2.png")
+		return BLACK_PLANE;
+	else if (name == "plane3.png")
+		return AIRSHIP;
+	else if (name == "balloon.png")
+		return BALLOON;
+	else {
+		std::cerr << "Entity can't be identified in Stats (sprite name = " << name << ")" << std::endl;
+		return BASIC_PLANE;
+	}
+}
+
+void GameData::Stats::plane_shot(const Entity const* en) {
+	shot_down_arr[find_type(en)] ++;
+}
+
+int GameData::Stats::get_shot_number(int type) const {
+	try {
+		return shot_down_arr[type];
+	}
+	catch (std::out_of_range) {
+		std::cerr << " Couldn't find enemy type information in get_shot_number, returning 0" << std::endl;
+		return 0;
+	}
+}
+
+int GameData::Stats::get_total_shot() const {
+	int total_shot = 0;
+	for (int shot_no : shot_down_arr)
+		total_shot += shot_no;
+	return total_shot;
+}
+
+GameData::Achievement::Achievement(std::string name, std::string icon, std::string description,int type, int kills) :
+	name(name),icon(icon),description(description), TYPE(type), KILLS(kills)
+{}
+
+bool GameData::Achievement::is_achieved() const {
+	if (TYPE == Stats::ALL)
+		return KILLS >= game_stats.get_total_shot();
+	else
+		return KILLS >= game_stats.get_shot_number(TYPE);
 }
