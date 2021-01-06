@@ -20,7 +20,7 @@ const int GObjFactory::b_plane_score = 100;
 const float GObjFactory::player_sp = 150.f;
 const float GObjFactory::player_w = b_plane_size * 1.5f / 1.2f;
 const float GObjFactory::player_h = b_plane_size * 3.f / 1.2f;
-const int GObjFactory::player_hp = 100;
+const int GObjFactory::player_hp = 150;
 const float GObjFactory::pl_dangle = PI / 4.0f;
 
 const float GObjFactory::b_proj_sp = 350.f;
@@ -121,7 +121,7 @@ Projectile* GObjFactory::createStandardBullet(float x, float y, float angle) {
 }
 
 Projectile* GObjFactory::createHeavyBullet(float x, float y, float angle) {
-	return new Projectile(x, y, angle, b_proj_sp * 0.5f, b_proj_size * 1.7f, new string(image_path + "bullet3.png"), new Path(), b_proj_dmg * 2.5f);
+	return new Projectile(x, y, angle, b_proj_sp * 0.5f, b_proj_size * 1.7f, new string(image_path + "bullet3.png"), new Path(), b_proj_dmg * 2.0f);
 }
 
 Projectile* GObjFactory::createLightBullet(float x, float y, float angle) {
