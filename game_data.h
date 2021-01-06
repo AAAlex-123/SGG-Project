@@ -14,17 +14,16 @@
 #include "button.h"
 
 // lmao imagine using using
-using namespace std;
 enum game_states;
 
 class GameData {
 private:
 	template<class T>
-	void static deleteList(list<T*>*);
+	void static deleteList(std::list<T*>*);
 
-	bool load_level_data_from_file(const string& level_path, const string& wave_path);
-	bool _load_waves_from_file(const string& wave_path);
-	bool _load_levels_from_file(const string& wave_path);
+	bool load_level_data_from_file(const std::string& level_path, const std::string& wave_path);
+	bool _load_waves_from_file(const std::string& wave_path);
+	bool _load_levels_from_file(const std::string& wave_path);
 	// callback in case reading from file fails
 	void _load_hardcoded_levels();
 
@@ -34,11 +33,11 @@ private:
 
 public:
 	// collections
-	list<Entity*>* enemyLs, * playerLs;
-	list<Projectile*>* enemyProjLs, * playerProjLs;
-	list<VisualEffect*>* effectsLs;
-	list<Powerup*>* powerupLs;
-	list<Button*>* buttons;
+	std::list<Entity*>* enemyLs, * playerLs;
+	std::list<Projectile*>* enemyProjLs, * playerProjLs;
+	std::list<VisualEffect*>* effectsLs;
+	std::list<Powerup*>* powerupLs;
+	std::list<Button*>* buttons;
 
 	// general
 	int fps;
@@ -48,14 +47,14 @@ public:
 	float el;
 	const float sps;
 	int curr_img;
-	vector<string> images;
+	std::vector<std::string> images;
 	
 	// players
 	bool isMult = false;
 
 	// levels
-	unordered_map<int, Level*> levels;
-	unordered_map<string, Wave*> _waves;
+	std::unordered_map<int, Level*> levels;
+	std::unordered_map<std::string, Wave*> _waves;
 	int curr_active_level, curr_selected_level;
 
 	// game
@@ -90,23 +89,23 @@ public:
 	
 	//Updates all objects within the list. Template class must be derived from Drawing.
 	template <class T>
-	static void update(float ms, list<T*>*);
+	static void update(float ms, std::list<T*>*);
 	
 	// Draws all objects within the list. Template class must be derived from Drawing.
 	template <class T>
-	static void draw(list<T*>* ls);
+	static void draw(std::list<T*>* ls);
 
 	//Checks collisions between 2 lists. Template classes must both be derived from GameObject.
 	template <class T1,class T2>
-	static void checkCollisions(list<T1*>*, list<T2*>*);
+	static void checkCollisions(std::list<T1*>*, std::list<T2*>*);
 
 	//Spawns a projectile for every eligible object in the list. Template class must be derived from Entity.
 	template <class T>
-	void fire(list<T*>*) const;
+	void fire(std::list<T*>*) const;
 
 	//Checks if any object within the list must be destroyed, and deletes it. Template class must be derived from Drawing.
 	template <class T>
-	void checkAndDelete(list<T*>*);
+	void checkAndDelete(std::list<T*>*);
 
 	//button stuff
 	void click_buttons();
@@ -122,28 +121,28 @@ public:
 
 // definition in the same file as declaration because c++ is awesome
 template <class T>
-void GameData::update(float ms, list<T*>* ls) {
+void GameData::update(float ms, std::list<T*>* ls) {
 	for (Drawing* dr : *ls) {
 		dr->update(ms);
 	}
 }
 
 template <class T>
-void GameData::draw(list<T*>* ls) {
+void GameData::draw(std::list<T*>* ls) {
 	for (Drawing* dr : *ls) {
 		dr->draw();
 	}
 }
 
 template <class T1,class T2>
-void GameData::checkCollisions(list<T1*>* ls1, list<T2*>* ls2) {
+void GameData::checkCollisions(std::list<T1*>* ls1, std::list<T2*>* ls2) {
 	for (GameObject* o1 : *ls1)
 		for (GameObject* o2 : *ls2)
 			o1->collides(o2);
 }
 
 template <class T>
-void GameData::fire(list<T*>* ls) const {
+void GameData::fire(std::list<T*>* ls) const {
 	bool isPlayer = false;
 	for (Entity* en : *ls) {
 
@@ -164,7 +163,7 @@ void GameData::fire(list<T*>* ls) const {
 }
 
 template <class T>
-void GameData::checkAndDelete(list<T*>* ls) {
+void GameData::checkAndDelete(std::list<T*>* ls) {
 	for (auto iter = ls->begin(); iter != ls->end(); ++iter) {
 		if (!**iter) {
 			// don't question this
@@ -184,7 +183,7 @@ void GameData::checkAndDelete(list<T*>* ls) {
 }
 
 template<class T>
-void GameData::deleteList(list<T*>* ls) {
+void GameData::deleteList(std::list<T*>* ls) {
 	for (T* obj : *ls)
 		delete obj;
 	delete ls;
