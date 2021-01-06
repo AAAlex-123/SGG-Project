@@ -216,11 +216,12 @@ public:
 };
 
 struct GameData::Achievement {
+private:
+	const int TYPE, KILLS;
 public:
 	const std::string name;
 	const std::string icon;
 	const std::string description;
-	const int TYPE, KILLS;
 	//Returns whether the condition was achieved
 	bool is_achieved() const;
 
