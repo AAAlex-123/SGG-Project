@@ -368,9 +368,6 @@ void draw()
 		setColor(br, new float[3]{ 0.0f, 0.0f, 0.0f });
 		graphics::drawText(CANVAS_WIDTH / 4, CANVAS_HEIGHT / 4, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 10, "Welcome!", br);
 		graphics::drawText(CANVAS_WIDTH / 8, 3 * CANVAS_HEIGHT / 5, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 10, "Press S to start!", br);
-		graphics::drawText(CANVAS_WIDTH / 8, CANVAS_HEIGHT / 1.4f, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 10, "Click the cog button", br);
-		graphics::drawText(CANVAS_WIDTH / 8, CANVAS_HEIGHT / 1.2f, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 10, "for more options", br);
-
 
 		break;
 	}
@@ -400,7 +397,7 @@ void draw()
 		graphics::resetPose();
 		setColor(br, 'L');
 		graphics::drawText(0.2f * get_canvas_width(), 0.3f * get_canvas_height(), 20,
-			"Next level in: " + std::to_string(gd->level_transition_timer * 1000), br);
+			"Next level in: " + std::to_string(((int)(gd->level_transition_timer * 10)) / 10.0f), br);
 		ui->draw();
 		break;
 	}
@@ -569,5 +566,5 @@ void initialize()
 inline float get_canvas_width() { return CANVAS_WIDTH; }
 inline float get_canvas_height() { return CANVAS_HEIGHT; }
 
-float mouse_x(float mx) { return (mx - ((WINDOW_WIDTH  - (CANVAS_WIDTH * c2w))  / 2)) * w2c; }
+float mouse_x(float mx) { return (mx - ((WINDOW_WIDTH  - (CANVAS_WIDTH  * c2w)) / 2)) * w2c; }
 float mouse_y(float my) { return (my - ((WINDOW_HEIGHT - (CANVAS_HEIGHT * c2w)) / 2)) * w2c; }
