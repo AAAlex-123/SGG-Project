@@ -9,10 +9,10 @@ using namespace std;
 GameData::Stats GameData::game_stats = Stats();
 
 const array<GameData::Achievement const *, 4> GameData::achievements = {
-	new GameData::Achievement("Kill 100 total enemies", image_path + "achievement_1.png", "Kill a total of 100 enemies of any type.",Stats::ALL,100),
-	new GameData::Achievement("Destroy 20 balloons", image_path + "achievement_2.png", "Balloons are well-protected floating enemies.",Stats::BALLOON,20),
-	new GameData::Achievement("Destroy an American airship", image_path + "achievement_3.png","American airships are well armoured and have excellent targeting.",Stats::AIRSHIP,1),
-	new GameData::Achievement("Destroy 50 british fighters", image_path + "achievement_4.png","You can recognise British fighters by their black color.",Stats::BLACK_PLANE,50)
+	new GameData::Achievement("Kill 100 total enemies", icon_path + "achievement_1.png", "Kill a total of 100 enemies of any type.",Stats::ALL,100),
+	new GameData::Achievement("Destroy 20 balloons", icon_path + "achievement_2.png", "Balloons are well-protected floating enemies.",Stats::BALLOON,20),
+	new GameData::Achievement("Destroy an American airship", icon_path + "achievement_3.png","American airships are well armoured and have excellent targeting.",Stats::AIRSHIP,1),
+	new GameData::Achievement("Destroy 50 british fighters", icon_path + "achievement_4.png","You can recognise British fighters by their black color.",Stats::BLACK_PLANE,50)
 };
 
 
