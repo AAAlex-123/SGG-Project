@@ -20,6 +20,7 @@ class GameData {
 private:
 	class Stats;
 	struct Achievement;
+
 	//Helper method used to delete all data from the provided list, as well as the list itself
 	template<class T>
 	void static deleteList(std::list<T*>*);
@@ -41,10 +42,13 @@ public:
 	~GameData();
 
 	//=========ACHIEVEMENT DATA=======
+
 	static Stats game_stats;
-	static const std::array<Achievement const *, 4> achievements;
+	static const std::array<Achievement const*, 4> achievements;
 
 	//=========GENERAL DATA===========
+
+	static std::list<const Achievement const*> getAchieved();
 
 	// collections
 	std::list<Entity*>* enemyLs, * playerLs;
