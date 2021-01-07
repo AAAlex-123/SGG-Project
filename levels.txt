@@ -15,7 +15,7 @@
 14//
 15//
 16//
-17   PointsPowerup(0.5f, 0.1f, -180.0f) 100
+17   PointsPowerup(0.5f, 0.1f, -180.0f) 50
 18//
 19//
 20   Level(-3, "Watch out!")
@@ -75,10 +75,10 @@
 74   wave tank-l 101
 75//
 76//
-77   HealthPowerup(0.3f, 0.1f, -180.0f) 114
-78   HealthPowerup(0.7f, 0.1f, -180.0f) 114
+77   HealthPowerup(0.3f, 0.1f, -180.0f) 110
+78   HealthPowerup(0.7f, 0.1f, -180.0f) 110
 79//
-80   Level(-8, "t i t l e")
+80   Level(-8, "null")
 81//
 82//
 83   wave half-circles-u 0
@@ -98,56 +98,91 @@
 97   PointsPowerup(0.5f, 0.1f, -180.0f) 128
 98   ProjectilePowerup(0.5f, 0.1f, -180.0f) 132
 99//
-100//
-101//
-102//
-103
-104   Level(-9, " - wip")
-105
+100   Level(-2, "almost there - wip")
+101   HealthPowerup(0.5f, 0.6f, -180.0f) 0
+102   HealthPowerup(0.5f, 0.6f, -180.0f) 0
+103   HealthPowerup(0.5f, 0.6f, -180.0f) 0
+104   HealthPowerup(0.5f, 0.6f, -180.0f) 0
+105   HealthPowerup(0.5f, 0.6f, -180.0f) 0
+106   HealthPowerup(0.5f, 0.6f, -180.0f) 0
+107   HealthPowerup(0.5f, 0.6f, -180.0f) 0
+108   ProjectilePowerup(0.5f, 0.6f, -180.0f) 0
+109   ProjectilePowerup(0.5f, 0.6f, -180.0f) 0
+110   wave half-circles-s 0
+111   wave half-circles-s 15
+112   wave simple-u-m 7
+113   wave tank-u 20
+114   wave balloons-h 27
+115   wave donuts 38
+116   wave simple-r-m 35
+117   wave simple-l-m 35
+118   wave half-circles-u 52
+119   wave tank-l 56
+120   wave tank-r 56
+121   wave simple-u-h 62
+122   wave accel-h-h 73
+123   wave simple-u-h 83
+124   wave half-circles-s 88
+125   wave tank-l 98
+126   wave balloons-h 108
+127   wave simple-l-m 116
+128   wave simple-r-m 117
+129//
+130//
+131//
+132//
+133//
+134   PointsPowerup(0.5f, 0.1f, -180.0f) 138
+135   HealthPowerup(0.3f, 0.1f, -180.0f) 140
+136   HealthPowerup(0.5f, 0.1f, -180.0f) 140
+137   HealthPowerup(0.7f, 0.1f, -180.0f) 140
+138//
+139//
+140   Level(-3, "one last hold")
+141   HealthPowerup(0.5f, 0.6f, -180.0f) 0
+142   HealthPowerup(0.5f, 0.6f, -180.0f) 0
+143   HealthPowerup(0.5f, 0.6f, -180.0f) 0
+144   ProjectilePowerup(0.5f, 0.6f, -180.0f) 0
+145   ProjectilePowerup(0.5f, 0.6f, -180.0f) 0
+146   wave simple-u-h 0
+147   wave donuts 5
+148   wave tank-l 10
+149   wave tank-r 13
+150   wave simple-u-h 20
+151   wave half-circles-s 25
+152   wave accel-h-h 31
+153   wave balloons-h 40
+154   wave simple-l-h 47
+155   wave simple-l-h 47
+156   wave tank-u 60
+157   wave simple-u-h 63
+158   wave donuts 65
+159   wave accel-v-h 70
+160   wave simple-u-h 75
+161   wave balloons-h 80
+162   wave half-circles-s 85
+163   wave tank-l 95
+164   wave simple-r-h 95
+165   wave accel-h-h 105
+166   wave balloons-h 108
+167   wave donuts 115
+168   wave tank-u 117
+169//
+170//
+171   HealthPowerup(0.2f, 0.1f, -180.0f) 137
+172   HealthPowerup(0.4f, 0.1f, -180.0f) 137
+173   HealthPowerup(0.6f, 0.1f, -180.0f) 137
+174   HealthPowerup(0.8f, 0.1f, -180.0f) 137
+175   PointsPowerup(0.5f, 0.1f, -180.0f) 135
+176   PointsPowerup(0.5f, 0.1f, -180.0f) 135
+177   PointsPowerup(0.5f, 0.1f, -180.0f) 135
+178//
+179//
+180//
+181   Level(-11, "the final boss - wip")
+182
 
-//70   Level(-9, " - wip")
-//71   wave simple-u-h 0
-//72   wave tank-u 15
-//73   wave balloons-m 22
-//74   wave donuts 30
-//75   wave accel-h-h 45
-////76   wave half-circles-u 55
-//77   wave balloons-m 55
-//78   HealthPowerup(0.5f, 0.2f, -180.0f) 70
-//79   ProjectilePowerup(0.5f, 0.1f, -180.0f) 71
-////8fds0   Level(-9, " - wip")
-//81   wave balloons-h 0
-//82   wave tank-u 0
-//83   wave simple-l-h 10
-//84   wave simple-r-h 10
-//85   wave half-circles-s 20
-//86   wave tank-l 25
-//87   wave simple-l-h 30
-//88   wave donuts 35
-//89   HealthPowerup(0.5f, 0.2f, -180.0f) 2
-//90   ProjectilePowerup(0.5f, 0.5f, -180.0f) 0
-//91   ProjectilePowerup(0.5f, 0.5f, -180.0f) 0
-//92   Level(-10, "wip")
-//93//
-//94//
-//95//
-//96//
-//97//
-//98//
-//99//
-//100   Level(-11, "the final boss - wip")
-//101//
-//102//
-//103//
-//104//
-//105//
-//106//
-//107//
-//108//
-//109//
-//110
-
---- File parsing stopped at '110' ---
+--- File parsing stopped at 'lol' ---
 Available waves:
  - wave simple-u/l/r-e/m/h
  - wave accel-v/h-e/h
