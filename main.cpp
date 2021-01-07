@@ -389,12 +389,12 @@ void draw()
 		break;
 	}
 	case game_states::ACHIEVEMENTS: {
-		graphics::drawText(CANVAS_WIDTH / 2, 0, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 10, "Unlocked Achievements: " + std::to_string(GameData::getAchieved().size()) + "/4", br);
+		graphics::drawText(CANVAS_WIDTH / 2, 0, 20, "Unlocked Achievements: " + std::to_string(GameData::getAchieved().size()) + "/4", br);
 		int i = 0;
 		for (auto a : GameData::getAchieved()) {
 			br.texture = a->icon;
-			graphics::drawRect(CANVAS_WIDTH / 8, 200 + i * 50, 50, 50, br);
-			graphics::drawText(CANVAS_WIDTH / 8, 200 + i * 50+20, 20, a->description, br);
+			graphics::drawRect(CANVAS_WIDTH / 2 - 100, 200 + i * 50, 50, 50, br);
+			graphics::drawText(0, 200 + i * 50+20, 20, a->description, br);
 			i++;
 		}
 		break;
