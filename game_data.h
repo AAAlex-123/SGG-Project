@@ -42,7 +42,7 @@ public:
 
 	//=========ACHIEVEMENT DATA=======
 	static Stats game_stats;
-	static std::array<Achievement const *, 4> achievements;
+	static const std::array<Achievement const *, 4> achievements;
 
 	//=========GENERAL DATA===========
 
@@ -123,6 +123,43 @@ public:
 
 };
 
+//=======INNER CLASSES========
+
+class GameData::Stats {
+private:
+	std::array<int, 4> shot_down_arr;
+	int find_type(const Entity const* en) const;
+
+public:
+	const static int BASIC_PLANE = 0;
+	const static int BLACK_PLANE = 1;
+	const static int AIRSHIP = 2;
+	const static int BALLOON = 3;
+	const static int ALL = 100;
+
+	//Called when an enemy is killed, updates internal data
+	void plane_shot(const Entity const* en);
+	//Get how many planes of a specific type were shot down
+	int get_shot_number(int type) const;
+	//Get the sum of all planes shot down
+	int get_total_shot() const;
+};
+
+struct GameData::Achievement {
+private:
+	const int TYPE, KILLS;
+public:
+	const std::string name;
+	const std::string icon;
+	const std::string description;
+	//Returns whether the condition was achieved
+	bool is_achieved() const;
+
+	Achievement(std::string name, std::string icon, std::string description, int type, int kills);
+};
+
+
+//======COLLECTION FUNCTIONS=========
 // Method definitions in the same file as declaration because of compiler constraints on template methods. 
 
 template <class T>
@@ -166,15 +203,25 @@ void GameData::fire(std::list<T*>* ls) const {
 	}
 }
 
+//Workaround as C++ doesn't permit method specialization
+template<class T>
+inline void delete_(GameData* gd,T* obj) {
+	delete obj;
+}
+
+template<>
+inline void delete_(GameData* gd, Entity* obj) {
+	gd->effectsLs->push_back(obj->getDestructionVisualEffect());
+	GameData::game_stats.plane_shot(obj);
+	delete obj;
+}
+
 template <class T>
 void GameData::checkAndDelete(std::list<T*>* ls) {
 	for (auto iter = ls->begin(); iter != ls->end(); ++iter) {
 		if (!**iter) {
-			// don't question this
-			if ((void*) ls == (void*)enemyLs || (void*)ls == (void*)playerLs) {
-				effectsLs->push_back((*iter)->getDestructionVisualEffect());
-			}
-			delete (*iter);
+
+			delete_(this, *iter);
 			iter = ls->erase(iter);
 			// if the last item is deleted, `iter == ls->end()`
 			// so `++iter` increments the end iterator before checking the `for` condition
@@ -193,37 +240,3 @@ void GameData::deleteList(std::list<T*>* ls) {
 	delete ls;
 }
 
-//=======INNER CLASSES========
-
-class GameData::Stats {
-private:
-	std::array<int,4> shot_down_arr;
-	int find_type(const Entity const* en) const;
-
-public:
-	const static int BASIC_PLANE = 0;
-	const static int BLACK_PLANE = 1;
-	const static int AIRSHIP = 2;
-	const static int BALLOON = 3;
-	const static int ALL = 100;
-
-	//Called when an enemy is killed, updates internal data
-	void plane_shot(const Entity const* en);
-	//Get how many planes of a specific type were shot down
-	int get_shot_number(int type) const;
-	//Get the sum of all planes shot down
-	int get_total_shot() const ;
-};
-
-struct GameData::Achievement {
-private:
-	const int TYPE, KILLS;
-public:
-	const std::string name;
-	const std::string icon;
-	const std::string description;
-	//Returns whether the condition was achieved
-	bool is_achieved() const;
-
-	Achievement(std::string name, std::string icon, std::string description, int type, int kills);
-};
