@@ -19,10 +19,9 @@ public:
 	}
 
 	void addHealth(int health) {
-		if (max_health - curr_health < health)
-			max_health += (max_health - curr_health) + health;
-
 		curr_health += health;
+
+		max_health = curr_health > max_health ? curr_health : max_health;
 	}
 
 	virtual ~Player() = default;
