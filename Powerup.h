@@ -63,7 +63,7 @@ public:
 
 class PointsPowerup : public Powerup {
 private:
-	static const int score = 10000;
+	static const int score = 100000;
 	const std::string sprite = std::string(image_path + "points_powerup.png");
 
 public:
