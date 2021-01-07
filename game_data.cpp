@@ -15,6 +15,13 @@ const array<GameData::Achievement const *, 4> GameData::achievements = {
 	new GameData::Achievement("Destroy 50 british fighters", icon_path + "achievement_4.png","You can recognise British fighters by their black color.",Stats::BLACK_PLANE,50)
 };
 
+list<const GameData::Achievement const *> GameData::getAchieved() {
+	list<const GameData::Achievement const*> ls;
+	for (auto a : achievements)
+		if (a->is_achieved())
+			ls.push_back(a);
+	return ls;
+}
 
 GameData::GameData()
 	: fps(0), game_state(0),
@@ -67,6 +74,7 @@ void GameData::create_buttons()
 	buttons->push_back(new GameStateChangingButton(this, 370.0f, 30.0f, 30.0f, new string(icon_path + "help.png"), game_states::MENU, game_states::HELP));
 	buttons->push_back(new GameStateChangingButton(this, 370.0f, 75.0f, 30.0f, new string(icon_path + "options.png"), game_states::MENU, game_states::OPTIONS));
 	buttons->push_back(new GameStateChangingButton(this, 370.0f, 120.0f, 30.0f, new string(icon_path + "credits.png"), game_states::MENU, game_states::CREDITS));
+	buttons->push_back(new GameStateChangingButton(this, 370.0f, 165.0f, 30.0f, new string(icon_path + "achievements.png"), game_states::MENU, game_states::ACHIEVEMENTS));
 	// game
 	buttons->push_back(new GameStateChangingButton(this, 370.0f, 30.0f, 30.0f, new string(icon_path + "pause.png"), game_states::GAME, game_states::PAUSE));
 	// === temp ===
@@ -92,6 +100,9 @@ void GameData::create_buttons()
 	buttons->push_back(new VariableChangingButton<bool>(this, 287.5f, 200.0f, 125.0f, new string(icon_path + "multiplayer.png"), game_states::OP_PLAYER, &this->isMult, true));
 	// options -- level
 	buttons->push_back(new GameStateChangingButton(this, 30.0f, 30.0f, 30.0f, new string(icon_path + "back.png"), game_states::OP_LEVEL, game_states::OPTIONS));
+	//achievement
+	buttons->push_back(new GameStateChangingButton(this, 30.0f, 30.0f, 30.0f, new string(icon_path + "back.png"), game_states::ACHIEVEMENTS, game_states::MENU));
+
 }
 
 void GameData::click_buttons()
