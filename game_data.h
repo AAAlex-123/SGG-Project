@@ -205,12 +205,12 @@ void GameData::fire(std::list<T*>* ls) const {
 
 //Workaround as C++ doesn't permit method specialization
 template<class T>
-inline void delete_(GameData* gd,T* obj) {
+inline void delete_(const GameData const* gd,T * obj) {
 	delete obj;
 }
 
 template<>
-inline void delete_(GameData* gd, Entity* obj) {
+inline void delete_(const GameData const* gd, Entity* obj) {
 	gd->effectsLs->push_back(obj->getDestructionVisualEffect());
 	GameData::game_stats.plane_shot(obj);
 	delete obj;
