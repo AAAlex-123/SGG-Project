@@ -210,6 +210,7 @@ void update(float ms)
 		gd->update(ms, gd->playerLs);
 		gd->update(ms, gd->playerProjLs);
 		gd->update(ms, gd->effectsLs);
+		gd->update(ms, gd->powerupLs);
 
 		gd->updateLevel(ms);
 		gd->updateBackground(ms);
@@ -218,6 +219,7 @@ void update(float ms)
 		gd->checkCollisions(gd->enemyProjLs, gd->playerLs);
 		gd->checkCollisions(gd->playerProjLs, gd->enemyLs);
 		gd->checkCollisions(gd->enemyLs, gd->playerLs);
+		gd->checkCollisions(gd->playerLs, gd->powerupLs);
 
 		//fire
 		gd->fire(gd->playerLs);
@@ -241,16 +243,21 @@ void update(float ms)
 		break;
 	}
 	case game_states::LEVEL_TRANSITION: {
+
 		// do some updating while waiting for next level
 		gd->update(ms, gd->playerLs);
 		gd->update(ms, gd->playerProjLs);
 		gd->update(ms, gd->effectsLs);
+		gd->update(ms, gd->powerupLs);
 		gd->updateBackground(ms);
 
 		gd->fire(gd->playerLs);
 
+		gd->checkCollisions(gd->playerLs, gd->powerupLs);
+
 		gd->checkAndDelete(gd->playerProjLs);
 		gd->checkAndDelete(gd->effectsLs);
+		gd->checkAndDelete(gd->powerupLs);
 
 		// update timer
 		gd->level_transition_timer -= (ms / 1000.0f);
@@ -390,15 +397,14 @@ void draw()
 		gd->draw(gd->playerLs);
 		gd->draw(gd->playerProjLs);
 		gd->draw(gd->effectsLs);
-
-		gd->draw(gd->playerLs);
+		gd->draw(gd->powerupLs);
+		ui->draw();
 
 		// display timer
 		graphics::resetPose();
 		setColor(br, 'L');
 		graphics::drawText(0.2f * get_canvas_width(), 0.3f * get_canvas_height(), 20,
 			"Next level in: " + std::to_string(((int)(gd->level_transition_timer * 10)) / 10.0f), br);
-		ui->draw();
 		break;
 	}
 	case game_states::GAME_LOSE: {
