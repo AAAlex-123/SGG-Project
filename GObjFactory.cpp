@@ -99,7 +99,7 @@ Entity* GObjFactory::createTankEnemy(float x, float y, float angle) {
 
 Entity* GObjFactory::createHomingEnemy(float x, float y, float angle) {
 	Entity* target = rand() % (playerLs->size()) == 0 ? playerLs->front() : playerLs->back();
-	return new Entity(x, y, angle, b_plane_sp * 0.7f, b_plane_size * 1.2f, b_plane_size * 1.2f, new string(image_path + "plane2"), new HomingPath(target, 0.05f, new Path()), b_plane_dmg * 4.0f, b_plane_hp * 2.5f, b_plane_score * 1.5f, GObjFactory::STANDARD_BULLET);
+	return new Entity(x, y, angle, b_plane_sp * 0.7f, b_plane_size * 1.2f, b_plane_size * 1.2f, new string(image_path + "bomb"), new HomingPath(target, 0.05f, new Path()), b_plane_dmg * 3.0f, b_plane_hp * 2.5f, b_plane_score * 1.5f, GObjFactory::STANDARD_BULLET);
 }
 
 
