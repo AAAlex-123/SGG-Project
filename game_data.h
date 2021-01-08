@@ -44,11 +44,11 @@ public:
 	//=========ACHIEVEMENT DATA=======
 
 	static Stats game_stats;
-	static const std::array<const Achievement * const, 4> achievements;
+	static const std::array<Achievement *, 4> achievements; //The C++ Standard forbids containers of const elements
 
 	//=========GENERAL DATA===========
 
-	static std::list<const Achievement * const> getAchieved();
+	static const std::list<Achievement *> getAchieved();
 
 	// collections
 	std::list<Entity*>* enemyLs, * playerLs;
@@ -132,7 +132,7 @@ public:
 class GameData::Stats {
 private:
 	std::array<int, 4> shot_down_arr;
-	int find_type(const Entity const* en) const;
+	int find_type(const Entity * const en) const;
 
 public:
 	const static int BASIC_PLANE = 0;
@@ -142,7 +142,7 @@ public:
 	const static int ALL = 100;
 
 	//Called when an enemy is killed, updates internal data
-	void plane_shot(const Entity const* en);
+	void plane_shot(const Entity * const en);
 	//Get how many planes of a specific type were shot down
 	int get_shot_number(int type) const;
 	//Get the sum of all planes shot down
@@ -155,11 +155,10 @@ private:
 public:
 	const std::string name;
 	const std::string icon;
-	const std::string description;
 	//Returns whether the condition was achieved
 	bool is_achieved() const;
 
-	Achievement(std::string name, std::string icon, std::string description, int type, int kills);
+	Achievement(std::string name, std::string icon, int type, int kills);
 };
 
 
@@ -209,12 +208,12 @@ void GameData::fire(std::list<T*>* ls) const {
 
 //Workaround as C++ doesn't permit method specialization
 template<class T>
-inline void delete_(const GameData const* gd, T* obj) {
+inline void delete_(const GameData * const gd, T* obj) {
 	delete obj;
 }
 
 template<>
-inline void delete_(const GameData const* gd, Entity* obj) {
+inline void delete_(const GameData * const gd, Entity* obj) {
 	gd->effectsLs->push_back(obj->getDestructionVisualEffect());
 	GameData::game_stats.plane_shot(obj);
 	delete obj;
