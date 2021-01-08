@@ -44,11 +44,11 @@ public:
 	//=========ACHIEVEMENT DATA=======
 
 	static Stats game_stats;
-	static const std::array<Achievement const*, 4> achievements;
+	static const std::array<const Achievement * const, 4> achievements;
 
 	//=========GENERAL DATA===========
 
-	static std::list<const Achievement const*> getAchieved();
+	static std::list<const Achievement * const> getAchieved();
 
 	// collections
 	std::list<Entity*>* enemyLs, * playerLs;
@@ -66,11 +66,11 @@ public:
 	const float sps;
 	int curr_img;
 	std::vector<std::string> images;
-	
+
 	// game
 	float bg_offset, height_perc_per_second;
 	bool isMult = false;
-	
+
 	//Scrolls downwards and loops the background as the game progresses
 	void updateBackground(float ms);
 	void drawBackground(graphics::Brush&);
@@ -97,24 +97,24 @@ public:
 	//Returns the next level to be used to spawn enemies
 	Level* get_next_level();
 
-	void updateLevel(float ms){levels[curr_playing_level]->update(ms);}
+	void updateLevel(float ms) { levels[curr_playing_level]->update(ms); }
 
 	//Spawns new enemies
 	void spawn();
-	
+
 
 	//======COLLECTION FUNCTIONS=========
 
 	//Updates all objects within the list. Template class must be derived from Drawing.
 	template <class T>
 	static void update(float ms, std::list<T*>*);
-	
+
 	// Draws all objects within the list. Template class must be derived from Drawing.
 	template <class T>
 	static void draw(std::list<T*>* ls);
 
 	//Checks collisions between 2 lists. Template classes must both be derived from GameObject.
-	template <class T1,class T2>
+	template <class T1, class T2>
 	static void checkCollisions(std::list<T1*>*, std::list<T2*>*);
 
 	//Spawns a projectile for every eligible object in the list. Template class must be derived from Entity.
@@ -168,17 +168,17 @@ public:
 
 template <class T>
 void GameData::update(float ms, std::list<T*>* ls) {
-	for (Drawing* dr : *ls) 
+	for (Drawing* dr : *ls)
 		dr->update(ms);
 }
 
 template <class T>
 void GameData::draw(std::list<T*>* ls) {
-	for (Drawing* dr : *ls) 
+	for (Drawing* dr : *ls)
 		dr->draw();
 }
 
-template <class T1,class T2>
+template <class T1, class T2>
 void GameData::checkCollisions(std::list<T1*>* ls1, std::list<T2*>* ls2) {
 	for (GameObject* o1 : *ls1)
 		for (GameObject* o2 : *ls2)
@@ -195,13 +195,13 @@ void GameData::fire(std::list<T*>* ls) const {
 
 			//check if projectile was launched by a player
 			for (Entity* pl : *playerLs)
-				isPlayer |= pl == en;	
+				isPlayer |= pl == en;
 
-			if (isPlayer) 
+			if (isPlayer)
 				playerProjLs->push_back(en->getProjectile());
-			else 
+			else
 				enemyProjLs->push_back(en->getProjectile());
-			
+
 			effectsLs->push_back(en->getFireVisualEffect());
 		}
 	}
@@ -209,7 +209,7 @@ void GameData::fire(std::list<T*>* ls) const {
 
 //Workaround as C++ doesn't permit method specialization
 template<class T>
-inline void delete_(const GameData const* gd,T * obj) {
+inline void delete_(const GameData const* gd, T* obj) {
 	delete obj;
 }
 
@@ -243,4 +243,3 @@ void GameData::deleteList(std::list<T*>* ls) {
 		delete obj;
 	delete ls;
 }
-
