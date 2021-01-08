@@ -47,9 +47,9 @@ void updateAndSpawn(GameData* starting_gd, float* const ms) {
 			if (terminate_all) //putting this condition on the while loop itself doesn't seem to work for some reason
 				return;
 		}
-			
-		
-				
+
+
+
 		if (!game_over) {
 
 			if (gd_changed) {
@@ -105,19 +105,22 @@ void checkAndFire(GameData* starting_gd) {
 		}
 	}
 }
+#endif
 
 //Standard exiting operation to be called whenever the window closes or the game ends
-void closeThreads() {
+void close() {
 	if (ui != nullptr) { //if game had started
-		terminate_all = true;
 		delete ui;
+#ifndef no_threads
+		terminate_all = true;
 		updateThread.join();
 		collisionThread.join();
+#endif
 	}
 	graphics::destroyWindow();
 	exit(0);
 }
-#endif
+
 
 // sgg functions
 void update(float ms)
@@ -169,7 +172,7 @@ void update(float ms)
 		break;
 	}
 	case game_states::MENU: {
-		
+
 		if (graphics::getKeyState(graphics::scancode_t::SCANCODE_S))
 		{
 			gd->game_state = game_states::GAME;
@@ -249,9 +252,9 @@ void update(float ms)
 
 #endif
 
-	//delete
-		//these are kept seperated from the concurrent threads as they may change *all* their data during their execution
-		//so a mutex wouldn't make sense
+		//delete
+			//these are kept seperated from the concurrent threads as they may change *all* their data during their execution
+			//so a mutex wouldn't make sense
 		gd->checkAndDelete(gd->enemyLs);
 		gd->checkAndDelete(gd->enemyProjLs);
 		gd->checkAndDelete(gd->playerLs);
@@ -389,14 +392,16 @@ void draw()
 		break;
 	}
 	case game_states::ACHIEVEMENTS: {
-		graphics::drawText(CANVAS_WIDTH / 2, 0, 20, "Unlocked Achievements: " + std::to_string(GameData::getAchieved().size()) + "/4", br);
+		graphics::drawText(CANVAS_WIDTH / 2, 20, 20, "Unlocked Achievements: " + std::to_string(GameData::getAchieved().size()) + "/4", br);
 		int i = 0;
 		for (auto a : GameData::getAchieved()) {
 			br.texture = a->icon;
-			graphics::drawRect(CANVAS_WIDTH / 2 - 100, 200 + i * 50, 50, 50, br);
-			graphics::drawText(0, 200 + i * 50+20, 20, a->description, br);
+			graphics::drawRect(60, 75 + i * 100, 75, 75, br);
+			graphics::drawText(0, 75 + i * 100 + 50, 10, a->name, br);
 			i++;
 		}
+		graphics::drawText(0, CANVAS_HEIGHT - 15, 10, "Return to this page after playing a game to see if you have won any achievements!", br);
+		graphics::drawText(0, CANVAS_HEIGHT, 10, "Achievement progress is kept between successive games (but not if the program closes).", br);
 		break;
 	}
 	case game_states::GAME: {
@@ -425,7 +430,7 @@ void draw()
 		graphics::resetPose();
 		setColor(br, 'L');
 		graphics::drawText(0.2f * get_canvas_width(), 0.3f * get_canvas_height(), 20,
-			"Next level in: " + std::to_string(gd->level_transition_timer * 1000), br);
+			"Next level in: " + std::to_string(gd->level_transition_timer).substr(0, 5), br);
 		ui->draw();
 		break;
 	}
@@ -500,7 +505,7 @@ void draw()
 		br.texture = std::string(image_path + "player1.png");
 		graphics::drawRect(CANVAS_WIDTH / 10, CANVAS_HEIGHT - 80, 40, 80, br);
 		br.texture = std::string(image_path + "player2.png");
-		graphics::drawRect(CANVAS_WIDTH-(CANVAS_WIDTH / 10), CANVAS_HEIGHT - 80, 40, 80, br);
+		graphics::drawRect(CANVAS_WIDTH - (CANVAS_WIDTH / 10), CANVAS_HEIGHT - 80, 40, 80, br);
 		br.texture = "";
 		break;
 	}
@@ -548,7 +553,7 @@ void resize(int new_w, int new_h)
 
 int main(int argc, char** argv)
 {
-	std::set_terminate(closeThreads);
+	std::set_terminate(close);
 	graphics::createWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "1917");
 	graphics::setFullScreen(true);
 
@@ -569,7 +574,8 @@ int main(int argc, char** argv)
 	curr_music = MENU_MUSIC;
 	bg_br.texture = image_path + "menu.png";
 	graphics::startMessageLoop();
-	graphics::destroyWindow();
+	
+	//destroyWindow is called in terminate() which is called in every case the game closes
 	return 0;
 }
 
@@ -580,7 +586,7 @@ void initialize()
 	gd->game_state = game_states::LOAD;
 
 	graphics::setUserData((void*)gd);
-	
+
 	// random seed for Factory homing enemies randomness
 	srand((unsigned int)gd);
 
@@ -595,5 +601,5 @@ void initialize()
 inline float get_canvas_width() { return CANVAS_WIDTH; }
 inline float get_canvas_height() { return CANVAS_HEIGHT; }
 
-float mouse_x(float mx) { return (mx - ((WINDOW_WIDTH  - (CANVAS_WIDTH * c2w))  / 2)) * w2c; }
+float mouse_x(float mx) { return (mx - ((WINDOW_WIDTH - (CANVAS_WIDTH * c2w)) / 2)) * w2c; }
 float mouse_y(float my) { return (my - ((WINDOW_HEIGHT - (CANVAS_HEIGHT * c2w)) / 2)) * w2c; }
