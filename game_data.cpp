@@ -9,7 +9,7 @@ using namespace std;
 GameData::Stats GameData::game_stats = Stats();
 
 const array<GameData::Achievement *, 4> GameData::achievements = {
-	new GameData::Achievement("Kill 100 total enemies", icon_path + "achievement_1.png",Stats::ALL,1),//change to 100
+	new GameData::Achievement("Kill 100 total enemies", icon_path + "achievement_1.png",Stats::ALL,100),
 	new GameData::Achievement("Destroy 20 balloons", icon_path + "achievement_2.png",Stats::BALLOON,20),
 	new GameData::Achievement("Destroy an American airship", icon_path + "achievement_3.png",Stats::AIRSHIP,1),
 	new GameData::Achievement("Destroy 50 british fighters", icon_path + "achievement_4.png",Stats::BLACK_PLANE,50)
