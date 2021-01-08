@@ -37,7 +37,7 @@ public:
 		Powerup(xpos, ypos, angle, &sprite, score){}
 
 	virtual void consume(Player* target) const override {
-		target->addHealth(3);
+		target->addHealth(10);
 	}
 
 	virtual ~HealthPowerup() = default;
