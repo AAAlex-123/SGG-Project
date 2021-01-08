@@ -17,14 +17,14 @@ const int GObjFactory::b_plane_dmg = 20;
 const int GObjFactory::b_plane_hp = 10;
 const int GObjFactory::b_plane_score = 100;
 
-const float GObjFactory::player_sp = 250.f;
+const float GObjFactory::player_sp = 200.f;
 const float GObjFactory::player_w = b_plane_size * 1.5f / 1.2f;
 const float GObjFactory::player_h = b_plane_size * 3.f / 1.2f;
-const int GObjFactory::player_hp = 200;
+const int GObjFactory::player_hp = 150;
 const float GObjFactory::pl_dangle = PI / 4.0f;
 
 const float GObjFactory::b_proj_sp = 350.f;
-const float GObjFactory::b_proj_size = 8.f;
+const float GObjFactory::b_proj_size = 5.f;
 const int GObjFactory::b_proj_dmg = 10;
 
 // spaghetti that will stay here forever
@@ -60,10 +60,10 @@ Player* GObjFactory::createPlayer(float x, float y, float angle, float dangle) {
 			throw std::logic_error("No player list detected, use the setPlayerData() method before using the factory");
 
 		atLeastOne = true;
-		return new Player(x, y, angle, player_sp, player_w, player_h, new string(image_path + "player1"), dangle, 0.15f, pl1_kset, player_hp, GObjFactory::LIGHT_BULLET);
+		return new Player(x, y, angle, player_sp, player_w, player_h, new string(image_path + "player1"), dangle, 0.1f, pl1_kset, player_hp, GObjFactory::LIGHT_BULLET);
 	}
 	else
-		return new Player(x, y, angle, player_sp, player_w, player_h, new string(image_path + "player2"), dangle, 0.15f, pl2_kset, player_hp, GObjFactory::LIGHT_BULLET);
+		return new Player(x, y, angle, player_sp, player_w, player_h, new string(image_path + "player2"), dangle, 0.1f, pl2_kset, player_hp, GObjFactory::LIGHT_BULLET);
 }
 
 // SIMPLE_ENEMY = 1,		SIMPLE_ENEMY2 = 7,		ROTATING_ENEMYD = 2,	ROTATING_ENEMYCA = 6
@@ -117,15 +117,15 @@ Projectile* GObjFactory::createProjectile(int type, float x, float y, float angl
 }
 
 Projectile* GObjFactory::createStandardBullet(float x, float y, float angle) {			   																  
-	return new Projectile(x, y, angle, b_proj_sp * 1.0f, b_proj_size * 1.1f, new string(image_path + "bullet1.png"), new Path(), b_proj_dmg * 0.9f);
+	return new Projectile(x, y, angle, b_proj_sp, b_proj_size, new string(image_path + "bullet1.png"), new Path(), b_proj_dmg);
 }
 
 Projectile* GObjFactory::createHeavyBullet(float x, float y, float angle) {
-	return new Projectile(x, y, angle, b_proj_sp * 0.5f, b_proj_size * 1.2f, new string(image_path + "bullet3.png"), new Path(), b_proj_dmg * 2.5f);
+	return new Projectile(x, y, angle, b_proj_sp * 0.7f, b_proj_size * 1.05f, new string(image_path + "bullet3.png"), new Path(), b_proj_dmg * 1.5f);
 }
 
 Projectile* GObjFactory::createLightBullet(float x, float y, float angle) {
-	return new Projectile(x, y, angle, b_proj_sp * 1.2f, b_proj_size * 0.8f, new string(image_path + "bullet2.png"), new Path(), b_proj_dmg * 0.5f);
+	return new Projectile(x, y, angle, b_proj_sp * 1.2f, b_proj_size * 0.9f, new string(image_path + "bullet2.png"), new Path(), b_proj_dmg * 0.5f);
 }
 
 // ===== VISUAL EFFECT =====
