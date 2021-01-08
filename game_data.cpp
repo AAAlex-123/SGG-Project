@@ -8,15 +8,15 @@ using namespace std;
 
 GameData::Stats GameData::game_stats = Stats();
 
-const array<GameData::Achievement const *, 4> GameData::achievements = {
+const array<const GameData::Achievement * const, 4> GameData::achievements = {
 	new GameData::Achievement("Kill 100 total enemies", icon_path + "achievement_1.png", "Kill a total of 100 enemies of any type.",Stats::ALL,100),
 	new GameData::Achievement("Destroy 20 balloons", icon_path + "achievement_2.png", "Balloons are well-protected floating enemies.",Stats::BALLOON,20),
 	new GameData::Achievement("Destroy an American airship", icon_path + "achievement_3.png","American airships are well armoured and have excellent targeting.",Stats::AIRSHIP,1),
 	new GameData::Achievement("Destroy 50 british fighters", icon_path + "achievement_4.png","You can recognise British fighters by their black color.",Stats::BLACK_PLANE,50)
 };
 
-list<const GameData::Achievement const *> GameData::getAchieved() {
-	list<const GameData::Achievement const*> ls;
+list<const GameData::Achievement * const> GameData::getAchieved() {
+	list<const GameData::Achievement * const> ls;
 	for (auto a : achievements)
 		if (a->is_achieved())
 			ls.push_back(a);
@@ -31,7 +31,7 @@ GameData::GameData()
 	bg_offset(0.0f), height_perc_per_second(0.02f),
 	curr_playing_level(-1), level_transition_timer(set_level_transition_timer()),
 	enemyLs(new list<Entity*>), playerLs(new list<Entity*>), enemyProjLs(new list<Projectile*>),
-	playerProjLs(new list<Projectile*>), effectsLs(new list<VisualEffect*>),  powerupLs(new list<Powerup*>), buttons(new list<Button*>)
+	playerProjLs(new list<Projectile*>), effectsLs(new list<VisualEffect*>), powerupLs(new list<Powerup*>), buttons(new list<Button*>)
 {
 	// sets all the user-selectable levels to nullptr
 	// to check later if a user-selectable level has been
@@ -184,10 +184,14 @@ bool GameData::_load_waves_from_file(const std::string& wave_path)
 		}
 		// eof
 		else if (std::regex_search(contents, match, eof))
-		{ break; }
+		{
+			break;
+		}
 		// comment
 		else if (std::regex_search(contents, match, comment))
-		{ ; }
+		{
+			;
+		}
 		// no match and not eof -> invalid line syntax
 		else
 		{
@@ -243,7 +247,7 @@ bool GameData::_load_levels_from_file(const std::string& level_path)
 		{
 			curr_level_id = stoi(match[1]);
 			levels[curr_level_id] = new Level(curr_level_id, match[2]);
-		}	
+		}
 		// wave declaration
 		else if (std::regex_search(contents, match, r2))
 		{
@@ -274,10 +278,14 @@ bool GameData::_load_levels_from_file(const std::string& level_path)
 		}
 		// eof
 		else if (std::regex_search(contents, match, eof))
-		{ break; }
+		{
+			break;
+		}
 		// comment
 		else if (std::regex_search(contents, match, comment))
-		{ ; }
+		{
+			;
+		}
 		// no match and not eof -> invalid line syntax
 		else
 		{
@@ -313,22 +321,19 @@ void GameData::_load_hardcoded_levels()
 	Level* l1 = new Level(-2, "owo");
 	l1->add_wave(5.0f, w1);
 	l1->add_wave(10.0f, w2);
-	
-/*	ABOUT LEVEL ID
-	=>	no level can have an id of -1 (because -1 is the default)
 
-	=>	levels selectable by users must have id 0-9 inclusive
-		(see update::OP_LEVEL case for selectable levels)
-
-	=>	levels not be selectable by users must have any other id
-		(see above and also l1 and update::TEST case)
-
-	=>	level id should always match its key in the levels map (see below)
-*/
+	/*	ABOUT LEVEL ID
+		=>	no level can have an id of -1 (because -1 is the default)
+		=>	levels selectable by users must have id 0-9 inclusive
+			(see update::OP_LEVEL case for selectable levels)
+		=>	levels not be selectable by users must have any other id
+			(see above and also l1 and update::TEST case)
+		=>	level id should always match its key in the levels map (see below)
+	*/
 	levels[l1->id()] = l1;
 
 	// dummy levels to see the level select screen
-	Level *l4 = new Level(4, "xd");
+	Level* l4 = new Level(4, "xd");
 	Level* l6 = new Level(6, "uwu");
 
 	levels[l4->id()] = l4;
@@ -405,13 +410,13 @@ int GameData::Stats::get_total_shot() const {
 	return total_shot;
 }
 
-GameData::Achievement::Achievement(std::string name, std::string icon, std::string description,int type, int kills) :
-	name(name),icon(icon),description(description), TYPE(type), KILLS(kills)
+GameData::Achievement::Achievement(std::string name, std::string icon, std::string description, int type, int kills) :
+	name(name), icon(icon), description(description), TYPE(type), KILLS(kills)
 {}
 
 bool GameData::Achievement::is_achieved() const {
-	if (TYPE == Stats::ALL) 
+	if (TYPE == Stats::ALL)
 		return KILLS < game_stats.get_total_shot();
-	else 
+	else
 		return KILLS < game_stats.get_shot_number(TYPE);
 }
