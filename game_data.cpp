@@ -8,15 +8,15 @@ using namespace std;
 
 GameData::Stats GameData::game_stats = Stats();
 
-const array<const GameData::Achievement * const, 4> GameData::achievements = {
-	new GameData::Achievement("Kill 100 total enemies", icon_path + "achievement_1.png", "Kill a total of 100 enemies of any type.",Stats::ALL,100),
-	new GameData::Achievement("Destroy 20 balloons", icon_path + "achievement_2.png", "Balloons are well-protected floating enemies.",Stats::BALLOON,20),
-	new GameData::Achievement("Destroy an American airship", icon_path + "achievement_3.png","American airships are well armoured and have excellent targeting.",Stats::AIRSHIP,1),
-	new GameData::Achievement("Destroy 50 british fighters", icon_path + "achievement_4.png","You can recognise British fighters by their black color.",Stats::BLACK_PLANE,50)
+const array<GameData::Achievement *, 4> GameData::achievements = {
+	new GameData::Achievement("Kill 100 total enemies", icon_path + "achievement_1.png",Stats::ALL,1),//change to 100
+	new GameData::Achievement("Destroy 20 balloons", icon_path + "achievement_2.png",Stats::BALLOON,20),
+	new GameData::Achievement("Destroy an American airship", icon_path + "achievement_3.png",Stats::AIRSHIP,1),
+	new GameData::Achievement("Destroy 50 british fighters", icon_path + "achievement_4.png",Stats::BLACK_PLANE,50)
 };
 
-list<const GameData::Achievement * const> GameData::getAchieved() {
-	list<const GameData::Achievement * const> ls;
+const list<GameData::Achievement *> GameData::getAchieved() {
+	list<GameData::Achievement *> ls;
 	for (auto a : achievements)
 		if (a->is_achieved())
 			ls.push_back(a);
@@ -373,7 +373,7 @@ GameData::~GameData() {
 
 //=======INNER CLASSES========
 
-int GameData::Stats::find_type(const Entity const* en) const {
+int GameData::Stats::find_type(const Entity * const en) const {
 	const std::string name = *en->getSprite();
 	if (name == image_path + "plane1.png")
 		return BASIC_PLANE;
@@ -389,7 +389,7 @@ int GameData::Stats::find_type(const Entity const* en) const {
 	}
 }
 
-void GameData::Stats::plane_shot(const Entity const* en) {
+void GameData::Stats::plane_shot(const Entity * const en) {
 	shot_down_arr[find_type(en)] ++;
 }
 
@@ -410,8 +410,8 @@ int GameData::Stats::get_total_shot() const {
 	return total_shot;
 }
 
-GameData::Achievement::Achievement(std::string name, std::string icon, std::string description, int type, int kills) :
-	name(name), icon(icon), description(description), TYPE(type), KILLS(kills)
+GameData::Achievement::Achievement(std::string name, std::string icon, int type, int kills) :
+	name(name), icon(icon), TYPE(type), KILLS(kills)
 {}
 
 bool GameData::Achievement::is_achieved() const {
