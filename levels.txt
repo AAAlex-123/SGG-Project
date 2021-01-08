@@ -98,7 +98,7 @@
 97   PointsPowerup(0.5f, 0.1f, -180.0f) 128
 98   ProjectilePowerup(0.5f, 0.1f, -180.0f) 132
 99//
-100   Level(-2, "almost there - wip")
+100   Level(-9, "almost there - wip")
 101   HealthPowerup(0.5f, 0.6f, -180.0f) 0
 102   HealthPowerup(0.5f, 0.6f, -180.0f) 0
 103   HealthPowerup(0.5f, 0.6f, -180.0f) 0
@@ -138,7 +138,7 @@
 137   HealthPowerup(0.7f, 0.1f, -180.0f) 140
 138//
 139//
-140   Level(-3, "one last hold")
+140   Level(-10, "one last hold")
 141   HealthPowerup(0.5f, 0.6f, -180.0f) 0
 142   HealthPowerup(0.5f, 0.6f, -180.0f) 0
 143   HealthPowerup(0.5f, 0.6f, -180.0f) 0
