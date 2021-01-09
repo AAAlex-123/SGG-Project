@@ -24,7 +24,7 @@ const int GObjFactory::player_hp = 150;
 const float GObjFactory::pl_dangle = PI / 4.0f;
 
 const float GObjFactory::b_proj_sp = 350.f;
-const float GObjFactory::b_proj_size = 10.f;
+const float GObjFactory::b_proj_size = 8.f;
 const int GObjFactory::b_proj_dmg = 10;
 
 // spaghetti that will stay here forever
@@ -121,7 +121,7 @@ Projectile* GObjFactory::createStandardBullet(float x, float y, float angle) {
 }
 
 Projectile* GObjFactory::createHeavyBullet(float x, float y, float angle) {
-	return new Projectile(x, y, angle, b_proj_sp * 0.6f, b_proj_size * 1.4f, new string(image_path + "bullet3.png"), new Path(), b_proj_dmg * 2.2f);
+	return new Projectile(x, y, angle, b_proj_sp * 0.6f, b_proj_size * 1.3f, new string(image_path + "bullet3.png"), new Path(), b_proj_dmg * 2.2f);
 }
 
 Projectile* GObjFactory::createLightBullet(float x, float y, float angle) {
