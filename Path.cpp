@@ -85,28 +85,30 @@ float FiringPath::getProjAngle(float x, float y) {
     return this->curr_angle;
 }
 
-inline double TargetedFiringPath::distance(float x1, float y1, float x2, float y2) { //function instead of method?
-    return sqrt(pow((x2 - x1), 2) + pow((y2 - y1), 2));
-}
+Entity* find_target(float x, float y,const std::list<Entity*>* ls) {
 
-Entity* TargetedFiringPath::find_target(float x, float y,const std::list<Entity*>* ls) const {
+    auto distance = [](float x1, float y1, float x2, float y2) {
+        return ((x2 - x1) * (x2 - x1)) + ((y2 - y1) * (y2 - y1));
+    };
+
     if (ls->size() == 1)
         return ls->front();
-    else {
-        Entity* pl1 = ls->front();
-        Entity* pl2 = ls->back();
-        return (distance(pl1->get_x(), pl1->get_y(), x, y) <= distance(pl2->get_x(), pl2->get_y(), x, y)) ? pl1 : pl2;
-    }
+
+    Entity* pl1 = ls->front();
+    Entity* pl2 = ls->back();
+    return (distance(pl1->get_x(), pl1->get_y(), x, y) <= distance(pl2->get_x(), pl2->get_y(), x, y)) ? pl1 : pl2;
+    
 }
 
 float TargetedFiringPath::getProjAngle(float x, float y) {
-    Entity* d = find_target(x,y,GObjFactory::getPlayerData());
+    Entity* d = find_target(x, y, GObjFactory::getPlayerData());
     return atan2((d->get_x() - x), (d->get_y() - y)) + PI;
 }
 
 bool HomingPath::move(float& x, float& y, float& angle, float& vel, float ms)
 {
     // mafs
+    Entity* followee = find_target(x, y, GObjFactory::getPlayerData());
 
     float slope = atan2((followee->get_x() - x), (followee->get_y() - y));
 
