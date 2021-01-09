@@ -29,7 +29,7 @@ public:
 
 class HealthPowerup : public Powerup {
 private:
-	static const int score = 3000;
+	static const int score = 10000;
 	const std::string sprite = std::string(image_path + "h_powerup.png");
 public:
 
@@ -37,7 +37,7 @@ public:
 		Powerup(xpos, ypos, angle, &sprite, score){}
 
 	virtual void consume(Player* target) const override {
-		target->addHealth(50);
+		target->addHealth(65);
 	}
 
 	virtual ~HealthPowerup() = default;
@@ -45,7 +45,7 @@ public:
 
 class ProjectilePowerup : public Powerup {
 private:
-	static const int score = 3000;
+	static const int score = 10000;
 	const std::string sprite = std::string(image_path + "proj_powerup.png");
 	int proj_type = 0;
 
