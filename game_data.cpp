@@ -61,14 +61,11 @@ void GameData::create_buttons()
 	buttons->push_back(new GameStateChangingButton(this, 370.0f, 120.0f, 30.0f, new string(icon_path + "credits.png"), game_states::MENU, game_states::CREDITS));
 	// game
 	buttons->push_back(new GameStateChangingButton(this, 370.0f, 30.0f, 30.0f, new string(icon_path + "pause.png"), game_states::GAME, game_states::PAUSE));
-	// === temp ===
-	buttons->push_back(new GameStateChangingButton(this, 30.0f, 30.0f, 30.0f, new string(icon_path + "back.png"), game_states::GAME, game_states::MENU));
-	// === temp ===
 		// game -- pause
 	buttons->push_back(new GameStateChangingButton(this, 370.0f, 30.0f, 30.0f, new string(icon_path + "continue.png"), game_states::PAUSE, game_states::GAME));
-	// game -- lose
+		// game -- lose
 	buttons->push_back(new GameStateChangingButton(this, 30.0f, 30.0f, 30.0f, new string(icon_path + "back.png"), game_states::GAME_LOSE, game_states::RESET));
-	// game -- win
+		// game -- win
 	buttons->push_back(new GameStateChangingButton(this, 30.0f, 30.0f, 30.0f, new string(icon_path + "back.png"), game_states::GAME_WIN, game_states::RESET));
 	// help
 	buttons->push_back(new GameStateChangingButton(this, 30.0f, 30.0f, 30.0f, new string(icon_path + "back.png"), game_states::HELP, game_states::MENU));
