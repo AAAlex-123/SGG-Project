@@ -8,7 +8,7 @@
 7//
 8//
 9//
-10   Level(-2, "A new beginning")
+10   Level(0, "A new beginning")
 11   wave simple-u-e 0
 12   wave simple-u-e 17
 13   wave simple-l-e 33
@@ -18,7 +18,7 @@
 17   PointsPowerup(0.5f, 0.1f, -180.0f) 50
 18//
 19//
-20   Level(-3, "Watch out!")
+20   Level(1, "Watch out!")
 21   wave accel-v-e 0
 22   wave simple-r-e 17
 23   wave accel-v-e 36
@@ -28,7 +28,7 @@
 27   PointsPowerup(0.5f, 0.1f, -180.0f) 100
 28   HealthPowerup(0.7f, 0.1f, -180.0f) 98
 29//
-30   Level(-4, "Getting harder")
+30   Level(2, "Getting harder")
 31   wave tank-u 0
 32   wave simple-r-m 16
 33   wave accel-v-e 38
@@ -39,7 +39,7 @@
 38   HealthPowerup(0.3f, 0.1f, -180.0f) 102
 39   PointsPowerup(0.7f, 0.1f, -180.0f) 104
 40   ProjectilePowerup(0.5f, 0.1f, -180.0f) 106
-41   Level(-5, "They are coming for you")
+41   Level(3, "They are coming for you")
 42   wave balloons-e 0
 43   wave simple-l-m 7
 44   wave tank-l 15
@@ -50,14 +50,14 @@
 49   wave simple-u-m 60
 50   HealthPowerup(0.7f, 0.1f, -180.0f) 80
 51//
-52   Level(-6, "the semi-final boss - wip")
+52   Level(4, "the semi-final boss - wip")
 53//
 54//
 55//
 56//
 57//
 58//
-59   Level(-7, "getting rolling - wip")
+59   Level(5, "getting rolling")
 60   HealthPowerup(0.6f, 0.1f, -180.0f) 2
 61   PointsPowerup(0.2f, 0.1f, -180.0f) 0
 62   PointsPowerup(0.5f, 0.1f, -180.0f) 0
@@ -78,7 +78,7 @@
 77   HealthPowerup(0.3f, 0.1f, -180.0f) 110
 78   HealthPowerup(0.7f, 0.1f, -180.0f) 110
 79//
-80   Level(-8, "null")
+80   Level(6, "null")
 81//
 82//
 83   wave half-circles-u 0
@@ -98,16 +98,16 @@
 97   PointsPowerup(0.5f, 0.1f, -180.0f) 128
 98   ProjectilePowerup(0.5f, 0.1f, -180.0f) 132
 99//
-100   Level(-9, "almost there - wip")
-101   HealthPowerup(0.5f, 0.6f, -180.0f) 0
-102   HealthPowerup(0.5f, 0.6f, -180.0f) 0
-103   HealthPowerup(0.5f, 0.6f, -180.0f) 0
-104   HealthPowerup(0.5f, 0.6f, -180.0f) 0
-105   HealthPowerup(0.5f, 0.6f, -180.0f) 0
-106   HealthPowerup(0.5f, 0.6f, -180.0f) 0
-107   HealthPowerup(0.5f, 0.6f, -180.0f) 0
-108   ProjectilePowerup(0.5f, 0.6f, -180.0f) 0
-109   ProjectilePowerup(0.5f, 0.6f, -180.0f) 0
+100   Level(7, "almost there")
+101//   HealthPowerup(0.5f, 0.6f, -180.0f) 0
+102//   HealthPowerup(0.5f, 0.6f, -180.0f) 0
+103//   HealthPowerup(0.5f, 0.6f, -180.0f) 0
+104//   HealthPowerup(0.5f, 0.6f, -180.0f) 0
+105//   HealthPowerup(0.5f, 0.6f, -180.0f) 0
+106//   HealthPowerup(0.5f, 0.6f, -180.0f) 0
+107//   HealthPowerup(0.5f, 0.6f, -180.0f) 0
+108//   ProjectilePowerup(0.5f, 0.6f, -180.0f) 0
+109//   ProjectilePowerup(0.5f, 0.6f, -180.0f) 0
 110   wave half-circles-s 0
 111   wave half-circles-s 15
 112   wave simple-u-m 7
@@ -138,12 +138,12 @@
 137   HealthPowerup(0.7f, 0.1f, -180.0f) 140
 138//
 139//
-140   Level(-10, "one last hold")
-141   HealthPowerup(0.5f, 0.6f, -180.0f) 0
-142   HealthPowerup(0.5f, 0.6f, -180.0f) 0
-143   HealthPowerup(0.5f, 0.6f, -180.0f) 0
-144   ProjectilePowerup(0.5f, 0.6f, -180.0f) 0
-145   ProjectilePowerup(0.5f, 0.6f, -180.0f) 0
+140   Level(8, "one last hold")
+141//   HealthPowerup(0.5f, 0.6f, -180.0f) 0
+142//   HealthPowerup(0.5f, 0.6f, -180.0f) 0
+143//   HealthPowerup(0.5f, 0.6f, -180.0f) 0
+144//   ProjectilePowerup(0.5f, 0.6f, -180.0f) 0
+145//   ProjectilePowerup(0.5f, 0.6f, -180.0f) 0
 146   wave simple-u-h 0
 147   wave donuts 5
 148   wave tank-l 10
@@ -179,10 +179,76 @@
 178//
 179//
 180//
-181   Level(-11, "the final boss - wip")
-182
+181   Level(9, "the final boss - wip")
+182//
+183//
+184//
+185//
+186//
+187//
+188//
+189//
+190//
+191//
+192//
+193//
+194//
+195//
+196//
+197//
+198//
+199//
+200//
+201//
+202//
+203//
+204//
+205   Level(-10, "demo1")
+206   wave simple-u-e 0
+207   wave simple-l-e 16
+208   wave balloons-e 30
+209   wave simple-u-e 45
+210   wave tank-u 57
+211//
+212//
+213//
+214   ProjectilePowerup(0.5f, 0.1f, -180.0f) 72
+215   HealthPowerup(0.3f, 0.1f, -180.0f) 70
+216   HealthPowerup(0.5f, 0.1f, -180.0f) 70
+217   HealthPowerup(0.7f, 0.1f, -180.0f) 70
+218//
+219//
+220   Level(-9, "demo2")
+221   wave donuts 0
+222   wave simple-u-e 10
+223   wave accel-h-e 22
+224   wave tank-l 30
+225   wave simple-r-m 45
+226   wave half-circles-s 65
+227//
+228//
+229//
+230   ProjectilePowerup(0.8f, 0.1f, -180.0f) 87.5
+231   HealthPowerup(0.65f, 0.1f, -180.0f) 87
+232   HealthPowerup(0.55f, 0.1f, -180.0f) 86.5
+233   HealthPowerup(0.45f, 0.1f, -180.0f) 86
+234   HealthPowerup(0.35f, 0.1f, -180.0f) 85.5
+235   PointsPowerup(0.2f, 0.1f, -180.0f) 85
+236//
+237//
+238   Level(-8, "demo3")
+239   wave balloons-m 0
+240   wave simple-u-h 14
+241   wave half-circles-u 22
+242   wave accel-h-e 32
+243   wave donuts 42
+244   wave accel-v-e 50
+245   wave simple-u-e 55
+246   wave tank-u 65
+247
 
---- File parsing stopped at 'lol' ---
+
+--- File parsing stopped at '255' ---
 Available waves:
  - wave simple-u/l/r-e/m/h
  - wave accel-v/h-e/h
