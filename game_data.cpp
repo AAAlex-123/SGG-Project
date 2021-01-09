@@ -1,20 +1,37 @@
 #include "game_data.h"
-
+#include "GObjFactory.h"
 #include <iostream>
 #include <regex>
 #include <fstream>
 
-#include "GObjFactory.h"
+using namespace std;
+
+GameData::Stats GameData::game_stats = Stats();
+
+const array<GameData::Achievement *, 4> GameData::achievements = {
+	new GameData::Achievement("Kill 100 total enemies", icon_path + "achievement_1.png",Stats::ALL,100),
+	new GameData::Achievement("Destroy 20 balloons", icon_path + "achievement_2.png",Stats::BALLOON,20),
+	new GameData::Achievement("Destroy an American airship", icon_path + "achievement_3.png",Stats::AIRSHIP,1),
+	new GameData::Achievement("Destroy 50 british fighters", icon_path + "achievement_4.png",Stats::BLACK_PLANE,50)
+};
+
+const list<GameData::Achievement *> GameData::getAchieved() {
+	list<GameData::Achievement *> ls;
+	for (auto a : achievements)
+		if (a->is_achieved())
+			ls.push_back(a);
+	return ls;
+}
 
 GameData::GameData()
 	: fps(0), game_state(0),
-	el(0.0f), sps(12.0f), curr_img(0), images(),
+	el(0.0f), sps(20.0f), curr_img(0), images(),
 	levels(std::unordered_map<int, Level*>()), _waves(std::unordered_map<std::string, Wave*>()),
 	curr_active_level(-1), curr_selected_level(-1),
 	bg_offset(0.0f), height_perc_per_second(0.02f),
 	curr_playing_level(-1), level_transition_timer(set_level_transition_timer()),
 	enemyLs(new list<Entity*>), playerLs(new list<Entity*>), enemyProjLs(new list<Projectile*>),
-	playerProjLs(new list<Projectile*>), effectsLs(new list<VisualEffect*>),  powerupLs(new list<Powerup*>), buttons(new list<Button*>)
+	playerProjLs(new list<Projectile*>), effectsLs(new list<VisualEffect*>), powerupLs(new list<Powerup*>), buttons(new list<Button*>)
 {
 	// sets all the user-selectable levels to nullptr
 	// to check later if a user-selectable level has been
@@ -57,6 +74,7 @@ void GameData::create_buttons()
 	buttons->push_back(new GameStateChangingButton(this, 370.0f, 30.0f, 30.0f, new string(icon_path + "help.png"), game_states::MENU, game_states::HELP));
 	buttons->push_back(new GameStateChangingButton(this, 370.0f, 75.0f, 30.0f, new string(icon_path + "options.png"), game_states::MENU, game_states::OPTIONS));
 	buttons->push_back(new GameStateChangingButton(this, 370.0f, 120.0f, 30.0f, new string(icon_path + "credits.png"), game_states::MENU, game_states::CREDITS));
+	buttons->push_back(new GameStateChangingButton(this, 370.0f, 165.0f, 30.0f, new string(icon_path + "achievements.png"), game_states::MENU, game_states::ACHIEVEMENTS));
 	// game
 	buttons->push_back(new GameStateChangingButton(this, 370.0f, 30.0f, 30.0f, new string(icon_path + "pause.png"), game_states::GAME, game_states::PAUSE));
 	// === temp ===
@@ -82,6 +100,9 @@ void GameData::create_buttons()
 	buttons->push_back(new VariableChangingButton<bool>(this, 287.5f, 200.0f, 125.0f, new string(icon_path + "multiplayer.png"), game_states::OP_PLAYER, &this->isMult, true));
 	// options -- level
 	buttons->push_back(new GameStateChangingButton(this, 30.0f, 30.0f, 30.0f, new string(icon_path + "back.png"), game_states::OP_LEVEL, game_states::OPTIONS));
+	//achievement
+	buttons->push_back(new GameStateChangingButton(this, 30.0f, 30.0f, 30.0f, new string(icon_path + "back.png"), game_states::ACHIEVEMENTS, game_states::MENU));
+
 }
 
 void GameData::click_buttons()
@@ -163,10 +184,14 @@ bool GameData::_load_waves_from_file(const std::string& wave_path)
 		}
 		// eof
 		else if (std::regex_search(contents, match, eof))
-		{ break; }
+		{
+			break;
+		}
 		// comment
 		else if (std::regex_search(contents, match, comment))
-		{ ; }
+		{
+			;
+		}
 		// no match and not eof -> invalid line syntax
 		else
 		{
@@ -222,7 +247,7 @@ bool GameData::_load_levels_from_file(const std::string& level_path)
 		{
 			curr_level_id = stoi(match[1]);
 			levels[curr_level_id] = new Level(curr_level_id, match[2]);
-		}	
+		}
 		// wave declaration
 		else if (std::regex_search(contents, match, r2))
 		{
@@ -253,10 +278,14 @@ bool GameData::_load_levels_from_file(const std::string& level_path)
 		}
 		// eof
 		else if (std::regex_search(contents, match, eof))
-		{ break; }
+		{
+			break;
+		}
 		// comment
 		else if (std::regex_search(contents, match, comment))
-		{ ; }
+		{
+			;
+		}
 		// no match and not eof -> invalid line syntax
 		else
 		{
@@ -292,23 +321,45 @@ void GameData::_load_hardcoded_levels()
 	Level* l1 = new Level(-2, "owo");
 	l1->add_wave(5.0f, w1);
 	l1->add_wave(10.0f, w2);
-	
-/*	ABOUT LEVEL ID
-	=>	no level can have an id of -1 (because -1 is the default)
-	=>	levels selectable by users must have id 0-9 inclusive
-		(see update::OP_LEVEL case for selectable levels)
-	=>	levels not be selectable by users must have any other id
-		(see above and also l1 and update::TEST case)
-	=>	level id should always match its key in the levels map (see below)
-*/
+
+	/*	ABOUT LEVEL ID
+		=>	no level can have an id of -1 (because -1 is the default)
+		=>	levels selectable by users must have id 0-9 inclusive
+			(see update::OP_LEVEL case for selectable levels)
+		=>	levels not be selectable by users must have any other id
+			(see above and also l1 and update::TEST case)
+		=>	level id should always match its key in the levels map (see below)
+	*/
 	levels[l1->id()] = l1;
 
 	// dummy levels to see the level select screen
-	Level *l4 = new Level(4, "xd");
+	Level* l4 = new Level(4, "xd");
 	Level* l6 = new Level(6, "uwu");
 
 	levels[l4->id()] = l4;
 	levels[l6->id()] = l6;
+}
+
+Level* GameData::get_next_level() {
+	Level* return_val = levels[curr_playing_level - 1];
+	if (!return_val)
+		levels.erase(curr_playing_level - 1);
+	return return_val;
+}
+
+void GameData::addScore(int scored) {
+	score += scored;
+}
+
+int GameData::getScore() const {
+	return score;
+}
+
+void GameData::spawn() {
+	if (levels[curr_playing_level]->can_spawn())
+		enemyLs->push_back(levels[curr_playing_level]->spawn());
+	if (levels[curr_playing_level]->can_spawn_p())
+		powerupLs->push_back(levels[curr_playing_level]->spawn_p());
 }
 
 GameData::~GameData() {
@@ -318,4 +369,54 @@ GameData::~GameData() {
 	deleteList(playerProjLs);
 	deleteList(effectsLs);
 	deleteList(buttons);
+}
+
+//=======INNER CLASSES========
+
+int GameData::Stats::find_type(const Entity * const en) const {
+	const std::string name = *en->getSprite();
+	if (name == image_path + "plane1.png")
+		return BASIC_PLANE;
+	else if (name == image_path + "plane2.png")
+		return BLACK_PLANE;
+	else if (name == image_path + "plane3.png")
+		return AIRSHIP;
+	else if (name == image_path + "balloon.png")
+		return BALLOON;
+	else {
+		std::cerr << "Entity can't be identified in Stats (sprite name = " << name << ")" << std::endl;
+		return BASIC_PLANE;
+	}
+}
+
+void GameData::Stats::plane_shot(const Entity * const en) {
+	shot_down_arr[find_type(en)] ++;
+}
+
+int GameData::Stats::get_shot_number(int type) const {
+	try {
+		return shot_down_arr[type];
+	}
+	catch (std::out_of_range) {
+		std::cerr << " Couldn't find enemy type information in get_shot_number, returning 0" << std::endl;
+		return 0;
+	}
+}
+
+int GameData::Stats::get_total_shot() const {
+	int total_shot = 0;
+	for (int shot_no : shot_down_arr)
+		total_shot += shot_no;
+	return total_shot;
+}
+
+GameData::Achievement::Achievement(std::string name, std::string icon, int type, int kills) :
+	name(name), icon(icon), TYPE(type), KILLS(kills)
+{}
+
+bool GameData::Achievement::is_achieved() const {
+	if (TYPE == Stats::ALL)
+		return KILLS < game_stats.get_total_shot();
+	else
+		return KILLS < game_stats.get_shot_number(TYPE);
 }

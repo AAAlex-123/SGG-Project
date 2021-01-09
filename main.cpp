@@ -30,8 +30,7 @@ bool th_2_done = false;
 bool game_over = false;
 bool terminate_all = false;
 
-float tortellini = 0; //this is needed to initialize the global pointer
-float* global_ms = &tortellini;
+float* global_ms = new float;
 
 //Note: The thread decisions below could have been implemented with <condition_variable> ( e.g cv.wait(), cv.notify_all())
 //but it's probably overkill for something as simple as starting and stopping 2 threads
@@ -48,9 +47,9 @@ void updateAndSpawn(GameData* starting_gd, float* const ms) {
 			if (terminate_all) //putting this condition on the while loop itself doesn't seem to work for some reason
 				return;
 		}
-			
-		
-				
+
+
+
 		if (!game_over) {
 
 			if (gd_changed) {
@@ -108,6 +107,21 @@ void checkAndFire(GameData* starting_gd) {
 }
 #endif
 
+//Standard exiting operation to be called whenever the window closes or the game ends
+void close() {
+	if (ui != nullptr) { //if game had started
+		delete ui;
+#ifndef no_threads
+		terminate_all = true;
+		updateThread.join();
+		collisionThread.join();
+#endif
+	}
+	graphics::destroyWindow();
+	exit(0);
+}
+
+
 // sgg functions
 void update(float ms)
 {
@@ -158,6 +172,7 @@ void update(float ms)
 		break;
 	}
 	case game_states::MENU: {
+
 		if (graphics::getKeyState(graphics::scancode_t::SCANCODE_S))
 		{
 			gd->game_state = game_states::GAME;
@@ -168,11 +183,12 @@ void update(float ms)
 				gd->playerLs->push_back(GObjFactory::createEntity(GObjFactory::PLAYER, 2 * get_canvas_width() / 3.0f, get_canvas_height() * 0.7f, 0));
 
 #ifndef no_threads
-			// start threads only the first time they game starts
+			// start threads only the first time the game starts
 			if (!updateThread.joinable())
 				updateThread = std::thread(updateAndSpawn, gd, global_ms);
 			if (!collisionThread.joinable())
 				collisionThread = std::thread(checkAndFire, gd);
+
 			// continue the infinite loop of the thread
 			game_over = false;
 #endif
@@ -181,6 +197,9 @@ void update(float ms)
 			break;
 		}
 
+		break;
+	}
+	case game_states::ACHIEVEMENTS: {
 		break;
 	}
 	case game_states::GAME: {
@@ -196,10 +215,15 @@ void update(float ms)
 		}
 
 #ifndef no_threads
+		//start threads
 		th_1_start = true;
 		th_2_start = true;
+
+		//wait for threads to stop
 		while (!(th_1_done && th_2_done))
 			;
+
+		//reset threads for next cycle
 		th_1_done = false;
 		th_2_done = false;
 #endif
@@ -228,9 +252,9 @@ void update(float ms)
 
 #endif
 
-	//delete
-		//these are kept separate to the concurrent threads as they change *all* their data during their execution
-		//so a mutex wouldn't make sense.
+		//delete
+			//these are kept seperated from the concurrent threads as they may change *all* their data during their execution
+			//so a mutex wouldn't make sense
 		gd->checkAndDelete(gd->enemyLs);
 		gd->checkAndDelete(gd->enemyProjLs);
 		gd->checkAndDelete(gd->playerLs);
@@ -254,8 +278,9 @@ void update(float ms)
 
 		// update timer
 		gd->level_transition_timer -= (ms / 1000.0f);
+
 		// if there isn't a next level, the player has won
-		if (!gd->has_next_level())
+		if (!gd->get_next_level())
 		{
 			gd->game_state = game_states::GAME_WIN;
 		}
@@ -269,10 +294,11 @@ void update(float ms)
 	case game_states::GAME_LOSE:
 	case game_states::GAME_WIN: {
 #ifndef no_threads
+		//stop threads until a new game has started
 		th_1_start = false;
 		th_2_start = false;
 		game_over = true;
-#endif // !no_threads
+#endif 
 		break;
 	}
 	case game_states::RESET: {
@@ -312,21 +338,12 @@ void update(float ms)
 		break;
 	}
 	case game_states::EXIT: {
-#ifndef no_threads
-		if (ui != nullptr) { //if game had started
-			terminate_all = true;
-			updateThread.join();
-			collisionThread.join();
-		}
-#endif 
-		graphics::destroyWindow();
-		exit(0);
+		std::terminate();
 	}
 	case game_states::PAUSE: {
 		// yes there is a button to un-pause but some prefer to use the keyboard for easier access
 		gd->game_state = ((game_states::GAME * graphics::getKeyState(graphics::scancode_t::SCANCODE_U)) + (gd->game_state * !graphics::getKeyState(graphics::scancode_t::SCANCODE_U)));
 
-		// other stuff to do when game is paused
 		break;
 	}
 	case game_states::HELP:
@@ -343,9 +360,8 @@ void draw()
 	graphics::resetPose();
 	br.texture = "";
 
-	if (bg_br.texture != "")
+	if (bg_br.texture != "") 	//if there is something to draw
 		graphics::drawRect(CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2, CANVAS_WIDTH, CANVAS_HEIGHT, bg_br);
-
 
 	switch (gd->game_state)
 	{
@@ -360,7 +376,7 @@ void draw()
 		graphics::drawRect(CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2, CANVAS_HEIGHT / 4, CANVAS_HEIGHT / 4, br);
 		setColor(br, 'L');
 		br.texture = "";
-		graphics::drawText(CANVAS_WIDTH / 50, 4 * CANVAS_HEIGHT / 5, CANVAS_HEIGHT / 16, "Loading:   " + curr_image, br);
+		graphics::drawText(CANVAS_WIDTH / 100, 20 * CANVAS_HEIGHT / 100, CANVAS_HEIGHT / 25, "Loading:   " + curr_image, br);
 
 		break;
 	}
@@ -373,6 +389,19 @@ void draw()
 		graphics::drawText(CANVAS_WIDTH / 8, CANVAS_HEIGHT / 1.2f, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 10, "for more options", br);
 
 
+		break;
+	}
+	case game_states::ACHIEVEMENTS: {
+		graphics::drawText(CANVAS_WIDTH / 2, 20, 20, "Unlocked Achievements: " + std::to_string(GameData::getAchieved().size()) + "/4", br);
+		int i = 0;
+		for (auto a : GameData::getAchieved()) {
+			br.texture = a->icon;
+			graphics::drawRect(60, 75 + i * 100, 75, 75, br);
+			graphics::drawText(0, 75 + i * 100 + 50, 10, a->name, br);
+			i++;
+		}
+		graphics::drawText(0, CANVAS_HEIGHT - 15, 10, "Return to this page after playing a game to see if you have won any achievements!", br);
+		graphics::drawText(0, CANVAS_HEIGHT, 10, "Achievement progress is kept between successive games (but not if the program closes).", br);
 		break;
 	}
 	case game_states::GAME: {
@@ -401,20 +430,20 @@ void draw()
 		graphics::resetPose();
 		setColor(br, 'L');
 		graphics::drawText(0.2f * get_canvas_width(), 0.3f * get_canvas_height(), 20,
-			"Next level in: " + std::to_string(gd->level_transition_timer * 1000), br);
+			"Next level in: " + std::to_string(gd->level_transition_timer).substr(0, 5), br);
 		ui->draw();
 		break;
 	}
 	case game_states::GAME_LOSE: {
 		setColor(br, new float[3]{ 1.0f, 1.0f, 1.0f });
 		graphics::drawText(CANVAS_WIDTH / 6, 2 * CANVAS_HEIGHT / 5, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 10, "You lost!", br);
-		graphics::drawText(CANVAS_WIDTH / 6, CANVAS_HEIGHT / 2, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 10, "Final score: " + to_string(gd->getScore()), br);
+		graphics::drawText(CANVAS_WIDTH / 6, CANVAS_HEIGHT / 2, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 10, "Final score: " + std::to_string(gd->getScore()), br);
 		break;
 	}
 	case game_states::GAME_WIN: {
 		setColor(br, new float[3]{ 1.0f, 1.0f, 1.0f });
-		graphics::drawText(CANVAS_WIDTH / 6, 2 * CANVAS_HEIGHT / 5, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 10, "Υou won!", br);
-		graphics::drawText(CANVAS_WIDTH / 6, CANVAS_HEIGHT / 2, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 10, "Final score: " + to_string(gd->getScore()), br);
+		graphics::drawText(CANVAS_WIDTH / 6, 2 * CANVAS_HEIGHT / 5, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 10, "You won!", br);
+		graphics::drawText(CANVAS_WIDTH / 6, CANVAS_HEIGHT / 2, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 10, "Final score: " + std::to_string(gd->getScore()), br);
 		break;
 	}
 	case game_states::RESET: {
@@ -473,10 +502,10 @@ void draw()
 		graphics::drawText(CANVAS_WIDTH / 10, 9.5f * CANVAS_HEIGHT / 13, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 17, "Gain score by killing enemies.", br);
 
 		br.outline_opacity = 0.f;
-		br.texture = string(image_path + "player1.png");
+		br.texture = std::string(image_path + "player1.png");
 		graphics::drawRect(CANVAS_WIDTH / 10, CANVAS_HEIGHT - 80, 40, 80, br);
-		br.texture = string(image_path + "player2.png");
-		graphics::drawRect(CANVAS_WIDTH-(CANVAS_WIDTH / 10), CANVAS_HEIGHT - 80, 40, 80, br);
+		br.texture = std::string(image_path + "player2.png");
+		graphics::drawRect(CANVAS_WIDTH - (CANVAS_WIDTH / 10), CANVAS_HEIGHT - 80, 40, 80, br);
 		br.texture = "";
 		break;
 	}
@@ -524,6 +553,7 @@ void resize(int new_w, int new_h)
 
 int main(int argc, char** argv)
 {
+	std::set_terminate(close);
 	graphics::createWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "1917");
 	graphics::setFullScreen(true);
 
@@ -544,7 +574,8 @@ int main(int argc, char** argv)
 	curr_music = MENU_MUSIC;
 	bg_br.texture = image_path + "menu.png";
 	graphics::startMessageLoop();
-	graphics::destroyWindow();
+	
+	//destroyWindow is called in terminate() which is called in every case the game closes
 	return 0;
 }
 
@@ -555,7 +586,7 @@ void initialize()
 	gd->game_state = game_states::LOAD;
 
 	graphics::setUserData((void*)gd);
-	
+
 	// random seed for Factory homing enemies randomness
 	srand((unsigned int)gd);
 
@@ -569,5 +600,6 @@ void initialize()
 
 inline float get_canvas_width() { return CANVAS_WIDTH; }
 inline float get_canvas_height() { return CANVAS_HEIGHT; }
-inline float mouse_x(float mx) { return (mx - ((WINDOW_WIDTH  - (CANVAS_WIDTH * c2w))  / 2)) * w2c; }
-inline float mouse_y(float my) { return (my - ((WINDOW_HEIGHT - (CANVAS_HEIGHT * c2w)) / 2)) * w2c; }
+
+float mouse_x(float mx) { return (mx - ((WINDOW_WIDTH - (CANVAS_WIDTH * c2w)) / 2)) * w2c; }
+float mouse_y(float my) { return (my - ((WINDOW_HEIGHT - (CANVAS_HEIGHT * c2w)) / 2)) * w2c; }
