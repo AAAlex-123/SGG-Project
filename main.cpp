@@ -158,12 +158,15 @@ void update(float ms)
 		break;
 	}
 	case game_states::MENU: {
-		if (graphics::getKeyState(graphics::scancode_t::SCANCODE_S))
+		if (graphics::getKeyState(graphics::scancode_t::SCANCODE_S) || graphics::getKeyState(graphics::scancode_t::SCANCODE_D))
 		{
 			gd->game_state = game_states::GAME;
-			gd->curr_playing_level = gd->curr_selected_level == -1 ? -2 : gd->curr_selected_level;
+			gd->curr_playing_level = gd->curr_selected_level == -1 ? 0 : gd->curr_selected_level;
+			if (graphics::getKeyState(graphics::scancode_t::SCANCODE_D))
+				gd->curr_playing_level = -10;
+
 			GObjFactory::setPlayerData(gd->playerLs);
-			gd->playerLs->push_back(GObjFactory::createEntity(GObjFactory::PLAYER, get_canvas_width() / 3.0f, get_canvas_height() * 0.7f, 0)); // 0.1f = fire cooldown
+			gd->playerLs->push_back(GObjFactory::createEntity(GObjFactory::PLAYER, get_canvas_width() / 3.0f, get_canvas_height() * 0.7f, 0));
 			if (gd->isMult)
 				gd->playerLs->push_back(GObjFactory::createEntity(GObjFactory::PLAYER, 2 * get_canvas_width() / 3.0f, get_canvas_height() * 0.7f, 0));
 
@@ -177,8 +180,6 @@ void update(float ms)
 			game_over = false;
 #endif
 			ui = new UI(gd);
-
-			break;
 		}
 
 		break;
@@ -303,8 +304,8 @@ void update(float ms)
 		graphics::getKeyState(graphics::scancode_t::SCANCODE_6) ,graphics::getKeyState(graphics::scancode_t::SCANCODE_7) ,graphics::getKeyState(graphics::scancode_t::SCANCODE_8) ,
 		graphics::getKeyState(graphics::scancode_t::SCANCODE_9) };
 
-		for (int i = 0; i < 10;i++)
-			gd->curr_active_level = (i * (codes[i] && gd->levels[i])) + (gd->curr_active_level * !codes[i] && gd->levels[i]);
+		for (int i = 0; i < 10; i++)
+			gd->curr_active_level = (i * (codes[i] && gd->levels[i])) + (gd->curr_active_level * !(codes[i] && gd->levels[i]));
 
 
 		gd->curr_selected_level = (gd->curr_active_level * graphics::getKeyState(graphics::scancode_t::SCANCODE_S)) + (gd->curr_selected_level * !graphics::getKeyState(graphics::scancode_t::SCANCODE_S));
@@ -366,15 +367,15 @@ void draw()
 		graphics::drawRect(CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2, CANVAS_HEIGHT / 4, CANVAS_HEIGHT / 4, br);
 		setColor(br, 'L');
 		br.texture = "";
-		graphics::drawText(CANVAS_WIDTH / 100, 20 * CANVAS_HEIGHT / 100, CANVAS_HEIGHT / 25, "Loading:   " + curr_image, br);
+		graphics::drawText(CANVAS_WIDTH / 100, 15 * CANVAS_HEIGHT / 100, CANVAS_HEIGHT / 25, "Loading:   " + curr_image, br);
 
 		break;
 	}
 	case game_states::MENU: {
-
 		setColor(br, new float[3]{ 0.0f, 0.0f, 0.0f });
 		graphics::drawText(CANVAS_WIDTH / 4, CANVAS_HEIGHT / 4, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 10, "Welcome!", br);
 		graphics::drawText(CANVAS_WIDTH / 8, 3 * CANVAS_HEIGHT / 5, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 10, "Press S to start!", br);
+		graphics::drawText(CANVAS_WIDTH / 8, 4 * CANVAS_HEIGHT / 5, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 10, "Press D to demo!", br);
 
 		break;
 	}
