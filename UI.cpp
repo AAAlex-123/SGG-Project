@@ -97,7 +97,8 @@ void UI::draw() {
 	graphics::drawText(width / 75, 2 * width / 20, ((width + height) / 2) / 35, "FPS " + std::to_string(new_fps), std_br);
 
 	//draw Level
-	graphics::drawText(width / 75, 2 * width / 20 + 20, ((width + height) / 2) / 35, "Level " + std::to_string(-gd->curr_playing_level - 1), std_br);
+	graphics::drawText(width / 75, 2 * width / 20 + 20, ((width + height) / 2) / 35, "Level "
+		+ std::to_string(gd->curr_playing_level >= 0 ? gd->curr_playing_level + 1 : gd->curr_playing_level + 11), std_br);
 
 	//draw pause text
 	graphics::drawText(4*width / 5, 2 * width / 20 + 20, ((width + height) / 2) / 35, "Pause (P)", std_br);

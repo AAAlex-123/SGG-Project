@@ -26,7 +26,6 @@ private:
 	void static deleteList(std::list<T*>*);
 
 	//Methods used to create levels upon initialization
-
 	bool load_level_data_from_file(const std::string& level_path, const std::string& wave_path);
 	bool _load_waves_from_file(const std::string& wave_path);
 	bool _load_levels_from_file(const std::string& wave_path);
@@ -79,6 +78,14 @@ public:
 	int curr_playing_level;
 	float level_transition_timer;
 	float set_level_transition_timer(float timer = 5.0f) { return timer; }
+	void next_level() { ++curr_playing_level; }
+  // lmao move this to gd.cpp
+	Level* has_next_level() { 
+		Level* return_val = levels[curr_playing_level + 1];
+		if (!return_val)
+			levels.erase(curr_playing_level + 1);
+		return return_val;
+	}
 	void addScore(int scored);
 	int getScore() const;
 
@@ -91,12 +98,11 @@ public:
 	std::unordered_map<std::string, Wave*> _waves;
 	int curr_active_level, curr_selected_level;
 
-	//Loads the next level
-	void next_level() { --curr_playing_level; }
 
 	//Returns the next level to be used to spawn enemies
 	Level* get_next_level();
 
+	//Loads the next level
 	void updateLevel(float ms) { levels[curr_playing_level]->update(ms); }
 
 	//Spawns new enemies

@@ -27,7 +27,10 @@ private:
 
 	static Player* createPlayer(float x, float y, float angle, float dangle);
 	static Entity* createSimpleEnemy(float x, float y, float angle);
-	static Entity* createRotatingEnemy(float x, float y, float angle);
+	static Entity* createSimpleFiringEnemy(float x, float y, float angle);
+	static Entity* createRotatingEnemyD(float x, float y, float angle);
+	static Entity* createRotatingEnemyC(float x, float y, float angle);
+	static Entity* createRotatingEnemyCA(float x, float y, float angle);
 	static Entity* createAcceleratingEnemy(float x, float y, float angle);
 	static Entity* createTankEnemy(float x, float y, float angle);
 	static Entity* createHomingEnemy(float x, float y, float angle);
@@ -41,8 +44,8 @@ private:
 	static VisualEffect* createNoEffect();
 
 public:
-	const static int STANDARD_BULLET = 10, HEAVY_BULLET = 11, LIGHT_BULLET = 12;
-	const static int PLAYER = 0, SIMPLE_ENEMY = 1, ROTATING_ENEMY = 2, ACCELERATING_ENEMY = 3, TANK_ENEMY = 4, HOMING_ENEMY = 5;
+	const static int STANDARD_BULLET = 11, HEAVY_BULLET = 12, LIGHT_BULLET = 10;
+	const static int PLAYER = 0, SIMPLE_ENEMY = 1, SIMPLE_ENEMY2 = 7, ROTATING_ENEMYD = 2, ROTATING_ENEMYC = 8, ROTATING_ENEMYCA = 6, ACCELERATING_ENEMY = 3, TANK_ENEMY = 4, HOMING_ENEMY = 5;
 	const static int NOEFFECT = 404, EXPLOSION_1 = 100, EXPLOSION_2 = 200, SMOKE = 300;
 
 	static Entity* createEntity(int type, float x, float y, float angle);

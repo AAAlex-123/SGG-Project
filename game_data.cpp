@@ -23,6 +23,8 @@ const list<GameData::Achievement *> GameData::getAchieved() {
 	return ls;
 }
 
+using namespace std;
+
 GameData::GameData()
 	: fps(0), game_state(0),
 	el(0.0f), sps(20.0f), curr_img(0), images(),
@@ -77,14 +79,11 @@ void GameData::create_buttons()
 	buttons->push_back(new GameStateChangingButton(this, 370.0f, 165.0f, 30.0f, new string(icon_path + "achievements.png"), game_states::MENU, game_states::ACHIEVEMENTS));
 	// game
 	buttons->push_back(new GameStateChangingButton(this, 370.0f, 30.0f, 30.0f, new string(icon_path + "pause.png"), game_states::GAME, game_states::PAUSE));
-	// === temp ===
-	buttons->push_back(new GameStateChangingButton(this, 30.0f, 30.0f, 30.0f, new string(icon_path + "back.png"), game_states::GAME, game_states::MENU));
-	// === temp ===
 		// game -- pause
 	buttons->push_back(new GameStateChangingButton(this, 370.0f, 30.0f, 30.0f, new string(icon_path + "continue.png"), game_states::PAUSE, game_states::GAME));
-	// game -- lose
+		// game -- lose
 	buttons->push_back(new GameStateChangingButton(this, 30.0f, 30.0f, 30.0f, new string(icon_path + "back.png"), game_states::GAME_LOSE, game_states::RESET));
-	// game -- win
+		// game -- win
 	buttons->push_back(new GameStateChangingButton(this, 30.0f, 30.0f, 30.0f, new string(icon_path + "back.png"), game_states::GAME_WIN, game_states::RESET));
 	// help
 	buttons->push_back(new GameStateChangingButton(this, 30.0f, 30.0f, 30.0f, new string(icon_path + "back.png"), game_states::HELP, game_states::MENU));

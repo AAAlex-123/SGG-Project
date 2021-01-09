@@ -2,9 +2,9 @@
 #include "GObjFactory.h"
 #include <cmath>
 
-Entity::Entity(float xpos, float ypos, float angle, float vel, float width,float height, const std::string* sprite_name, FiringPath* path,
-	int damage, int health,int score, int proj_type) :
-	GameObject(xpos, ypos, angle, vel, width,height, new std::string((*sprite_name) + ".png"), path, damage, health,score),
+Entity::Entity(float xpos, float ypos, float angle, float vel, float width, float height, const std::string* sprite_name, Path* path,
+	int damage, int health, int score, int proj_type) :
+	GameObject(xpos, ypos, angle, vel, width, height, new std::string((*sprite_name) + ".png"), path, damage, health, score),
 	curr_projectile(proj_type), _hasFired(false), shadow(std::string(*sprite_name + "_shadow.png"))
 {}
 

@@ -29,7 +29,7 @@ public:
 
 class HealthPowerup : public Powerup {
 private:
-	static const int score = 1000;
+	static const int score = 10000;
 	const std::string sprite = std::string(image_path + "h_powerup.png");
 public:
 
@@ -37,7 +37,7 @@ public:
 		Powerup(xpos, ypos, angle, &sprite, score){}
 
 	virtual void consume(Player* target) const override {
-		target->addHealth(10);
+		target->addHealth(65);
 	}
 
 	virtual ~HealthPowerup() = default;
@@ -45,22 +45,17 @@ public:
 
 class ProjectilePowerup : public Powerup {
 private:
-	static const int score = 1000;
+	static const int score = 10000;
 	const std::string sprite = std::string(image_path + "proj_powerup.png");
 	int proj_type = 0;
 
 public:
 	ProjectilePowerup(float xpos, float ypos, float angle) :
-		Powerup(xpos, ypos, angle, &sprite, score) {
-
-		if ((double)rand() / (RAND_MAX) + 1 > 0.5f)
-			proj_type = GObjFactory::HEAVY_BULLET;
-		else
-			proj_type = GObjFactory::LIGHT_BULLET;
-	}
+		Powerup(xpos, ypos, angle, &sprite, score)
+	{}
 
 	virtual void consume(Player* target) const override {
-		target->setProjectile(proj_type);
+		target->incrementProjectile();
 	}
 
 	virtual ~ProjectilePowerup() = default;
@@ -68,7 +63,7 @@ public:
 
 class PointsPowerup : public Powerup {
 private:
-	static const int score = 4000;
+	static const int score = 100000;
 	const std::string sprite = std::string(image_path + "points_powerup.png");
 
 public:

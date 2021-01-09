@@ -82,7 +82,6 @@ bool Level::can_spawn_p()
 
 Powerup* Level::spawn_p()
 {
-	std::cout << "actually spawning" << std::endl;
 	// return the first enemy of the queue
 	Powerup* return_val = powerup_queue->front();
 	powerup_queue->pop();

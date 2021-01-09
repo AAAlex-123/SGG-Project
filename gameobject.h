@@ -6,7 +6,8 @@ class VisualEffect;
 // Superclass for all interactive objects in the game
 class GameObject : public Drawing {
 protected:
-	const int damage, score, max_health;
+	const int damage, score;
+	int max_health;
 	const float radius;
 	int curr_health;
 	virtual void hit(GameObject* o2);

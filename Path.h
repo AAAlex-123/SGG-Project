@@ -80,27 +80,21 @@ public:
 	TargetedFiringPath(float period, Path* p) : FiringPath(period,p)
 	{}
 	virtual float getProjAngle(float x, float y) override;
-
-private:
-	Entity* find_target(float x, float y, const std::list<Entity*>* ls) const;
-	static double distance(float x1, float y1, float x2, float y2);
 };
 
 // Decorator that changes angle to follow an entity
 class HomingPath : public Path {
 public:
-	HomingPath(Drawing* followee, float perc, Path* p)
-		: followee(followee), perc(perc), _path(p)
+	HomingPath(float perc, Path* p)
+		: perc(perc), _path(p)
 	{}
 	virtual bool move(float& x, float& y, float& angle, float& vel, float ms) override;
 
 private:
-	const Drawing* const followee;
 	// percentage of angle turn relative to target, 0-1
 	const float perc;
 	Path* const _path;
 };
-
 
 // Standalone Path that has no movement
 class StaticPath : public Path {

@@ -172,13 +172,15 @@ void update(float ms)
 		break;
 	}
 	case game_states::MENU: {
-
-		if (graphics::getKeyState(graphics::scancode_t::SCANCODE_S))
+		if (graphics::getKeyState(graphics::scancode_t::SCANCODE_S) || graphics::getKeyState(graphics::scancode_t::SCANCODE_D))
 		{
 			gd->game_state = game_states::GAME;
-			gd->curr_playing_level = gd->curr_selected_level == -1 ? -2 : gd->curr_selected_level;
+			gd->curr_playing_level = gd->curr_selected_level == -1 ? 0 : gd->curr_selected_level;
+			if (graphics::getKeyState(graphics::scancode_t::SCANCODE_D))
+				gd->curr_playing_level = -10;
+
 			GObjFactory::setPlayerData(gd->playerLs);
-			gd->playerLs->push_back(GObjFactory::createEntity(GObjFactory::PLAYER, get_canvas_width() / 3.0f, get_canvas_height() * 0.7f, 0)); // 0.1f = fire cooldown
+			gd->playerLs->push_back(GObjFactory::createEntity(GObjFactory::PLAYER, get_canvas_width() / 3.0f, get_canvas_height() * 0.7f, 0));
 			if (gd->isMult)
 				gd->playerLs->push_back(GObjFactory::createEntity(GObjFactory::PLAYER, 2 * get_canvas_width() / 3.0f, get_canvas_height() * 0.7f, 0));
 
@@ -193,8 +195,6 @@ void update(float ms)
 			game_over = false;
 #endif
 			ui = new UI(gd);
-
-			break;
 		}
 
 		break;
@@ -234,6 +234,7 @@ void update(float ms)
 		gd->update(ms, gd->playerLs);
 		gd->update(ms, gd->playerProjLs);
 		gd->update(ms, gd->effectsLs);
+		gd->update(ms, gd->powerupLs);
 
 		gd->updateLevel(ms);
 		gd->updateBackground(ms);
@@ -242,6 +243,7 @@ void update(float ms)
 		gd->checkCollisions(gd->enemyProjLs, gd->playerLs);
 		gd->checkCollisions(gd->playerProjLs, gd->enemyLs);
 		gd->checkCollisions(gd->enemyLs, gd->playerLs);
+		gd->checkCollisions(gd->playerLs, gd->powerupLs);
 
 		//fire
 		gd->fire(gd->playerLs);
@@ -265,16 +267,21 @@ void update(float ms)
 		break;
 	}
 	case game_states::LEVEL_TRANSITION: {
+
 		// do some updating while waiting for next level
 		gd->update(ms, gd->playerLs);
 		gd->update(ms, gd->playerProjLs);
 		gd->update(ms, gd->effectsLs);
+		gd->update(ms, gd->powerupLs);
 		gd->updateBackground(ms);
 
 		gd->fire(gd->playerLs);
 
+		gd->checkCollisions(gd->playerLs, gd->powerupLs);
+
 		gd->checkAndDelete(gd->playerProjLs);
 		gd->checkAndDelete(gd->effectsLs);
+		gd->checkAndDelete(gd->powerupLs);
 
 		// update timer
 		gd->level_transition_timer -= (ms / 1000.0f);
@@ -322,8 +329,8 @@ void update(float ms)
 		graphics::getKeyState(graphics::scancode_t::SCANCODE_6) ,graphics::getKeyState(graphics::scancode_t::SCANCODE_7) ,graphics::getKeyState(graphics::scancode_t::SCANCODE_8) ,
 		graphics::getKeyState(graphics::scancode_t::SCANCODE_9) };
 
-		for (int i = 0; i < 10;i++)
-			gd->curr_active_level = (i * (codes[i] && gd->levels[i])) + (gd->curr_active_level * !codes[i] && gd->levels[i]);
+		for (int i = 0; i < 10; i++)
+			gd->curr_active_level = (i * (codes[i] && gd->levels[i])) + (gd->curr_active_level * !(codes[i] && gd->levels[i]));
 
 
 		gd->curr_selected_level = (gd->curr_active_level * graphics::getKeyState(graphics::scancode_t::SCANCODE_S)) + (gd->curr_selected_level * !graphics::getKeyState(graphics::scancode_t::SCANCODE_S));
@@ -376,18 +383,16 @@ void draw()
 		graphics::drawRect(CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2, CANVAS_HEIGHT / 4, CANVAS_HEIGHT / 4, br);
 		setColor(br, 'L');
 		br.texture = "";
-		graphics::drawText(CANVAS_WIDTH / 100, 20 * CANVAS_HEIGHT / 100, CANVAS_HEIGHT / 25, "Loading:   " + curr_image, br);
+		graphics::drawText(CANVAS_WIDTH / 100, 15 * CANVAS_HEIGHT / 100, CANVAS_HEIGHT / 25, "Loading:   " + curr_image, br);
+
 
 		break;
 	}
 	case game_states::MENU: {
-
 		setColor(br, new float[3]{ 0.0f, 0.0f, 0.0f });
 		graphics::drawText(CANVAS_WIDTH / 4, CANVAS_HEIGHT / 4, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 10, "Welcome!", br);
 		graphics::drawText(CANVAS_WIDTH / 8, 3 * CANVAS_HEIGHT / 5, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 10, "Press S to start!", br);
-		graphics::drawText(CANVAS_WIDTH / 8, CANVAS_HEIGHT / 1.4f, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 10, "Click the cog button", br);
-		graphics::drawText(CANVAS_WIDTH / 8, CANVAS_HEIGHT / 1.2f, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 10, "for more options", br);
-
+		graphics::drawText(CANVAS_WIDTH / 8, 4 * CANVAS_HEIGHT / 5, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 10, "Press D to demo!", br);
 
 		break;
 	}
@@ -423,14 +428,14 @@ void draw()
 		gd->draw(gd->playerLs);
 		gd->draw(gd->playerProjLs);
 		gd->draw(gd->effectsLs);
-
-		gd->draw(gd->playerLs);
+		gd->draw(gd->powerupLs);
+		ui->draw();
 
 		// display timer
 		graphics::resetPose();
 		setColor(br, 'L');
 		graphics::drawText(0.2f * get_canvas_width(), 0.3f * get_canvas_height(), 20,
-			"Next level in: " + std::to_string(gd->level_transition_timer).substr(0, 5), br);
+                      "Next level in: " + std::to_string(gd->level_transition_timer).substr(0, 5), br);
 		ui->draw();
 		break;
 	}
@@ -505,7 +510,9 @@ void draw()
 		br.texture = std::string(image_path + "player1.png");
 		graphics::drawRect(CANVAS_WIDTH / 10, CANVAS_HEIGHT - 80, 40, 80, br);
 		br.texture = std::string(image_path + "player2.png");
+
 		graphics::drawRect(CANVAS_WIDTH - (CANVAS_WIDTH / 10), CANVAS_HEIGHT - 80, 40, 80, br);
+
 		br.texture = "";
 		break;
 	}
@@ -553,9 +560,9 @@ void resize(int new_w, int new_h)
 
 int main(int argc, char** argv)
 {
+	graphics::createWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "1942ripoff");
+	//graphics::setFullScreen(true);
 	std::set_terminate(close);
-	graphics::createWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "1917");
-	graphics::setFullScreen(true);
 
 	graphics::setCanvasSize(CANVAS_WIDTH, CANVAS_HEIGHT);
 	graphics::setCanvasScaleMode(graphics::CANVAS_SCALE_FIT);
@@ -601,5 +608,6 @@ void initialize()
 inline float get_canvas_width() { return CANVAS_WIDTH; }
 inline float get_canvas_height() { return CANVAS_HEIGHT; }
 
-float mouse_x(float mx) { return (mx - ((WINDOW_WIDTH - (CANVAS_WIDTH * c2w)) / 2)) * w2c; }
+float mouse_x(float mx) { return (mx - ((WINDOW_WIDTH  - (CANVAS_WIDTH  * c2w)) / 2)) * w2c; }
+
 float mouse_y(float my) { return (my - ((WINDOW_HEIGHT - (CANVAS_HEIGHT * c2w)) / 2)) * w2c; }
