@@ -1,6 +1,7 @@
 #pragma once
 #include "entity.h"
 #include "globals.h"
+#include "GObjFactory.h"
 #include <iostream>
 
 class Player final : public Entity{
@@ -14,8 +15,10 @@ public:
 
 	// Changes the projectile type
 	void incrementProjectile() {
-		if (++curr_projectile > 12)
-			curr_projectile = 12;
+		if (curr_projectile == GObjFactory::LIGHT_BULLET)
+			curr_projectile = GObjFactory::STANDARD_BULLET;
+		else if (curr_projectile == GObjFactory::STANDARD_BULLET)
+			curr_projectile = GObjFactory::HEAVY_BULLET;
 	}
 
 	void addHealth(int health) {
