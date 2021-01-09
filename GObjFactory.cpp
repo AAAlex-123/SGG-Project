@@ -95,6 +95,7 @@ Entity* GObjFactory::createAcceleratingEnemy(float x, float y, float angle) {
 
 Entity* GObjFactory::createTankEnemy(float x, float y, float angle) {
 	return new Entity(x, y, angle, b_plane_sp * 0.4f, b_plane_size * 1.3f, b_plane_size * 2.0f, new string(image_path + "balloon"), new TargetedFiringPath(3.5f, new Path()), b_plane_dmg * 3.0f, b_plane_hp * 4, b_plane_score * 2, GObjFactory::HEAVY_BULLET);
+
 }
 
 Entity* GObjFactory::createHomingEnemy(float x, float y, float angle) {
@@ -116,7 +117,7 @@ Projectile* GObjFactory::createProjectile(int type, float x, float y, float angl
 	}
 }
 
-Projectile* GObjFactory::createStandardBullet(float x, float y, float angle) {			   																  
+Projectile* GObjFactory::createStandardBullet(float x, float y, float angle) {
 	return new Projectile(x, y, angle, b_proj_sp * 1.0f, b_proj_size * 1.1f, new string(image_path + "bullet1.png"), new Path(), b_proj_dmg * 0.9f);
 }
 

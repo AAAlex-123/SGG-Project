@@ -1,5 +1,11 @@
 #pragma once
 #include "graphics.h"
+#include "game_data.h"
+#include <fstream>
+#include <iostream>
+#include <regex>
+
+//A file dedicated to store the numerous constants and functions main.cpp uses
 
 // constants
 short WINDOW_WIDTH = 1200;
@@ -14,7 +20,6 @@ float c2w = 1.0f / w2c;
 
 // function declarations
 void initialize();
-// true == success
 bool load_images_from_file(const std::string& image_path);
 
 // key short names
@@ -26,3 +31,37 @@ const graphics::scancode_t K_W = graphics::scancode_t::SCANCODE_W;
 const graphics::scancode_t K_A = graphics::scancode_t::SCANCODE_A;
 const graphics::scancode_t K_S = graphics::scancode_t::SCANCODE_S;
 const graphics::scancode_t K_D = graphics::scancode_t::SCANCODE_D;
+
+bool load_images_from_file(const std::string& image_path)
+{
+	GameData* gd = reinterpret_cast<GameData*> (graphics::getUserData());
+
+	std::string temp_file_name = "_mytemp.txt";
+
+	// create temp file and stream to that temp file
+	system(("dir " + image_path + " > " + temp_file_name).c_str());
+	std::ifstream in(temp_file_name);
+
+	if (!in)
+	{
+		std::cerr << "Error opening file '" << temp_file_name << "'" << std::endl;
+		return false;
+	}
+
+	// get all assets from file
+	std::string contents((std::istreambuf_iterator<char>(in)), std::istreambuf_iterator<char>());
+	std::smatch match;
+	std::regex r("(\\w+\\.png)");
+
+	while (std::regex_search(contents, match, r))
+	{
+		gd->images.push_back(match[1].str());
+		contents = match.suffix();
+	}
+
+	// close stream, delete file
+	in.close();
+	remove(temp_file_name.c_str());
+
+	return true;
+}
