@@ -248,7 +248,7 @@
 247
 
 
---- File parsing stopped at '255' ---
+--- File parsing stopped at '247' ---
 Available waves:
  - wave simple-u/l/r-e/m/h
  - wave accel-v/h-e/h
