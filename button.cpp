@@ -12,25 +12,25 @@ void Button::update(float not_used_lmao)
 	{
 		graphics::getMouseState(ms);
 		if (ms.button_left_pressed)
-		{
 			clicked = (((abs(mouse_x((float)ms.cur_pos_x) - x) <= width)) && (abs(mouse_y((float)ms.cur_pos_y) - y) <= height));
-		}
 	}
 }
 
 void Button::draw()
 {
-	if (gd->game_state == targetGS) {
+	if (gd->game_state == targetGS)
 		Drawing::draw();
-	}
 }
 
 void Button::execute() const
 {
 	if (gd->game_state == targetGS && clicked)
-	{
 		execute_();
-	}
+}
+
+Button::operator bool() const
+{
+	return true;
 }
 
 // GameStateChangingButton
