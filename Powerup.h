@@ -15,7 +15,7 @@ public:
 	Powerup(float xpos, float ypos, float angle, const std::string* sprite, int score);
 	//The method subclasses override to specify hit()'s behavior
 	virtual void consume(Player* target) const = 0;
-	//Powerup is implemented with the clone pattern because of how levels are loaded
+	//Powerup is implemented with the prototype pattern because of how they get spawned from Level
 	virtual Powerup* clone() const = 0;
 
 	virtual VisualEffect* getDestructionVisualEffect() const override;
