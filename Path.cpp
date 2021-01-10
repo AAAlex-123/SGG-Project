@@ -1,5 +1,4 @@
 #include "Path.h"
-#include "UI.h" //access to UI's "hitbox"
 #include "Player.h"
 #include "GObjFactory.h"
 #include <cmath>
