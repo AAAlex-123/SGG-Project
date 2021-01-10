@@ -1,4 +1,5 @@
 #include "level.h"
+#include "Powerup.h"
 #include "entity.h"
 #include "GObjFactory.h"
 #include <iostream>
@@ -19,6 +20,21 @@ Level::Level(int id, const std::string& desc)
 	{
 		std::cerr << "Warning: level id '" << id << "' out of bounds; players won't be able to select this level" << std::endl;
 	}
+}
+
+Level* Level::clone()
+{
+	Level* l = new Level(_id, _desc);
+	for (auto iter = this->waves->begin(); iter != this->waves->end(); ++iter)
+	{
+		l->waves->insert(new std::pair<float, Wave*>((*iter)->first, (*iter)->second->clone()));
+	}
+
+	for (auto iter = this->powerups->begin(); iter != this->powerups->end(); ++iter)
+	{
+		l->powerups->insert(new std::pair<float, Powerup*>((*iter)->first, (*iter)->second->clone()));
+	}
+	return l;
 }
 
 void Level::update(float ms)
@@ -128,13 +144,14 @@ Wave::Wave(const std::string& desc)
 	: _desc(desc), spawnpoints(new std::unordered_set<Spawnpoint*>), enemy_queue(new std::queue<Entity*>)
 {}
 
-Wave::Wave(const Wave& w)
-	: _desc(w._desc), spawnpoints(new std::unordered_set<Spawnpoint*>), enemy_queue(new std::queue<Entity*>)
+Wave* Wave::clone()
 {
-	for (Spawnpoint* sp : *(w.spawnpoints))
+	Wave* w = new Wave(_desc);
+	for (Spawnpoint* sp : *(this->spawnpoints))
 	{
-		spawnpoints->insert(new Spawnpoint(*sp));
+		w->spawnpoints->insert(sp->clone());
 	}
+	return w;
 }
 
 void Wave::update(float ms)
@@ -205,9 +222,10 @@ Spawnpoint::Spawnpoint(int type, float perc_x, float perc_y, float angle, int am
 	: type(type), perc_x(perc_x), perc_y(perc_y), angle(angle), _spawn_delta(spawn_delta), _amount(amount), _initial_delay(initial_delay), _elapsed_time(spawn_delta - 0.1f)
 {}
 
-//Spawnpoint::Spawnpoint(const Spawnpoint& s)
-//	: type(s.type), perc_x(s.perc_x), perc_y(s.perc_y), angle(s.angle), _spawn_delta(s._spawn_delta), _amount(s._amount), _initial_delay(s._initial_delay), _elapsed_time(s._spawn_delta - 0.1f)
-//{}
+Spawnpoint* Spawnpoint::clone()
+{
+	return new Spawnpoint(type, perc_x, perc_y, angle, _amount, _spawn_delta, _initial_delay);
+}
 
 void Spawnpoint::update(float ms)
 {

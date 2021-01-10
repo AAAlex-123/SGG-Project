@@ -126,6 +126,7 @@ void close() {
 void update(float ms)
 {
 	GameData* gd = reinterpret_cast<GameData*> (graphics::getUserData());
+	//std::cout << "curr gs: " << gd->game_state << std::endl;
 #ifndef no_threads
 	* global_ms = ms;
 #endif // !nothreads
@@ -167,8 +168,13 @@ void update(float ms)
 			++(gd->curr_img);
 		}
 
-		gd->game_state = ((game_states::MENU * (gd->curr_img == gd->images.size())) + (gd->game_state * !(gd->curr_img == gd->images.size())));
+		gd->game_state = ((game_states::LOAD_L * (gd->curr_img == gd->images.size())) + (gd->game_state * !(gd->curr_img == gd->images.size())));
 
+		break;
+	}
+	case game_states::LOAD_L: {
+		gd->load_levels();
+		gd->game_state = game_states::MENU;
 		break;
 	}
 	case game_states::MENU: {
@@ -178,6 +184,8 @@ void update(float ms)
 			gd->curr_playing_level = gd->curr_selected_level == -1 ? 0 : gd->curr_selected_level;
 			if (graphics::getKeyState(graphics::scancode_t::SCANCODE_D))
 				gd->curr_playing_level = -10;
+
+			gd->current_level = gd->levels[gd->curr_playing_level]->clone();
 
 			GObjFactory::setPlayerData(gd->playerLs);
 			//Due to Factory constraints we are forced to upcast then downcast the player pointer.
@@ -209,7 +217,7 @@ void update(float ms)
 		gd->game_state = ((game_states::PAUSE * graphics::getKeyState(graphics::scancode_t::SCANCODE_P)) + (gd->game_state * !graphics::getKeyState(graphics::scancode_t::SCANCODE_P)));
 
 		// level change logic
-		if ((!(*gd->levels[gd->curr_playing_level])) && (gd->enemyLs->empty()) && (gd->enemyProjLs->empty()))
+		if ((!(*gd->current_level)) && (gd->enemyLs->empty()) && (gd->enemyProjLs->empty()))
 		{
 			gd->level_transition_timer = gd->set_level_transition_timer();
 			gd->game_state = game_states::LEVEL_TRANSITION;
@@ -310,12 +318,10 @@ void update(float ms)
 		break;
 	}
 	case game_states::RESET: {
+		std::cout << "resetting" << std::endl;
 		GObjFactory::reset();
 
-		delete gd;
-
-		GameData* gd = new GameData();
-		graphics::setUserData((void*)gd);
+		gd->reset();
 
 		gd->game_state = game_states::MENU;
 		break;
@@ -387,6 +393,11 @@ void draw()
 		graphics::drawText(CANVAS_WIDTH / 100, 15 * CANVAS_HEIGHT / 100, CANVAS_HEIGHT / 25, "Loading:   " + curr_image, br);
 
 
+		break;
+	}
+	case game_states::LOAD_L: {
+		setColor(br, 'L');
+		graphics::drawText(CANVAS_WIDTH / 100, 15 * CANVAS_HEIGHT / 100, CANVAS_HEIGHT / 25, "Loading levels...", br);
 		break;
 	}
 	case game_states::MENU: {
@@ -507,7 +518,7 @@ void draw()
 		graphics::drawText(CANVAS_WIDTH / 10, 5.5f * CANVAS_HEIGHT / 13, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 17, "Player 2:", br);
 		graphics::drawText(CANVAS_WIDTH / 10, 6.5f * CANVAS_HEIGHT / 13, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 28, "Arrow-keys to move, SPACE to fire, '.'/',' to spin", br);
 		graphics::drawText(CANVAS_WIDTH / 10, 8.5f * CANVAS_HEIGHT / 13, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 17, "Pick up powerups by running into them.", br);
-		graphics::drawText(CANVAS_WIDTH / 10, 9.5f * CANVAS_HEIGHT / 13, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 17, "Gain score by killing enemies.", br);
+		graphics::drawText(CANVAS_WIDTH / 10, 9.5f * CANVAS_HEIGHT / 13, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 17, "Gain points by killing enemies.", br);
 
 		setColor(br,'W');
 		br.outline_opacity = 0.f;

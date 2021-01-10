@@ -35,7 +35,8 @@ enum game_states
 	EXIT = 9,
 	PAUSE = 12,
 	RESET = 13,
-	ACHIEVEMENTS = 14
+	ACHIEVEMENTS = 14,
+	LOAD_L = 15,
 };
 
 float get_canvas_height();
