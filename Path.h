@@ -12,13 +12,12 @@ class Entity;
 class Path {
 public:
 	Path() {}
-	// updates the position based on angle and velocity
-	// returns bool if the object should fire
-	// only used by Entities, other classes dismiss this value
+	// Updates the position based on angle and velocity
+	// Returns bool if the object should fire (only used by Entities, other classes dismiss this value)
 	virtual bool move(float& x, float& y, float& angle, float& vel, float ms);
 };
 
-// Decorator that changes the speed
+// Decorator that accelerates the object in relation to time
 class AcceleratingPath : public Path {
 public:
 	AcceleratingPath(float dvel, Path* p) : dvel(dvel), _path(p)
@@ -58,20 +57,6 @@ protected:
 	float elapsed;
 	Path* const _path;
 	float curr_angle;
-};
-
-// Standalone Path that responds to Keyboard
-class KeyboardPath : public FiringPath {
-public:
-	KeyboardPath(float dangle, float cooldown, Keyset keyset) : FiringPath(cooldown, this),dangle(dangle), remaining(0.0f), keyset(keyset)
-	{}
-	virtual bool move(float& x, float& y, float& angle, float& vel, float ms) override;
-
-private:
-	// % of a full rotation per second
-	const float dangle;
-	float remaining;
-	const Keyset keyset;
 };
 
 // Decorator that returns bool if the object should fire

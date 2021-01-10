@@ -33,7 +33,7 @@ GameData::GameData()
 	current_level(nullptr), curr_active_level(-1), curr_selected_level(-1),
 	bg_offset(0.0f), height_perc_per_second(0.02f),
 	curr_playing_level(-1), level_transition_timer(set_level_transition_timer()),
-	enemyLs(new list<Entity*>), playerLs(new list<Entity*>), enemyProjLs(new list<Projectile*>),
+	enemyLs(new list<Entity*>), playerLs(new list<Player*>), enemyProjLs(new list<Projectile*>),
 	playerProjLs(new list<Projectile*>), effectsLs(new list<VisualEffect*>), powerupLs(new list<Powerup*>), buttons(new list<Button*>)
 {
 	// sets all the user-selectable levels to nullptr
@@ -409,7 +409,7 @@ int GameData::Stats::find_type(const Entity * const en) const {
 	const std::string name = *en->getSprite();
 	if (name == image_path + "plane1.png")
 		return BASIC_PLANE;
-	else if (name == image_path + "plane2.png")
+	else if (name == image_path + "plane2.png" || name == image_path + "plane4.png")
 		return BLACK_PLANE;
 	else if (name == image_path + "plane3.png")
 		return AIRSHIP;

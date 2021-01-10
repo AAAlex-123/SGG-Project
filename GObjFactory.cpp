@@ -9,7 +9,7 @@
 
 using namespace std;
 
-const std::list<Entity*>* GObjFactory::playerLs = nullptr; //declared here as well because c++ is dumb
+const std::list<Player*>* GObjFactory::playerLs = nullptr; //declared here as well because c++ is dumb
 
 const float GObjFactory::b_plane_sp = 100.f;
 const float GObjFactory::b_plane_size = 20.f;
@@ -27,12 +27,11 @@ const float GObjFactory::b_proj_sp = 350.f;
 const float GObjFactory::b_proj_size = 8.f;
 const int GObjFactory::b_proj_dmg = 10;
 
-// spaghetti that will stay here forever
 bool GObjFactory::atLeastOne = false;
 
 const Keyset GObjFactory::pl1_kset = Keyset(key::SCANCODE_W, key::SCANCODE_S, key::SCANCODE_A, key::SCANCODE_D, key::SCANCODE_Q, key::SCANCODE_E, key::SCANCODE_X);
 const Keyset GObjFactory::pl2_kset = Keyset(key::SCANCODE_UP, key::SCANCODE_DOWN, key::SCANCODE_LEFT, key::SCANCODE_RIGHT, key::SCANCODE_PERIOD, key::SCANCODE_COMMA, key::SCANCODE_SPACE);
-//unused: Keyset(key::SCANCODE_T, key::SCANCODE_G, key::SCANCODE_F, key::SCANCODE_H, key::SCANCODE_R, key::SCANCODE_Y, key::SCANCODE_B);
+
 
 // ===== ENTITY =====
 
@@ -99,7 +98,6 @@ Entity* GObjFactory::createTankEnemy(float x, float y, float angle) {
 }
 
 Entity* GObjFactory::createHomingEnemy(float x, float y, float angle) {
-	Entity* target = rand() % (playerLs->size()) == 0 ? playerLs->front() : playerLs->back();
 	return new Entity(x, y, angle, b_plane_sp * 0.65f, b_plane_size * 1.2f, b_plane_size * 1.2f, new string(image_path + "plane4"), new HomingPath(0.05f, new Path()), b_plane_dmg * 4.0f, b_plane_hp * 2.5f, b_plane_score * 1.5f, GObjFactory::STANDARD_BULLET);
 }
 
