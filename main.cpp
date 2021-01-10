@@ -30,7 +30,7 @@ bool th_2_done = false;
 bool game_over = false;
 bool terminate_all = false;
 
-float* global_ms = new float;
+float * const global_ms = new float;
 
 //Note: The thread decisions below could have been implemented with <condition_variable> ( e.g cv.wait(), cv.notify_all())
 //but it's probably overkill for something as simple as starting and stopping 2 threads
@@ -122,7 +122,7 @@ void close() {
 }
 
 
-// sgg functions
+//========== SGG FUNCTIONS ===============
 void update(float ms)
 {
 	GameData* gd = reinterpret_cast<GameData*> (graphics::getUserData());
@@ -180,9 +180,10 @@ void update(float ms)
 				gd->curr_playing_level = -10;
 
 			GObjFactory::setPlayerData(gd->playerLs);
-			gd->playerLs->push_back(GObjFactory::createEntity(GObjFactory::PLAYER, get_canvas_width() / 3.0f, get_canvas_height() * 0.7f, 0));
+			//Due to Factory constraints we are forced to upcast then downcast the player pointer.
+			gd->playerLs->push_back(dynamic_cast<Player*>(GObjFactory::createEntity(GObjFactory::PLAYER, get_canvas_width() / 3.0f, get_canvas_height() * 0.7f, 0)));
 			if (gd->isMult)
-				gd->playerLs->push_back(GObjFactory::createEntity(GObjFactory::PLAYER, 2 * get_canvas_width() / 3.0f, get_canvas_height() * 0.7f, 0));
+				gd->playerLs->push_back(dynamic_cast<Player*>(GObjFactory::createEntity(GObjFactory::PLAYER, 2 * get_canvas_width() / 3.0f, get_canvas_height() * 0.7f, 0)));
 
 #ifndef no_threads
 			// start threads only the first time the game starts
@@ -254,9 +255,9 @@ void update(float ms)
 
 #endif
 
-		//delete
-			//these are kept seperated from the concurrent threads as they may change *all* their data during their execution
-			//so a mutex wouldn't make sense
+	//delete
+		//these are kept seperate from the concurrent threads as they may change *all* their data during their execution
+		//so a mutex wouldn't make sense
 		gd->checkAndDelete(gd->enemyLs);
 		gd->checkAndDelete(gd->enemyProjLs);
 		gd->checkAndDelete(gd->playerLs);
@@ -401,7 +402,9 @@ void draw()
 		int i = 0;
 		for (auto a : GameData::getAchieved()) {
 			br.texture = a->icon;
+			setColor(br,'W');
 			graphics::drawRect(60, 75 + i * 100, 75, 75, br);
+			setColor(br, 'L');
 			graphics::drawText(0, 75 + i * 100 + 50, 10, a->name, br);
 			i++;
 		}
@@ -500,12 +503,13 @@ void draw()
 
 		setColor(br, new float[3]{ 0.0f, 0.0f, 0.0f });
 		graphics::drawText(CANVAS_WIDTH / 10, 2.5f * CANVAS_HEIGHT / 13, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 17, "Player 1:", br);
-		graphics::drawText(CANVAS_WIDTH / 10, 3.5f * CANVAS_HEIGHT / 13, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 17, "WASD to move, X to fire, QE to spin", br);
+		graphics::drawText(CANVAS_WIDTH / 10, 3.5f * CANVAS_HEIGHT / 13, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 28, "WASD to move, X to fire, Q/E to spin", br);
 		graphics::drawText(CANVAS_WIDTH / 10, 5.5f * CANVAS_HEIGHT / 13, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 17, "Player 2:", br);
-		graphics::drawText(CANVAS_WIDTH / 10, 6.5f * CANVAS_HEIGHT / 13, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 17, "arrows to move, SPACE to fire, ZC to spin", br);
+		graphics::drawText(CANVAS_WIDTH / 10, 6.5f * CANVAS_HEIGHT / 13, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 28, "Arrow-keys to move, SPACE to fire, '.'/',' to spin", br);
 		graphics::drawText(CANVAS_WIDTH / 10, 8.5f * CANVAS_HEIGHT / 13, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 17, "Pick up powerups by running into them.", br);
 		graphics::drawText(CANVAS_WIDTH / 10, 9.5f * CANVAS_HEIGHT / 13, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 17, "Gain score by killing enemies.", br);
 
+		setColor(br,'W');
 		br.outline_opacity = 0.f;
 		br.texture = std::string(image_path + "player1.png");
 		graphics::drawRect(CANVAS_WIDTH / 10, CANVAS_HEIGHT - 80, 40, 80, br);
@@ -561,7 +565,7 @@ void resize(int new_w, int new_h)
 int main(int argc, char** argv)
 {
 	graphics::createWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "1942ripoff");
-	//graphics::setFullScreen(true);
+	graphics::setFullScreen(true);
 	std::set_terminate(close);
 
 	graphics::setCanvasSize(CANVAS_WIDTH, CANVAS_HEIGHT);
@@ -593,9 +597,6 @@ void initialize()
 	gd->game_state = game_states::LOAD;
 
 	graphics::setUserData((void*)gd);
-
-	// random seed for Factory homing enemies randomness
-	srand((unsigned int)gd);
 
 	// load stuff
 	if (!graphics::setFont(font))
