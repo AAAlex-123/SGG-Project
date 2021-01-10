@@ -339,10 +339,12 @@ void GameData::_load_hardcoded_levels()
 	levels[l6->id()] = l6;
 }
 
+void GameData::next_level() { ++curr_playing_level; }
+
 Level* GameData::get_next_level() {
-	Level* return_val = levels[curr_playing_level - 1];
+	Level* return_val = levels[curr_playing_level + 1];
 	if (!return_val)
-		levels.erase(curr_playing_level - 1);
+		levels.erase(curr_playing_level + 1);
 	return return_val;
 }
 
