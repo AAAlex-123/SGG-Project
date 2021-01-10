@@ -75,6 +75,8 @@ public:
 	// Background (looping and moving downwards)
 	void updateBackground(float ms);
 	void drawBackground(graphics::Brush&);
+	std::string bg_sprite = std::string(image_path + "background.png");
+	float iw = 400.0f, ih = 1213.0f;
 
 	// Data used by UI
 	int curr_playing_level;

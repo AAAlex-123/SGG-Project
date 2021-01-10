@@ -65,20 +65,20 @@ void GameData::reset()
 
 void GameData::updateBackground(float ms)
 {
-	bg_offset = (bg_offset < get_canvas_width() / get_canvas_height())
+	bg_offset = (bg_offset < ih / get_canvas_height())
 		? (bg_offset + (height_perc_per_second * (ms / 1000.0f)))
 		: (0.0f);
 }
 
 void GameData::drawBackground(graphics::Brush& br)
 {
-	br.texture = image_path + "background.png";
+	br.texture = bg_sprite;
 	setColor(br, new float[3]{ 1.0f, 1.0f, 1.0f });
 	br.outline_opacity = 0.0f;
+
 	float cw = get_canvas_width(), ch = get_canvas_height();
-	graphics::drawRect(cw / 2, ch * (bg_offset - (cw / ch)), cw, cw, br);
-	graphics::drawRect(cw / 2, ch * bg_offset, cw, cw, br);
-	graphics::drawRect(cw / 2, ch * (bg_offset + (cw / ch)), cw, cw, br);
+	graphics::drawRect(cw / 2, (ch * bg_offset) - ih, iw, ih, br);
+	graphics::drawRect(cw / 2, (ch * bg_offset),      iw, ih, br);
 }
 
 void GameData::create_buttons()
