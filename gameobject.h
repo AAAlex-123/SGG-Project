@@ -4,6 +4,7 @@
 class VisualEffect;
 
 // Superclass for all interactive objects in the game
+//Includes methods for hitting other objects, reacting to being hit and placing special effects on death.
 class GameObject : public Drawing {
 protected:
 	const int damage, score;
@@ -13,9 +14,9 @@ protected:
 	virtual void hit(GameObject* o2);
 
 public:
-	GameObject(float xpos, float ypos, float angle, float vel, float width,float height, const std::string* sprite, Path*, int damage, int health, int score);
+	GameObject(float xpos, float ypos, float angle, float vel, float width,float height, const std::string * const sprite, Path*, int damage, int health, int score);
 
-	// Routine called by the update() main function; updated the object's state
+	// Routine called by the update() main function; updates the object's state
 	virtual void update(float ms) override;
 
 	// Checks if, and controls behavior when, hit by another object
@@ -23,7 +24,7 @@ public:
 
 	int getHealth() const { return curr_health; }
 	int getMaxHealth() const { return max_health; }
-	const std::string* getSprite() const {return sprites;}
+	const std::string * const getSprite() const {return sprites;}
 
 	// Returns false if the object is not alive; i.e. it must be destroyed
 	virtual operator bool() const override;
