@@ -39,6 +39,7 @@ private:
 public:
 	GameData();
 	~GameData();
+	void reset();
 
 	//=========ACHIEVEMENT DATA=======
 
@@ -70,31 +71,31 @@ public:
 	float bg_offset, height_perc_per_second;
 	bool isMult = false;
 
-	//Scrolls downwards and loops the background as the game progresses
+	// Background (looping and moving downwards)
 	void updateBackground(float ms);
 	void drawBackground(graphics::Brush&);
 
-	//Data used by UI
+	// Data used by UI
 	int curr_playing_level;
 	void addScore(int scored);
 	int getScore() const;
 
-	//buttons
+	// buttons
 	void click_buttons();
 
-	//=======LEVELS==========
-
+	// levels
+	Level* current_level;
 	std::unordered_map<int, Level*> levels;
 	std::unordered_map<std::string, Wave*> _waves;
 	int curr_active_level, curr_selected_level;
 
+	void load_levels();
 
 	//Returns the next level. If it's nullptr, the player has won
 	Level* get_next_level();
 
-
 	//Loads the next level
-	void updateLevel(float ms) { levels[curr_playing_level]->update(ms); }
+	void updateLevel(float ms);
 
 	//Spawns new enemies
 	void spawn();
