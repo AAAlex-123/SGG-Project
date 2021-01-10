@@ -65,7 +65,7 @@ void updateAndSpawn(GameData* starting_gd, float* const ms) {
 			gd->update(*ms, gd->effectsLs);
 			gd->update(*ms, gd->powerupLs);
 
-			gd->updateLevel(*ms);
+			gd->update_level(*ms);
 			gd->updateBackground(*ms);
 
 			th_1_done = true;
@@ -154,21 +154,21 @@ void update(float ms)
 	}
 
 	gd->fps = (int)(1000.0f / ms);
-	gd->update(ms, gd->buttons);
+	gd->update(ms, gd->buttonLs);
 	gd->click_buttons();
 
 	switch (gd->game_state)
 	{
 	case game_states::LOAD: {
-		gd->el += ms;
+		gd->elapsed += ms;
 
-		if (gd->el > (1 / (gd->sps)) * 1000.0f)
+		if (gd->elapsed > (1 / (gd->sprites_per_second)) * 1000.0f)
 		{
-			gd->el = 0.0f;
-			++(gd->curr_img);
+			gd->elapsed = 0.0f;
+			++(gd->curr_img_index);
 		}
 
-		gd->game_state = ((game_states::LOAD_L * (gd->curr_img == gd->images.size())) + (gd->game_state * !(gd->curr_img == gd->images.size())));
+		gd->game_state = ((game_states::LOAD_L * (gd->curr_img_index == gd->image_names.size())) + (gd->game_state * !(gd->curr_img_index == gd->image_names.size())));
 
 		break;
 	}
@@ -181,16 +181,16 @@ void update(float ms)
 		if (graphics::getKeyState(graphics::scancode_t::SCANCODE_S) || graphics::getKeyState(graphics::scancode_t::SCANCODE_D))
 		{
 			gd->game_state = game_states::GAME;
-			gd->curr_playing_level = gd->curr_selected_level == -1 ? 0 : gd->curr_selected_level;
+			gd->_playing_level_id = gd->_selected_level_id == -1 ? 0 : gd->_selected_level_id;
 			if (graphics::getKeyState(graphics::scancode_t::SCANCODE_D))
-				gd->curr_playing_level = -10;
+				gd->_playing_level_id = -10;
 
-			gd->current_level = gd->levels[gd->curr_playing_level]->clone();
+			gd->current_level = gd->levels[gd->_playing_level_id]->clone();
 
 			GObjFactory::setPlayerData(gd->playerLs);
 			//Due to Factory constraints we are forced to upcast then downcast the player pointer.
 			gd->playerLs->push_back(dynamic_cast<Player*>(GObjFactory::createEntity(GObjFactory::PLAYER, get_canvas_width() / 3.0f, get_canvas_height() * 0.7f, 0)));
-			if (gd->isMult)
+			if (gd->isMultiplayer)
 				gd->playerLs->push_back(dynamic_cast<Player*>(GObjFactory::createEntity(GObjFactory::PLAYER, 2 * get_canvas_width() / 3.0f, get_canvas_height() * 0.7f, 0)));
 
 #ifndef no_threads
@@ -245,7 +245,7 @@ void update(float ms)
 		gd->update(ms, gd->effectsLs);
 		gd->update(ms, gd->powerupLs);
 
-		gd->updateLevel(ms);
+		gd->update_level(ms);
 		gd->updateBackground(ms);
 
 		//check collisions
@@ -302,7 +302,7 @@ void update(float ms)
 		}
 		else if (gd->level_transition_timer <= 0.0f)
 		{
-			gd->next_level();
+			gd->set_next_level();
 			gd->game_state = game_states::GAME;
 		}
 		break;
@@ -318,7 +318,6 @@ void update(float ms)
 		break;
 	}
 	case game_states::RESET: {
-		std::cout << "resetting" << std::endl;
 		GObjFactory::reset();
 
 		gd->reset();
@@ -337,14 +336,14 @@ void update(float ms)
 		graphics::getKeyState(graphics::scancode_t::SCANCODE_9) };
 
 		for (int i = 0; i < 10; i++)
-			gd->curr_active_level = (i * (codes[i] && gd->levels[i])) + (gd->curr_active_level * !(codes[i] && gd->levels[i]));
+			gd->_active_level_id = (i * (codes[i] && gd->levels[i])) + (gd->_active_level_id * !(codes[i] && gd->levels[i]));
 
 
-		gd->curr_selected_level = (gd->curr_active_level * graphics::getKeyState(graphics::scancode_t::SCANCODE_S)) + (gd->curr_selected_level * !graphics::getKeyState(graphics::scancode_t::SCANCODE_S));
+		gd->_selected_level_id = (gd->_active_level_id * graphics::getKeyState(graphics::scancode_t::SCANCODE_S)) + (gd->_selected_level_id * !graphics::getKeyState(graphics::scancode_t::SCANCODE_S));
 
 
-		gd->curr_active_level = (-1 * graphics::getKeyState(graphics::scancode_t::SCANCODE_D)) + (gd->curr_active_level * !graphics::getKeyState(graphics::scancode_t::SCANCODE_D));
-		gd->curr_selected_level = (-1 * graphics::getKeyState(graphics::scancode_t::SCANCODE_D)) + (gd->curr_selected_level * !graphics::getKeyState(graphics::scancode_t::SCANCODE_D));
+		gd->_active_level_id = (-1 * graphics::getKeyState(graphics::scancode_t::SCANCODE_D)) + (gd->_active_level_id * !graphics::getKeyState(graphics::scancode_t::SCANCODE_D));
+		gd->_selected_level_id = (-1 * graphics::getKeyState(graphics::scancode_t::SCANCODE_D)) + (gd->_selected_level_id * !graphics::getKeyState(graphics::scancode_t::SCANCODE_D));
 
 		break;
 	}
@@ -382,9 +381,9 @@ void draw()
 	case game_states::LOAD: {
 		setColor(br, 'W');
 
-		if (gd->images.empty())
+		if (gd->image_names.empty())
 			return;
-		std::string curr_image = image_path + gd->images[gd->curr_img];
+		std::string curr_image = image_path + gd->image_names[gd->curr_img_index];
 
 		br.texture = curr_image;
 		graphics::drawRect(CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2, CANVAS_HEIGHT / 4, CANVAS_HEIGHT / 4, br);
@@ -409,9 +408,9 @@ void draw()
 		break;
 	}
 	case game_states::ACHIEVEMENTS: {
-		graphics::drawText(CANVAS_WIDTH / 2, 20, 20, "Unlocked Achievements: " + std::to_string(GameData::getAchieved().size()) + "/4", br);
+		graphics::drawText(CANVAS_WIDTH / 2, 20, 20, "Unlocked Achievements: " + std::to_string(gd->getAchieved(gd).size()) + "/4", br);
 		int i = 0;
-		for (auto a : GameData::getAchieved()) {
+		for (auto a : gd->getAchieved(gd)) {
 			br.texture = a->icon;
 			setColor(br,'W');
 			graphics::drawRect(60, 75 + i * 100, 75, 75, br);
@@ -478,7 +477,7 @@ void draw()
 	case game_states::OP_LEVEL: {
 
 		setColor(br, new float[3]{ 0.0f, 0.0f, 0.0f });
-		gd->curr_active_level == -1
+		gd->_active_level_id == -1
 			? graphics::drawText(CANVAS_WIDTH / 11, 1.7f * CANVAS_HEIGHT / 10, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 20, "use  the  numbers  to  select  a  track", br)
 			: graphics::drawText(CANVAS_WIDTH / 8, 1.7f * CANVAS_HEIGHT / 10, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 30, "Select  this  track  or  Deselect  all  tracks", br);
 
@@ -487,9 +486,9 @@ void draw()
 		{
 			if (gd->levels[i])
 			{
-				if (gd->curr_selected_level == gd->levels[i]->id())
+				if (gd->_selected_level_id == gd->levels[i]->id())
 					setColor(br, 'O');
-				else if (gd->curr_active_level == gd->levels[i]->id())
+				else if (gd->_active_level_id == gd->levels[i]->id())
 					setColor(br, new float[3]{ 1.0f, 1.0f, 1.0f });
 				else
 					setColor(br, new float[3]{ 0.0f, 0.0f, 0.0f });
@@ -507,7 +506,7 @@ void draw()
 		graphics::drawText(4.5f * CANVAS_WIDTH / 8, 2 * CANVAS_HEIGHT / 3, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 15, "Multiplayer", br);
 
 		graphics::drawText(4 * CANVAS_WIDTH / 32, 5 * CANVAS_HEIGHT / 6, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 15,
-			gd->isMult ? "Multiplayer mode selected!" : "Singleplayer mode selected!", br);
+			gd->isMultiplayer ? "Multiplayer mode selected!" : "Singleplayer mode selected!", br);
 		break;
 	}
 	case game_states::HELP: {
@@ -560,7 +559,7 @@ void draw()
 		graphics::drawText(20 * CANVAS_WIDTH / 100, 1 * CANVAS_HEIGHT / 7, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 15, "Please exit and inform the developers", br);
 	}
 	}
-	gd->draw(gd->buttons);
+	gd->draw(gd->buttonLs);
 }
 
 void resize(int new_w, int new_h)
