@@ -1,5 +1,6 @@
 #include "game_data.h"
 #include "GObjFactory.h"
+#include <thread>
 #include <iostream>
 #include <regex>
 #include <fstream>
@@ -29,7 +30,7 @@ GameData::GameData()
 	: fps(0), game_state(0),
 	el(0.0f), sps(20.0f), curr_img(0), images(),
 	levels(std::unordered_map<int, Level*>()), _waves(std::unordered_map<std::string, Wave*>()),
-	curr_active_level(-1), curr_selected_level(-1),
+	current_level(nullptr), curr_active_level(-1), curr_selected_level(-1),
 	bg_offset(0.0f), height_perc_per_second(0.02f),
 	curr_playing_level(-1), level_transition_timer(set_level_transition_timer()),
 	enemyLs(new list<Entity*>), playerLs(new list<Entity*>), enemyProjLs(new list<Projectile*>),
@@ -41,13 +42,24 @@ GameData::GameData()
 	for (int i = 0; i < 10; ++i)
 		levels[i] = nullptr;
 
-	if (!load_level_data_from_file(level_path, wave_path))
-	{
-		std::cerr << "Warning: Level loading from files failed, loading hardcoded levels" << std::endl;
-		_load_hardcoded_levels();
-	}
-	std::cout << "Levels loaded successfully" << std::endl;
+	create_buttons();
+}
 
+void GameData::reset()
+{
+	delete current_level;
+	current_level = nullptr;
+	curr_active_level = -1;
+	curr_selected_level = -1;
+	curr_playing_level = -1;
+	score = 0;
+	enemyLs = new list<Entity*>;
+	playerLs = new list<Entity*>;
+	enemyProjLs = new list<Projectile*>;
+	playerProjLs = new list<Projectile*>;
+	effectsLs = new list<VisualEffect*>;
+	powerupLs = new list<Powerup*>;
+	buttons = new list<Button*>;
 	create_buttons();
 }
 
@@ -77,6 +89,7 @@ void GameData::create_buttons()
 	buttons->push_back(new GameStateChangingButton(this, 370.0f, 75.0f, 30.0f, new string(icon_path + "options.png"), game_states::MENU, game_states::OPTIONS));
 	buttons->push_back(new GameStateChangingButton(this, 370.0f, 120.0f, 30.0f, new string(icon_path + "credits.png"), game_states::MENU, game_states::CREDITS));
 	buttons->push_back(new GameStateChangingButton(this, 370.0f, 165.0f, 30.0f, new string(icon_path + "achievements.png"), game_states::MENU, game_states::ACHIEVEMENTS));
+	buttons->push_back(new GameStateChangingButton(this, 370.0f, 210.0f, 30.0f, new string(icon_path + "reload.png"), game_states::MENU, game_states::LOAD_L));
 	// game
 	buttons->push_back(new GameStateChangingButton(this, 370.0f, 30.0f, 30.0f, new string(icon_path + "pause.png"), game_states::GAME, game_states::PAUSE));
 		// game -- pause
@@ -110,6 +123,16 @@ void GameData::click_buttons()
 	{
 		b->execute();
 	}
+}
+
+void GameData::load_levels()
+{
+	if (!load_level_data_from_file(level_path, wave_path))
+	{
+		std::cerr << "Warning: Level loading from files failed, loading hardcoded levels" << std::endl;
+		_load_hardcoded_levels();
+	}
+	std::cout << "Levels loaded successfully" << std::endl;
 }
 
 bool GameData::load_level_data_from_file(const std::string& level_path, const std::string& wave_path) {
@@ -339,13 +362,21 @@ void GameData::_load_hardcoded_levels()
 	levels[l6->id()] = l6;
 }
 
-void GameData::next_level() { ++curr_playing_level; }
+void GameData::next_level()
+{
+	current_level = levels[++curr_playing_level]->clone();
+}
 
 Level* GameData::get_next_level() {
 	Level* return_val = levels[curr_playing_level + 1];
 	if (!return_val)
 		levels.erase(curr_playing_level + 1);
 	return return_val;
+}
+
+void GameData::updateLevel(float ms)
+{
+	current_level->update(ms);
 }
 
 void GameData::addScore(int scored) {
@@ -357,10 +388,10 @@ int GameData::getScore() const {
 }
 
 void GameData::spawn() {
-	if (levels[curr_playing_level]->can_spawn())
-		enemyLs->push_back(levels[curr_playing_level]->spawn());
-	if (levels[curr_playing_level]->can_spawn_p())
-		powerupLs->push_back(levels[curr_playing_level]->spawn_p());
+	if (current_level->can_spawn())
+		enemyLs->push_back(current_level->spawn());
+	if (current_level->can_spawn_p())
+		powerupLs->push_back(current_level->spawn_p());
 }
 
 GameData::~GameData() {
