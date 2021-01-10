@@ -17,6 +17,7 @@ public:
 		GameObject(xpos,ypos,angle, 50.f,20,20, sprite, new Path(),0,1,score){}
 
 	virtual void consume(Player* target) const = 0;
+	virtual Powerup* clone() const = 0;
 
 	virtual ~Powerup() {
 		graphics::playSound(sound_path + "powerup.mp3", 0.2f, false);
@@ -40,6 +41,10 @@ public:
 		target->addHealth(65);
 	}
 
+	virtual Powerup* clone() const {
+		return new HealthPowerup(x, y, angle);
+	}
+
 	virtual ~HealthPowerup() = default;
 };
 
@@ -58,6 +63,10 @@ public:
 		target->incrementProjectile();
 	}
 
+	virtual Powerup* clone() const {
+		return new ProjectilePowerup(x, y, angle);
+	}
+
 	virtual ~ProjectilePowerup() = default;
 };
 
@@ -72,6 +81,10 @@ public:
 
 	virtual void consume(Player* target) const override {
 		;
+	}
+
+	virtual Powerup* clone() const {
+		return new PointsPowerup(x, y, angle);
 	}
 
 	virtual ~PointsPowerup() = default;
