@@ -76,16 +76,6 @@ public:
 
 	//Data used by UI
 	int curr_playing_level;
-	float level_transition_timer;
-	float set_level_transition_timer(float timer = 5.0f) { return timer; }
-	void next_level() { ++curr_playing_level; }
-  // lmao move this to gd.cpp
-	Level* has_next_level() { 
-		Level* return_val = levels[curr_playing_level + 1];
-		if (!return_val)
-			levels.erase(curr_playing_level + 1);
-		return return_val;
-	}
 	void addScore(int scored);
 	int getScore() const;
 
@@ -99,14 +89,19 @@ public:
 	int curr_active_level, curr_selected_level;
 
 
-	//Returns the next level to be used to spawn enemies
+	//Returns the next level. If it's nullptr, the player has won
 	Level* get_next_level();
+
 
 	//Loads the next level
 	void updateLevel(float ms) { levels[curr_playing_level]->update(ms); }
 
 	//Spawns new enemies
 	void spawn();
+
+	float level_transition_timer;
+	float set_level_transition_timer(float timer = 5.0f) { return timer; }
+	void next_level();
 
 
 	//======COLLECTION FUNCTIONS=========
