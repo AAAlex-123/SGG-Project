@@ -43,18 +43,19 @@ public:
 	//=========ACHIEVEMENT DATA=======
 
 	static Stats game_stats;
-	static const std::array<Achievement *, 4> achievements; //The C++ Standard forbids containers of const elements
+	static const std::array<Achievement *, 4> achievements; 
 
 	//=========GENERAL DATA===========
 
 	static const std::list<Achievement *> getAchieved();
 
 	// collections
-	std::list<Entity*>* enemyLs, * playerLs;
-	std::list<Projectile*>* enemyProjLs, * playerProjLs;
-	std::list<VisualEffect*>* effectsLs;
-	std::list<Powerup*>* powerupLs;
-	std::list<Button*>* buttons;
+	std::list<Player*>* const playerLs; //The C++ Standard forbids containers of const elements, so the obj's pointers are non-const
+	std::list<Entity*>* const enemyLs;
+	std::list<Projectile*>* const enemyProjLs, * playerProjLs;
+	std::list<VisualEffect*>* const effectsLs;
+	std::list<Powerup*>* const powerupLs;
+	std::list<Button*>* const buttons;
 
 	// general
 	int fps;
