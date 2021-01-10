@@ -3,11 +3,12 @@
 #include "Path.h"
 
 //Interface to allow uniform access to all drawable objects. Includes a standard virtual drawing method.
+//A Drawing is any object that can be drawn and move on the screen.
 class Drawing {
 
 protected:
 	static graphics::Brush br;
-	const std::string* const sprites;
+	const std::string* const sprites; //this could either be an array or a single string, internally it's handled the same way
 
 	float x, y, angle, vel;	// angle is measured in radiants and not in degrees
 	const float width, height;
@@ -16,7 +17,7 @@ protected:
 	Path* movement; //movement across the screen
 
 public:
-	Drawing(float xpos, float ypos, float angle, float vel, float width, float height, const std::string* sprites, Path* = new StaticPath());
+	Drawing(float xpos, float ypos, float angle, float vel, float width, float height, const std::string* const sprites, Path* = new StaticPath());
 
 	// Updates the entities state (movement etc.)
 	virtual void update(float) = 0;
