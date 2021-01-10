@@ -1,6 +1,6 @@
 #include "UI.h"
 
-UI::UI(GameData* gd) :
+UI::UI(const GameData* const  gd) :
 	width(get_canvas_width()), height(get_canvas_height()), gd(gd)
 {
 	initializeBrushes();
@@ -27,7 +27,7 @@ inline void UI::initializeBrushes() {
 
 
 
-void UI::drawPlayerPanel(const Entity* player, float x_pos) {
+void UI::drawPlayerPanel(const Player* const player, float x_pos) {
 
 	//draw Text
 	graphics::drawText(x_pos, height - 80, 20, "Player: ", std_br);
