@@ -1,6 +1,7 @@
 #include "Path.h"
 #include "UI.h" //access to UI's "hitbox"
 #include "drawing.h"
+#include "GObjFactory.h"
 #include <cmath>
 
 bool Path::move(float& x, float& y, float& angle, float& vel, float ms)
