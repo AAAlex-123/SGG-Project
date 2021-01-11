@@ -24,7 +24,7 @@ void VisualEffect::update(float ms) {
 }
 
 VisualEffect* VisualEffect::getDestructionVisualEffect() const {
-	return GObjFactory::createVisualEffect(GObjFactory::NOEFFECT, 0, 0, 0, 0, 0);
+	return GObjFactory::createVisualEffect(GObjFactory::EFFECT::NOEFFECT, 0, 0, 0, 0, 0);
 }
 
 VisualEffect::~VisualEffect() {
