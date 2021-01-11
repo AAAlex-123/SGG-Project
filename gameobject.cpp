@@ -38,4 +38,5 @@ GameObject::~GameObject()
 		GameData* gd = reinterpret_cast<GameData*>(graphics::getUserData());
 		gd->addScore(score);
 	}
+	delete sprites;
 }
