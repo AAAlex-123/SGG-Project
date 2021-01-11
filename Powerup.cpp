@@ -18,7 +18,7 @@ Powerup::~Powerup() {
 }
 
 VisualEffect* Powerup::getDestructionVisualEffect() const  {
-	return GObjFactory::createVisualEffect(GObjFactory::NOEFFECT, x, y, 0.0f, 1.0f, 18.0f); //obviously change this later not
+	return GObjFactory::createVisualEffect(GObjFactory::EFFECT::NOEFFECT, x, y, 0.0f, 1.0f, 18.0f); //obviously change this later not
 }
 
 
