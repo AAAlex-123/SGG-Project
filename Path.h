@@ -7,21 +7,24 @@ typedef graphics::scancode_t key;
 class Drawing;
 class Entity;
 
-//Interface for all Path classes
-//Path is a Decorated Strategy changing its parent class' position, angle and velocity
-class Path {
+/**
+ * Interface for all Path classes
+ * Path is a Decorated Strategy changing its parent class' position, angle, velocity and fire state
+ */
+class Path
+{
 public:
-	Path() {}
+	Path();
 	// Updates the position based on angle and velocity
 	// Returns bool if the object should fire (only used by Entities, other classes dismiss this value)
 	virtual bool move(float& x, float& y, float& angle, float& vel, float ms);
 };
 
-// Decorator that accelerates the object in relation to time
-class AcceleratingPath : public Path {
+// Decorator that increases the object's velocity
+class AcceleratingPath : public Path
+{
 public:
-	AcceleratingPath(float dvel, Path* p) : dvel(dvel), _path(p)
-	{}
+	AcceleratingPath(float dvel, Path* p);
 	virtual bool move(float& x, float& y, float& angle, float& vel, float ms) override;
 
 private:
@@ -31,10 +34,10 @@ private:
 };
 
 // Decorator that changes the angle
-class RotatingPath : public Path {
+class RotatingPath : public Path
+{
 public:
-	RotatingPath(float dangle, Path* p) : dangle(dangle), _path(p)
-	{}
+	RotatingPath(float dangle, Path* p);
 	virtual bool move(float& x, float& y, float& angle, float& vel, float ms) override;
 
 private:
@@ -43,11 +46,11 @@ private:
 	Path* const _path;
 };
 
-// Decorator that returns bool if the object should fire
-class FiringPath : public Path {
+// Decorator that returns true if the object should fire
+class FiringPath : public Path
+{
 public:
-	FiringPath(float period, Path* p) : period(period), elapsed(0), _path(p),curr_angle(0)
-	{}
+	FiringPath(float period, Path* p);
 	virtual bool move(float& x, float& y, float& angle, float& vel, float ms) override;
 
 	virtual float getProjAngle(float x, float y);
@@ -56,35 +59,36 @@ protected:
 	const float period;
 	float elapsed;
 	Path* const _path;
+	// stores the angle to fire. used by getProjAngle to determine the angle to fire
 	float curr_angle;
 };
 
-// Decorator that returns bool if the object should fire
-class TargetedFiringPath : public FiringPath {
+// Decorator that returns bool if the object should fire; fires at the closest target
+class TargetedFiringPath : public FiringPath
+{
 public:
-	TargetedFiringPath(float period, Path* p) : FiringPath(period,p)
-	{}
+	TargetedFiringPath(float period, Path* p);
+
 	virtual float getProjAngle(float x, float y) override;
 };
 
-// Decorator that changes angle to follow an entity
-class HomingPath : public Path {
+// Decorator that changes angle to follow the closest player
+class HomingPath : public Path
+{
 public:
-	HomingPath(float perc, Path* p)
-		: perc(perc), _path(p)
-	{}
+	HomingPath(float perc, Path* p);
 	virtual bool move(float& x, float& y, float& angle, float& vel, float ms) override;
 
 private:
-	// percentage of angle turn relative to target, 0-1
+	// percentage of angle turn relative to target every update cycle, 0-1
 	const float perc;
 	Path* const _path;
 };
 
-// Standalone Path that has no movement
-class StaticPath : public Path {
+// Standalone Path that has no movement and no fire
+class StaticPath : public Path
+{
 public:
-	StaticPath() : Path()
-	{}
+	StaticPath();
 	virtual bool move(float& x, float& y, float& angle, float& vel, float ms) override;
 };
