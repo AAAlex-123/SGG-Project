@@ -1,5 +1,6 @@
 #pragma once
 #include "gameobject.h"
+#include "GObjFactory.h"
 
 class Projectile;
 
@@ -28,11 +29,11 @@ public:
 	virtual ~Entity();
 
 protected:
-	int curr_projectile;
+	GObjFactory::BULLET curr_projectile;
 	bool _hasFired;
 
-	Entity(float xpos, float ypos, float angle, float vel, float width, float height, const std::string* const sprite_name, Path*,
-		int damage, int health, int score, int proj_type);
+	Entity(float xpos, float ypos, float angle, float vel, float width, float height, const std::string* const, Path*,
+		int damage, int health, int score, GObjFactory::BULLET proj_type);
 
 	friend class GObjFactory; // allow creation of entities only to the factory
 
