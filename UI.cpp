@@ -1,12 +1,11 @@
 #include "UI.h"
+#include "game_data.h"
+#include "Player.h"
 
-UI::UI(const GameData* const  gd) :
-	width(get_canvas_width()), height(get_canvas_height()), gd(gd)
+UI::UI(const GameData* const  gd)
+	: width(get_canvas_width()), height(get_canvas_height()), gd(gd)
 {
-	initializeBrushes();
-}
-
-inline void UI::initializeBrushes() {
+	// initialize brushes
 	health_br.fill_color[0] = 1.f;
 	health_br.fill_color[1] = 0.f;
 	health_br.fill_color[2] = 0.f;
@@ -25,10 +24,42 @@ inline void UI::initializeBrushes() {
 	std_br.fill_color[2] = 0.f;
 }
 
+void UI::draw()
+{
+	graphics::setOrientation(0.f);
+	// draw UI box
+	setColor(bg_br, new float[3]{ 0.8f, 0.4f, 0.1f });
+	bg_br.texture = "";
+	graphics::drawRect(width / 2, height - box_height, width, 110, bg_br);
 
+	// draw Score
+	graphics::drawText(width / 2 - 75, 60, 30, "Score: " + std::to_string(gd->getScore()), std_br);
 
-void UI::drawPlayerPanel(const Player* const player, float x_pos) {
+	// draw FPS
+	if ((int)graphics::getGlobalTime() % 20 == 0) //change fps every 0.2 seconds
+		new_fps = gd->fps;
+	graphics::drawText(width / 75, 2 * width / 20, ((width + height) / 2) / 35, "FPS " + std::to_string(new_fps), std_br);
 
+	// draw Level
+	graphics::drawText(width / 75, 2 * width / 20 + 20, ((width + height) / 2) / 35, "Level "
+		+ std::to_string(gd->_playing_level_id >= 0 ? gd->_playing_level_id + 1 : gd->_playing_level_id + 11), std_br);
+
+	// draw pause text
+	graphics::drawText(4 * width / 5, 2 * width / 20 + 20, ((width + height) / 2) / 35, "Pause (P)", std_br);
+
+	// draw Panels
+	drawPlayerPanel(gd->playerLs->front(), 0);
+	if (gd->isMultiplayer)
+	{
+		if (gd->playerLs->size() == 2)
+			drawPlayerPanel(gd->playerLs->back(), width - 175);
+		else
+			drawDestroyedPanel(width - 175);
+	}
+}
+
+void UI::drawPlayerPanel(const Player* const player, float x_pos)
+{
 	//draw Text
 	graphics::drawText(x_pos, height - 80, 20, "Player: ", std_br);
 	graphics::drawText(x_pos, height - 50, 20, "Bullets:", std_br);
@@ -41,8 +72,7 @@ void UI::drawPlayerPanel(const Player* const player, float x_pos) {
 	graphics::setOrientation(90.f);
 	graphics::drawRect(x_pos + 100, height - 80, 20, box_height, bg_br);
 
-
-	//draw Projectile icon
+	//draw Projectile icons
 	bg_br.texture = *(player->getProjectile()->getSprite());
 	graphics::setOrientation(0.f);
 	graphics::drawRect(x_pos + 90,  height - 50, 20, box_height, bg_br);
@@ -62,52 +92,21 @@ void UI::drawPlayerPanel(const Player* const player, float x_pos) {
 	graphics::drawRect(x_pos + 75, height - 20, 150, 20, health_br);
 }
 
-void UI::drawDestroyedPanel(float x_pos) {
-
-	//draw Text
+void UI::drawDestroyedPanel(float x_pos)
+{
+	// draw Text
 	graphics::drawText(x_pos, height - 80, 20, "Player: ", std_br);
 	graphics::drawText(x_pos, height - 50, 20, "Bullets:", std_br);
 	graphics::drawText(x_pos, height - 15, 20, "HP", std_br);
 
-	//draw Player icon
+	// draw Player icon
 	bg_br.texture = image_path + "skull.png";
 	graphics::drawRect(x_pos + 100, height - 80, 30, 30, bg_br);
 
-	//draw empty healthbar
+	// draw empty healthbar
 	graphics::drawRect(x_pos + 75, height - 20, 150, 20, health_br);
 
-	//draw X
+	// draw X
 	bg_br.texture = image_path + "X.png";
-	graphics::drawRect((width+x_pos)/2, height - box_height - 7, 95, 95, bg_br);
+	graphics::drawRect((width + x_pos) / 2, height - box_height - 7, 95, 95, bg_br);
 }
-
-void UI::draw() {
-	graphics::setOrientation(0.f);
-	//draw UI box
-	setColor(bg_br, new float[3]{ 0.8f, 0.4f, 0.1f });
-	bg_br.texture = "";
-	graphics::drawRect(width / 2, height - box_height, width, 110, bg_br);
-
-	//draw Score
-	graphics::drawText(width / 2 - 75, 60, 30, "Score: " + std::to_string(gd->getScore()), std_br);
-
-	//draw FPS
-	if ((int)graphics::getGlobalTime() % 20 == 0) //change fps every 0.2 seconds
-		new_fps = gd->fps;
-	graphics::drawText(width / 75, 2 * width / 20, ((width + height) / 2) / 35, "FPS " + std::to_string(new_fps), std_br);
-
-	//draw Level
-	graphics::drawText(width / 75, 2 * width / 20 + 20, ((width + height) / 2) / 35, "Level "
-		+ std::to_string(gd->curr_playing_level >= 0 ? gd->curr_playing_level + 1 : gd->curr_playing_level + 11), std_br);
-
-	//draw pause text
-	graphics::drawText(4*width / 5, 2 * width / 20 + 20, ((width + height) / 2) / 35, "Pause (P)", std_br);
-
-	//draw Panels
-	drawPlayerPanel(gd->playerLs->front(), 0);
-	if (gd->playerLs->size() == 1 && gd->isMult)
-		drawDestroyedPanel(width - 175);
-	else if (gd->isMult)
-		drawPlayerPanel(gd->playerLs->back(), width - 175);
-}
-
