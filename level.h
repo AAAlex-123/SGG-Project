@@ -1,5 +1,6 @@
 #pragma once
 #include "globals.h"
+#include "GObjFactory.h"
 #include <unordered_set>
 #include <queue>
 
@@ -91,7 +92,7 @@ class Spawnpoint
 {
 private:
 	// enemy parameters
-	const int type;
+	const GObjFactory::ENEMY type;
 	const float perc_x, perc_y, angle;
 
 	// spawnpoint parameters
@@ -100,7 +101,7 @@ private:
 	float _initial_delay, _elapsed_time;
 
 public:
-	Spawnpoint(int type, float perc_x, float perc_y, float angle, int amount, float spawn_delta, float initial_delay);
+	Spawnpoint(GObjFactory::ENEMY type, float perc_x, float perc_y, float angle, int amount, float spawn_delta, float initial_delay);
 	Spawnpoint* clone();
 
 	void update(float);
