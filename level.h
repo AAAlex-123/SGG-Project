@@ -9,87 +9,113 @@ class Spawnpoint;
 class Entity;
 class Powerup;
 
-// defines a set of waves and their timings
+/*
+ * Composition of Levels and Waves:
+ * 
+ *  -  Spawnpoints spawn a number of enemies all with the same properties.
+ *     For example, a Spawnpoint might spawn 5 enemies of type t at [x, y] with a dt delay between each spawn
+ *  -  Waves are a set of different Spawnpoints that all spawn at the same time.
+ *	   For example, a Wave might have 3 spawnpoints at the top of the screen that spawn enemies moving downwards
+ *  -  Levels are a set of Waves that start at a specific time to spawn enemies, and stop when they are empty
+ *     Levels also spawn Powerups, again at specific times since level start.
+ *     For example, a Level might have 3 Waves that start to spawn at 5, 10 and 15 seconds,
+ *     and also a Powerup that spawns at 25 seconds since level start
+ */
+
+/**
+ * A class that defines an in-game level.
+ * Specifically, defines the timing of the waves of enemies that spawn and the timing of the level's powerups.
+ */
 class Level
 {
-private:
-	const int _id;
-	const std::string _desc;
-
-	// queue of waves and their start time
-	// the time of each wave corresponds to the amount of time that will pass
-	// from level start before the wave starts
-	std::unordered_set<std::pair<float, Wave*>*>* waves;
-	std::unordered_set<std::pair<float, Powerup*>*>* powerups;
-	// queue of enemies to be spawned (look at Wave::update() for why it is a queue)
-	std::queue<Entity*>* enemy_queue;
-	std::queue<Powerup*>* powerup_queue;
-
-	float _total_time;
-
 public:
 	Level(int, const std::string&);
-	Level* clone();
+	// levels are cloned from the GameData map of levels so they can be replayed without reloading them
+	Level* clone() const;
 
-	// update level and wave time
+	// updates the level's timer as well as the timer of all the waves that are active
+	// also adds enemies to the queue to be spawned using the waves' spawn method
 	void update(float ms);
-	// delegate entity spawning to the waves
-	bool can_spawn();
+	bool can_spawn() const;
+	// each spawn() call can only return a single enemy, therefore a queue is used internaly
+	// to enable multiple enemies to be spawned at the same update() call
 	Entity* spawn();
-	// handle powerup spawning
-	bool can_spawn_p();
+	// powerup spawning
+	bool can_spawn_p() const;
 	Powerup* spawn_p();
 
 	void add_wave(float, Wave*);
 	void add_powerup(float, Powerup*);
 
-	// used by level selection to display info and select level
-	int id() { return _id; }
-	std::string info() { return "level " + std::to_string(id()) + ": " + _desc; }
+	int id() const { return _id; }
+	std::string info() const { return "level " + std::to_string(id()) + ": " + _desc; }
 
-	// false if no enemies or waves left;
-	// false if it shouldn't be here
+	// false if no waves and no enemies left;
 	operator bool() const;
 
-	// (wip) returns the string necessary to rebuild the level
-	std::string to_file_string();
-
 	~Level();
+
+private:
+	const int _id;
+	const std::string _desc;
+	float _total_time;
+
+	// sets of waves and powerups and the time from level start to spawn
+	std::unordered_set<std::pair<float, Wave*>*>* waves;
+	std::unordered_set<std::pair<float, Powerup*>*>* powerups;
+
+	// queues of enemies and powerups to be spawned
+	std::queue<Entity*>* enemy_queue;
+	std::queue<Powerup*>* powerup_queue;
 };
 
+/**
+* A class that defines a wave of enemies.
+* Specifically, defines a set of spawnpoints that spawn enemies.
+*/
 class Wave
 {
-private:
-	const std::string _desc;
-
-	std::unordered_set<Spawnpoint*>* spawnpoints;
-	// queue of enemies to be spawned (look at Wave::update() for why it is a queue)
-	std::queue<Entity*>* enemy_queue;
-
 public:
 	Wave(const std::string&);
 	Wave* clone();
 
-	// update the spawnpoints' timer, add new enemies to enemy_queue
 	void update(float);
-	// work with the enemy_queue
 	bool can_spawn();
 	Entity* spawn();
 
 	void add_spawnpoint(Spawnpoint*);
 
-	// false if no spawnpoint has any enemies left
-	// false if it shouldn't be here
+	// false if there are no enemies left to spawn
 	operator bool() const;
 
-	// (wip) returns the string necessary to rebuild the wave
-	std::string to_file_string();
-
 	~Wave();
+
+private:
+	const std::string _desc;
+
+	std::unordered_set<Spawnpoint*>* spawnpoints;
+	std::queue<Entity*>* enemy_queue;
 };
 
+/**
+* A class that defines a spawnpoint that spawns enemies.
+* Specifically, a set of parameters that define the properties of enemies spawning at a location
+*/
 class Spawnpoint
 {
+public:
+	Spawnpoint(GObjFactory::ENEMY type, float perc_x, float perc_y, float angle, int amount, float spawn_delta, float initial_delay);
+	Spawnpoint* clone();
+
+	void update(float);
+	bool can_spawn();
+	Entity* spawn();
+
+	// false if there are no enemies left to spawn
+	operator bool() const;
+
+	~Spawnpoint() = default;
+
 private:
 	// enemy parameters
 	const GObjFactory::ENEMY type;
@@ -99,18 +125,4 @@ private:
 	const float _spawn_delta;
 	int _amount;
 	float _initial_delay, _elapsed_time;
-
-public:
-	Spawnpoint(GObjFactory::ENEMY type, float perc_x, float perc_y, float angle, int amount, float spawn_delta, float initial_delay);
-	Spawnpoint* clone();
-
-	void update(float);
-	bool can_spawn();
-	Entity* spawn();
-
-	// false if there are no enemies left
-	operator bool() const;
-
-	// (wip) returns the string necessary to rebuild the spawnpoint
-	std::string to_file_string();
 };
