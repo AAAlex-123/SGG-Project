@@ -112,9 +112,9 @@ public:
 
 private:
 	// Methods used to create levels upon initialization
-	bool load_level_data_from_file(const std::string& level_path, const std::string& wave_path);
+	bool _load_level_data_from_file(const std::string& level_path, const std::string& wave_path);
 	bool _load_waves_from_file(const std::string& wave_path);
-	bool _load_levels_from_file(const std::string& wave_path);
+	bool _load_levels_from_file(const std::string& level_path);
 	// Failsafe in case reading from file fails
 	void _load_hardcoded_levels();
 
