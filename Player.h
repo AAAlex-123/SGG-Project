@@ -1,9 +1,7 @@
 #pragma once
-#include "Path.h"
 #include "entity.h"
-#include "globals.h"
-#include "GObjFactory.h"
-#include <iostream>
+
+class FiringPath;
 
 //A subclass of Entity that can interact with powerups and has access to a unique path.
 class Player final : public Entity{
@@ -25,7 +23,7 @@ private:
 public:
 
     Player(float xpos, float ypos, float angle, float vel, float width, float height, const std::string* sprite_name, float dangle, float cooldown, Keyset keys,
-        int health, int proj_type);
+        int health, GObjFactory::BULLET proj_type);
 
 	// Changes the projectile type
     void incrementProjectile();
@@ -34,6 +32,3 @@ public:
 
 	virtual ~Player() = default;
 };
-
-
-
