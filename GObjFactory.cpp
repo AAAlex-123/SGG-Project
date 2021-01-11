@@ -72,9 +72,9 @@ Player* GObjFactory::createPlayer(float x, float y, float angle, float dangle) {
 
 	switch (playerLs->size())
 	{
-	case 1:
+	case 0:
 		return new Player(x, y, angle, player_speed, player_w, player_h, new string(image_path + "player1"), dangle, 0.1f, pl1_kset, player_hp, GObjFactory::BULLET::LIGHT_BULLET);
-	case 2:
+	case 1:
 		return new Player(x, y, angle, player_speed, player_w, player_h, new string(image_path + "player2"), dangle, 0.1f, pl2_kset, player_hp, GObjFactory::BULLET::LIGHT_BULLET);
 	default:
 		throw std::logic_error("GObjFactory::createPlayer: what the actual fuck how did this even happen");
