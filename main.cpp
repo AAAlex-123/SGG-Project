@@ -3,6 +3,7 @@
 #include "GObjFactory.h"
 #include "game_data.h"
 #include "UI.h"
+#include "Player.h"
 #include <iostream>
 #include <thread>
 
@@ -574,6 +575,7 @@ void resize(int new_w, int new_h)
 
 int main(int argc, char** argv)
 {
+
 	graphics::createWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "1942ripoff");
 	graphics::setFullScreen(true);
 	std::set_terminate(close);
