@@ -189,9 +189,9 @@ void update(float ms)
 
 			GObjFactory::setPlayerData(gd->playerLs);
 			//Due to Factory constraints we are forced to upcast then downcast the player pointer.
-			gd->playerLs->push_back(dynamic_cast<Player*>(GObjFactory::createEntity(GObjFactory::PLAYER, get_canvas_width() / 3.0f, get_canvas_height() * 0.7f, 0)));
+			gd->playerLs->push_back(dynamic_cast<Player*>(GObjFactory::createEntity(GObjFactory::ENEMY::PLAYER, get_canvas_width() / 3.0f, get_canvas_height() * 0.7f, 0)));
 			if (gd->isMultiplayer)
-				gd->playerLs->push_back(dynamic_cast<Player*>(GObjFactory::createEntity(GObjFactory::PLAYER, 2 * get_canvas_width() / 3.0f, get_canvas_height() * 0.7f, 0)));
+				gd->playerLs->push_back(dynamic_cast<Player*>(GObjFactory::createEntity(GObjFactory::ENEMY::PLAYER, 2 * get_canvas_width() / 3.0f, get_canvas_height() * 0.7f, 0)));
 
 #ifndef no_threads
 			// start threads only the first time the game starts
@@ -609,8 +609,8 @@ void initialize()
 	graphics::setUserData((void*)gd);
 
 	// load stuff
-	if (!graphics::setFont(font))
-		std::cerr << "Unable to load font from: " << font << std::endl;
+	if (!graphics::setFont(font_file))
+		std::cerr << "Unable to load font from: " << font_file << std::endl;
 
 	if (!load_images_from_file(image_path))
 		std::cerr << "Unable to load images from: " << image_path << std::endl;
