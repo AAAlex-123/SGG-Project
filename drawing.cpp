@@ -21,6 +21,7 @@ void Drawing::draw()
 
 Drawing::~Drawing()
 {
+	// sprites can either be a single pointer or an array
+	// therefore subclasses are responsible for deleting it
 	delete movement;
-	delete sprites;
 }
