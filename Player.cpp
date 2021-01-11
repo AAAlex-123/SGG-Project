@@ -1,16 +1,18 @@
 #include "Player.h"
+#include "GObjFactory.h"
+#include "Path.h"
 #include "UI.h" //access to UI's "hitbox"
 
 Player::Player(float xpos, float ypos, float angle, float vel, float width, float height, const std::string* sprite_name, float dangle, float cooldown, Keyset keys,
-    int health, int proj_type) :
-    Entity(xpos, ypos, angle, vel, width, height, sprite_name, new KeyboardPath(dangle, cooldown, keys), INT_MAX, health, 0, proj_type)
+    int health, GObjFactory::BULLET proj_type)
+    : Entity(xpos, ypos, angle, vel, width, height, sprite_name, new KeyboardPath(dangle, cooldown, keys), INT_MAX, health, 0, proj_type)
 {}
 
 void Player::incrementProjectile() {
-    if (curr_projectile == GObjFactory::LIGHT_BULLET)
-        curr_projectile = GObjFactory::STANDARD_BULLET;
-    else if (curr_projectile == GObjFactory::STANDARD_BULLET)
-        curr_projectile = GObjFactory::HEAVY_BULLET;   
+    if (curr_projectile == GObjFactory::BULLET::LIGHT_BULLET)
+        curr_projectile = GObjFactory::BULLET::STANDARD_BULLET;
+    else if (curr_projectile == GObjFactory::BULLET::STANDARD_BULLET)
+        curr_projectile = GObjFactory::BULLET::HEAVY_BULLET;   
 }
 
 void Player::addHealth(int health) {

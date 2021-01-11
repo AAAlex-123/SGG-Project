@@ -3,19 +3,23 @@
 #include "scancodes.h"
 #include <string>
 
+/**
+* Functions and data that should be accessible by every class
+*/
+
 typedef graphics::scancode_t key;
 
 const float PI = 3.14159265359f;
 
 // assets and other paths
 const std::string asset_path = ".\\assets";
-const std::string font = asset_path + "\\standard_font.ttf";
 const std::string image_path = asset_path + "\\images\\";
 const std::string icon_path = asset_path + "\\icons\\";
 const std::string sound_path = asset_path + "\\sounds\\";
 const std::string music_path = asset_path + "\\music\\";
-const std::string level_path = ".\\levels.txt";
-const std::string wave_path = ".\\waves.txt";
+const std::string font_file = asset_path + "\\standard_font.ttf";
+const std::string level_file = ".\\levels.txt";
+const std::string wave_file = ".\\waves.txt";
 
 // enum
 enum game_states
@@ -45,16 +49,15 @@ float get_canvas_width();
 float mouse_x(float);
 float mouse_y(float);
 
-void setColor(graphics::Brush&, const float*);
-void setColor(graphics::Brush&, char c);
-
+/**
+* A class defining a set of keys the player uses to move
+*/
 struct Keyset
 {
 	key up, down, left, right, rleft, rright, fire;
 	Keyset(key up, key down, key left, key right, key rleft, key rright, key fire)
 		: up(up), down(down), left(left), right(right), rleft(rleft), rright(rright), fire(fire) {}
 };
-
 
 inline void setColor(graphics::Brush& br, const float* rgb)
 {

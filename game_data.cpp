@@ -98,7 +98,7 @@ void GameData::click_buttons()
 
 void GameData::load_levels()
 {
-	if (!load_level_data_from_file(level_path, wave_path))
+	if (!_load_level_data_from_file(level_file, wave_file))
 	{
 		std::cerr << "Warning: Level loading from files failed, loading hardcoded levels" << std::endl;
 		_load_hardcoded_levels();
@@ -132,12 +132,12 @@ void GameData::spawn()
 		powerupLs->push_back(current_level->spawn_p());
 }
 
-bool GameData::load_level_data_from_file(const std::string& level_file_path, const std::string& wave_file_path)
+bool GameData::_load_level_data_from_file(const std::string& level_file_path, const std::string& wave_file_path)
 {
 	// first load waves
 	if (!_load_waves_from_file(wave_file_path))
 	{
-		std::cerr << "Warning: Unable to load waves from file: " + level_file_path << std::endl;
+		std::cerr << "Warning: Unable to load waves from file: " + wave_file_path << std::endl;
 		return false;
 	}
 
@@ -198,8 +198,45 @@ bool GameData::_load_waves_from_file(const std::string& wave_file_path)
 				std::cerr << "Error: Attempting to add spawnpoint before declaring a wave at line " << line << std::endl;
 				return false;
 			}
+
+			// SIMPLE_ENEMY = 1,		SIMPLE_ENEMY_F = 7,		ROTATING_ENEMY_D = 2,	ROTATING_ENEMY_CA = 6
+			// ROTATING_ENEMY_C = 8,	ACCELERATING_ENEMY = 3, TANK_ENEMY = 4,			HOMING_ENEMY = 5;
+
+			// arbitrarily match ints to the factory's enum
+
+			GObjFactory::ENEMY type = GObjFactory::ENEMY::SIMPLE_ENEMY;
+			switch (stoi(match[1]))
+			{
+			case 1:
+				type = GObjFactory::ENEMY::SIMPLE_ENEMY;
+				break;
+			case 2:
+				type = GObjFactory::ENEMY::ROTATING_ENEMY_D;
+				break;
+			case 3:
+				type = GObjFactory::ENEMY::ACCELERATING_ENEMY;
+				break;
+			case 4:
+				type = GObjFactory::ENEMY::TANK_ENEMY;
+				break;
+			case 5:
+				type = GObjFactory::ENEMY::HOMING_ENEMY;
+				break;
+			case 6:
+				type = GObjFactory::ENEMY::ROTATING_ENEMY_CA;
+				break;
+			case 7:
+				type = GObjFactory::ENEMY::SIMPLE_ENEMY_F;
+				break;
+			case 8:
+				type = GObjFactory::ENEMY::ROTATING_ENEMY_C;
+				break;
+			default:
+				std::cerr << "GameData::_load_waves_from_file: invalid enemy type from file: " << stoi(match[1])
+					<< ". Creating simple enemy" << std::endl;;
+			}
 			_waves[curr_wave]->add_spawnpoint(new Spawnpoint(
-				stoi(match[1]), stof(match[2]), stof(match[3]), stof(match[4]) / 180 * PI,
+				type, stof(match[2]), stof(match[3]), stof(match[4]) / 180 * PI,
 				stoi(match[5]), stof(match[6]), stof(match[7])
 			));
 		}
@@ -337,7 +374,7 @@ bool GameData::_load_levels_from_file(const std::string& level_file_path)
 // wip lmao
 void GameData::_load_hardcoded_levels()
 {
-	Spawnpoint* sp11 = new Spawnpoint(3, 0.0f, 0.5, -PI / 2, 10, 1.0f, 0.0f);
+	Spawnpoint* sp11 = new Spawnpoint(GObjFactory::ENEMY::SIMPLE_ENEMY, 0.0f, 0.5, -PI / 2, 10, 1.0f, 0.0f);
 
 	Wave* w1 = new Wave("line");
 	w1->add_spawnpoint(sp11);
