@@ -1,10 +1,8 @@
 #include "projectile.h"
 #include "GObjFactory.h"
-#include "graphics.h"
-#include "globals.h"
 
 Projectile::Projectile(float xpos, float ypos, float angle, float vel, float radius, std::string* sprites, Path* p, int damage) :
-	GameObject(xpos, ypos, angle, vel, radius,radius, sprites, p, damage, 1,0) //width == height -> square
+	GameObject(xpos, ypos, angle, vel, radius, radius, sprites, p, damage, 1, 0) //width == height -> square
 {}
 
 
@@ -18,7 +16,7 @@ void Projectile::hit(GameObject* o2) {
 }
 
 VisualEffect* Projectile::getDestructionVisualEffect() const {
-	return GObjFactory::createVisualEffect(GObjFactory::NOEFFECT, 0, 0, 0, 0, 0);
+	return GObjFactory::createVisualEffect(GObjFactory::EFFECT::NOEFFECT, 0, 0, 0, 0, 0);
 }
 
 Projectile::~Projectile() {}
