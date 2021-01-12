@@ -77,7 +77,7 @@ void GameData::checkAndDelete(std::list<T*>* ls)
 
 // Workaround as C++ doesn't permit method specialization
 template<class T>
-inline void delete_(const GameData* const gd, T* obj)
+inline void delete_(const GameData* const gd, const T* const obj)
 {
 	delete obj;
 }
