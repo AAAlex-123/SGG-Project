@@ -86,7 +86,7 @@ bool Level::can_spawn() const
 	return (!enemy_queue->empty());
 }
 
-Entity* Level::spawn()
+Entity* Level::spawn() const
 {
 	Entity* return_val = enemy_queue->front();
 	enemy_queue->pop();
@@ -161,7 +161,7 @@ Wave::Wave(const std::string& desc)
 	: _desc(desc), spawnpoints(new std::unordered_set<Spawnpoint*>), enemy_queue(new std::queue<Entity*>)
 {}
 
-Wave* Wave::clone()
+Wave* const Wave::clone() const
 {
 	Wave* w = new Wave(_desc);
 	for (Spawnpoint* sp : *(this->spawnpoints))
@@ -181,19 +181,19 @@ void Wave::update(float ms)
 	}
 }
 
-bool Wave::can_spawn()
+bool Wave::can_spawn() const
 {
 	return !(enemy_queue->empty());
 }
 
-Entity* Wave::spawn()
+Entity* const Wave::spawn() const
 {
 	Entity* return_val = enemy_queue->front();
 	enemy_queue->pop();
 	return return_val;
 }
 
-void Wave::add_spawnpoint(Spawnpoint* s)
+void Wave::add_spawnpoint(Spawnpoint* const s)
 {
 	spawnpoints->insert(s);
 }
@@ -247,7 +247,7 @@ void Spawnpoint::update(float ms)
 	}
 }
 
-bool Spawnpoint::can_spawn()
+bool Spawnpoint::can_spawn() const
 {
 	// _elapsed_time == 0.0f only when it is reset from update() -> only when it can spawn
 	return (_elapsed_time == 0.0f) && (_amount > 0);
