@@ -21,8 +21,24 @@ float w2c = (WINDOW_HEIGHT - CANVAS_HEIGHT) < (WINDOW_WIDTH - CANVAS_WIDTH)
 	: CANVAS_WIDTH / WINDOW_WIDTH;
 float c2w = 1.0f / w2c;
 
+enum class MUSIC
+{
+	MENU_MUSIC,
+	BATTLE_MUSIC,
+	LOSE_MUSIC,
+	WIN_MUSIC,
+};
+
 // functions
+
+void update(float);
+void draw();
+void resize(int, int);
+int main();
 void initialize();
+void close();
+void updateAndSpawn(GameData* starting_gd, float* ms);
+void checkAndFire(GameData* starting_gd);
 
 bool load_images_from_file(const std::string& image_path)
 {
