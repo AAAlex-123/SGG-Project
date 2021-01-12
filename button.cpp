@@ -1,7 +1,7 @@
 #include "button.h"
 #include "game_data.h"
 
-Button::Button(GameData* gd, float x, float y, float size, std::string* icon, int targetGS)
+Button::Button(GameData* gd, float x, float y, float size, std::string* icon, GAME_STATE targetGS)
 	: Drawing(x, y, 0, 0, size, size, icon), gd(gd), targetGS(targetGS), clicked(false), ms(graphics::MouseState())
 {}
 
@@ -34,7 +34,7 @@ Button::operator bool() const
 }
 
 // GameStateChangingButton
-GameStateChangingButton::GameStateChangingButton(GameData* gd, float x, float y, float size, std::string* icon, int targetGS, int newGS)
+GameStateChangingButton::GameStateChangingButton(GameData* gd, float x, float y, float size, std::string* icon, GAME_STATE targetGS, GAME_STATE newGS)
 	: Button(gd, x, y, size, icon, targetGS), newGS(newGS)
 {}
 
