@@ -11,21 +11,21 @@
  */
 
 template <class T>
-void GameData::update(float ms, std::list<T*>* ls)
+void GameData::update(float ms, std::list<T*>* const ls)
 {
 	for (Drawing* dr : *ls)
 		dr->update(ms);
 }
 
 template <class T>
-void GameData::draw(std::list<T*>* ls)
+void GameData::draw(std::list<T*>* const ls)
 {
 	for (Drawing* dr : *ls)
 		dr->draw();
 }
 
 template <class T1, class T2>
-void GameData::checkCollisions(std::list<T1*>* ls1, std::list<T2*>* ls2)
+void GameData::checkCollisions(std::list<T1*>* const ls1, std::list<T2*>* const ls2)
 {
 	for (GameObject* o1 : *ls1)
 		for (GameObject* o2 : *ls2)
@@ -33,7 +33,7 @@ void GameData::checkCollisions(std::list<T1*>* ls1, std::list<T2*>* ls2)
 }
 
 template <class T>
-void GameData::fire(std::list<T*>* ls) const
+void GameData::fire(std::list<T*>* const ls) const
 {
 	for (Entity* en : *ls)
 	{
@@ -57,7 +57,7 @@ void GameData::fire(std::list<T*>* ls) const
 }
 
 template <class T>
-void GameData::checkAndDelete(std::list<T*>* ls)
+void GameData::checkAndDelete(std::list<T*>* const ls)
 {
 	for (auto iter = ls->begin(); iter != ls->end(); ++iter)
 	{
@@ -91,9 +91,8 @@ inline void delete_(const GameData* const gd, const Entity* const obj)
 }
 
 template<class T>
-void GameData::deleteList(std::list<T*>* ls)
+void GameData::clearList(std::list<T*>* const ls)
 {
 	for (T* obj : *ls)
 		delete obj;
-	delete ls;
 }
