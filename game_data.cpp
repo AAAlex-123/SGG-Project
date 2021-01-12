@@ -405,9 +405,9 @@ void GameData::create_buttons()
 	// game -- pause
 	buttonLs->push_back(new GameStateChangingButton(this, 370.0f, 30.0f, 30.0f, new string(icon_path + "continue.png"), GAME_STATE::PAUSE, GAME_STATE::GAME));
 	// game -- lose
-	buttonLs->push_back(new GameStateChangingButton(this, 30.0f, 30.0f, 30.0f, new string(icon_path + "back.png"), GAME_STATE::GAME_LOSE, GAME_STATE::RESET));
+	buttonLs->push_back(new GameStateChangingButton(this, 30.0f, 30.0f, 30.0f, new string(icon_path + "back2.png"), GAME_STATE::GAME_LOSE, GAME_STATE::RESET));
 	// game -- win
-	buttonLs->push_back(new GameStateChangingButton(this, 30.0f, 30.0f, 30.0f, new string(icon_path + "back.png"), GAME_STATE::GAME_WIN, GAME_STATE::RESET));
+	buttonLs->push_back(new GameStateChangingButton(this, 30.0f, 30.0f, 30.0f, new string(icon_path + "back2.png"), GAME_STATE::GAME_WIN, GAME_STATE::RESET));
 	// help
 	buttonLs->push_back(new GameStateChangingButton(this, 30.0f, 30.0f, 30.0f, new string(icon_path + "back.png"), GAME_STATE::HELP, GAME_STATE::MENU));
 	// credits
