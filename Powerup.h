@@ -1,78 +1,73 @@
 #pragma once
-#include "globals.h"
-#include "Player.h"
-#include "GObjFactory.h"
+#include "gameobject.h"
 
-//All the methods here are supposed to be in-line so they are declared only in the header file
+class Player;
 
-class Powerup :public GameObject{
-protected:
-	virtual void hit(GameObject* o2) final override {
-		GameObject::hit(o2);
-		consume(dynamic_cast<Player*> (o2)); //it's guaranteed to be a Player* and the method will be used only a couple times in the game
-	}
-
+/**
+ * A superclass defining objects that when interact with a player give him any kind of buff
+ * Subclasses specify the details of said buff
+ */ 
+class Powerup :public GameObject
+{
 public:
-	Powerup(float xpos, float ypos, float angle, const std::string* sprite, int score):
-		GameObject(xpos,ypos,angle, 50.f,20,20, sprite, new Path(),0,1,score){}
+	Powerup(float xpos, float ypos, float angle, const std::string* sprite, int score);
 
+	//The method subclasses override to specify hit()'s behavior
 	virtual void consume(Player* target) const = 0;
+	//Powerup is implemented with the prototype pattern because of how they get spawned from Level
+	virtual Powerup* clone() const = 0;
 
-	virtual ~Powerup() {
-		graphics::playSound(sound_path + "powerup.mp3", 0.2f, false);
-	}
+	virtual VisualEffect* getDestructionVisualEffect() const override;
 
-	virtual VisualEffect* getDestructionVisualEffect() const override {
-		return GObjFactory::createVisualEffect(GObjFactory::NOEFFECT, x, y, 0.0f, 1.0f, 18.0f); //obviously change this later
-	}
+	virtual ~Powerup();
+
+protected:
+	// A simple template method called whenever a powerup is touched
+	virtual void hit(GameObject* o2) final override;
 };
 
-class HealthPowerup : public Powerup {
-private:
-	static const int score = 10000;
-	const std::string sprite = std::string(image_path + "h_powerup.png");
+class HealthPowerup : public Powerup
+{
 public:
 
-	HealthPowerup(float xpos, float ypos, float angle):
-		Powerup(xpos, ypos, angle, &sprite, score){}
+	HealthPowerup(float xpos, float ypos, float angle);
 
-	virtual void consume(Player* target) const override {
-		target->addHealth(65);
-	}
+	virtual void consume(Player* target) const override;
+
+	virtual Powerup* clone() const;
 
 	virtual ~HealthPowerup() = default;
-};
 
-class ProjectilePowerup : public Powerup {
 private:
 	static const int score = 10000;
-	const std::string sprite = std::string(image_path + "proj_powerup.png");
-	int proj_type = 0;
-
-public:
-	ProjectilePowerup(float xpos, float ypos, float angle) :
-		Powerup(xpos, ypos, angle, &sprite, score)
-	{}
-
-	virtual void consume(Player* target) const override {
-		target->incrementProjectile();
-	}
-
-	virtual ~ProjectilePowerup() = default;
 };
 
-class PointsPowerup : public Powerup {
-private:
-	static const int score = 100000;
-	const std::string sprite = std::string(image_path + "points_powerup.png");
-
+class ProjectilePowerup : public Powerup
+{
 public:
-	PointsPowerup(float xpos, float ypos, float angle) :
-		Powerup(xpos, ypos, angle, &sprite, score) {}
+	ProjectilePowerup(float xpos, float ypos, float angle);
 
-	virtual void consume(Player* target) const override {
-		;
-	}
+	virtual void consume(Player* target) const override;
+
+	virtual Powerup* clone() const;
+
+	virtual ~ProjectilePowerup() = default;
+
+private:
+	static const int score = 10000;
+};
+
+class PointsPowerup : public Powerup
+{
+public:
+	PointsPowerup(float xpos, float ypos, float angle);
+
+	virtual void consume(Player* target) const override;
+
+	virtual Powerup* clone() const;
 
 	virtual ~PointsPowerup() = default;
+
+private:
+	static const int score = 100000;
 };
