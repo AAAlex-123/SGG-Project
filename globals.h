@@ -22,25 +22,25 @@ const std::string level_file = ".\\levels.txt";
 const std::string wave_file = ".\\waves.txt";
 
 // enum
-enum game_states
+enum class GAME_STATE
 {
-	TEST = -2,
-	LOAD = -1,
-	CREDITS = 0,
-	MENU = 1,
-	GAME = 2,
-	GAME_LOSE = 10,
-	GAME_WIN = 11,
-	OPTIONS = 4,
-	OP_LEVEL = 5,
-	OP_PLAYER = 6,
-	LEVEL_TRANSITION = 7,
-	HELP = 8,
-	EXIT = 9,
-	PAUSE = 12,
-	RESET = 13,
-	ACHIEVEMENTS = 14,
-	LOAD_L = 15,
+	LOAD,
+	LOAD_L,
+	MENU,
+	ACHIEVEMENTS,
+	GAME,
+	LEVEL_TRANSITION,
+	GAME_LOSE,
+	GAME_WIN,
+	RESET,
+	OPTIONS,
+	OP_LEVEL,
+	OP_PLAYER,
+	HELP,
+	EXIT,
+	PAUSE,
+	CREDITS,
+	INVALID_STATE,
 };
 
 float get_canvas_height();
