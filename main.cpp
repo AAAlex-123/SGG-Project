@@ -382,8 +382,8 @@ void draw()
 		// display timer
 		graphics::resetPose();
 		setColor(br, new float[3]{ 0.0f, 0.0f, 0.0f });
-		graphics::drawText(CANVAS_WIDTH * 0.2f, CANVAS_HEIGHT * 0.3f, 20,
-                      "Next level in: " + std::to_string(gd->level_transition_timer).substr(0, 4), br);
+		graphics::drawText(CANVAS_WIDTH * 0.35f, CANVAS_HEIGHT * 0.3f, 20,
+                      "Next Level in: " + std::to_string(gd->level_transition_timer).substr(0, 4), br);
 		ui->draw();
 
 		break;
@@ -476,12 +476,14 @@ void draw()
 	}
 	case GAME_STATE::PAUSE: {
 
-		br.texture = "owo.png";
+		setColor(br, new float[3]{ 0.5f, 0.7f, 0.9f });
+		br.texture = "";
 		graphics::drawRect(CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2, CANVAS_WIDTH, CANVAS_HEIGHT, br);
 
-		graphics::drawText(CANVAS_WIDTH / 6, 2.5f * CANVAS_HEIGHT / 13, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 17, "Game paused...", br);
+		setColor(br, 'L');
+		graphics::drawText(CANVAS_WIDTH / 3, 2.5f * CANVAS_HEIGHT / 13, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 17, "Game paused...", br);
 
-		graphics::drawText(4 * CANVAS_WIDTH / 5, 2 * CANVAS_HEIGHT / 20 + 20, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 35, "Unpause (U)", br);
+		graphics::drawText(6 * CANVAS_WIDTH / 7, 2 * CANVAS_WIDTH / 20 + 20, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 35, "Unpause (U)", br);
 
 		break;
 	}
