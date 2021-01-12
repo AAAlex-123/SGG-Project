@@ -537,7 +537,7 @@ void resize(int new_w, int new_h)
 int main()
 {
 	graphics::createWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "1942ripoff");
-	//graphics::setFullScreen(true);
+	graphics::setFullScreen(true);
 	std::set_terminate(close);
 
 	graphics::setCanvasSize(CANVAS_WIDTH, CANVAS_HEIGHT);
