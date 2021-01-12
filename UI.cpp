@@ -45,7 +45,7 @@ void UI::draw()
 		+ std::to_string(gd->_playing_level_id >= 0 ? gd->_playing_level_id + 1 : gd->_playing_level_id + 11), std_br);
 
 	// draw pause text
-	graphics::drawText(4 * width / 5, 2 * width / 20 + 20, ((width + height) / 2) / 35, "Pause (P)", std_br);
+	graphics::drawText(6 * width / 7, 2 * width / 20 + 20, ((width + height) / 2) / 35, "Pause (P)", std_br);
 
 	// draw Panels
 	drawPlayerPanel(gd->playerLs->front(), 0);
