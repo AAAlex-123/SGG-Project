@@ -11,7 +11,7 @@ class Powerup;
 
 /*
  * Composition of Levels and Waves:
- * 
+ *
  *  -  Spawnpoints spawn a number of enemies all with the same properties.
  *     For example, a Spawnpoint might spawn 5 enemies of type t at [x, y] with a dt delay between each spawn
  *  -  Waves are a set of different Spawnpoints that all spawn at the same time.
@@ -22,10 +22,10 @@ class Powerup;
  *     and also a Powerup that spawns at 25 seconds since level start
  */
 
-/**
- * A class that defines an in-game level.
- * Specifically, defines the timing of the waves of enemies that spawn and the timing of the level's powerups.
- */
+ /**
+  * A class that defines an in-game level.
+  * Specifically, defines the timing of the waves of enemies that spawn and the timing of the level's powerups.
+  */
 class Level
 {
 public:
@@ -39,7 +39,7 @@ public:
 	bool can_spawn() const;
 	// each spawn() call can only return a single enemy, therefore a queue is used internaly
 	// to enable multiple enemies to be spawned at the same update() call
-	Entity* spawn();
+	Entity* spawn() const;
 	// powerup spawning
 	bool can_spawn_p() const;
 	Powerup* spawn_p();
@@ -61,8 +61,8 @@ private:
 	float _total_time;
 
 	// sets of waves and powerups and the time from level start to spawn
-	std::unordered_set<std::pair<float, Wave*>*>* waves;
-	std::unordered_set<std::pair<float, Powerup*>*>* powerups;
+	std::unordered_set<std::pair<float, Wave*>*>* const waves;
+	std::unordered_set<std::pair<float, Powerup*>*>* const powerups;
 
 	// queues of enemies and powerups to be spawned
 	std::queue<Entity*>* enemy_queue;
@@ -77,13 +77,13 @@ class Wave
 {
 public:
 	Wave(const std::string&);
-	Wave* clone();
+	Wave* const clone() const;
 
 	void update(float);
-	bool can_spawn();
-	Entity* spawn();
+	bool can_spawn() const;
+	Entity* const spawn() const;
 
-	void add_spawnpoint(Spawnpoint*);
+	void add_spawnpoint(Spawnpoint* const);
 
 	// false if there are no enemies left to spawn
 	operator bool() const;
@@ -93,8 +93,8 @@ public:
 private:
 	const std::string _desc;
 
-	std::unordered_set<Spawnpoint*>* spawnpoints;
-	std::queue<Entity*>* enemy_queue;
+	std::unordered_set<Spawnpoint*>* const spawnpoints;
+	std::queue<Entity*>* const enemy_queue;
 };
 
 /**
@@ -108,7 +108,7 @@ public:
 	Spawnpoint* clone();
 
 	void update(float);
-	bool can_spawn();
+	bool can_spawn() const;
 	Entity* spawn();
 
 	// false if there are no enemies left to spawn
