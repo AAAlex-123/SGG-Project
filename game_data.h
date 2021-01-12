@@ -2,115 +2,94 @@
 #include "globals.h"
 #include <list>
 #include <vector>
-#include <iostream>
 #include <unordered_map>
 #include <array>
 
-// needed because templates are defined in this header file
-#include "projectile.h"
-#include "entity.h"
-#include "visual_effect.h"
-#include "level.h"
-#include "Powerup.h"
-#include "button.h"
+class Player;
+class Entity;
+class Projectile;
+class VisualEffect;
+class Powerup;
+class Button;
+class Level;
+class Wave;
 
-enum game_states;
-
-class GameData {
-private:
-	class Stats;
-	struct Achievement;
-
-	//Helper method used to delete all data from the provided list, as well as the list itself
-	template<class T>
-	void static deleteList(std::list<T*>*);
-
-	//Methods used to create levels upon initialization
-	bool load_level_data_from_file(const std::string& level_path, const std::string& wave_path);
-	bool _load_waves_from_file(const std::string& wave_path);
-	bool _load_levels_from_file(const std::string& wave_path);
-	//Failsafe in case reading from file fails
-	void _load_hardcoded_levels();
-
-	void create_buttons();
-
-	int score;
-
+/**
+* A class that hold the necessary information the main program needs to run
+*/
+class GameData
+{
 public:
+	class Stats;
+	class Achievement;
+
 	GameData();
 	~GameData();
 	void reset();
 
-	//=========ACHIEVEMENT DATA=======
+	// ======= ACHIEVEMENTS =======
 
-	static Stats game_stats;
-	static const std::array<Achievement *, 4> achievements; 
+	Stats* stats;
+	std::array<Achievement*, 4> achievements;
+	const std::list<const Achievement*> getAchieved(GameData*) const;
 
-	//=========GENERAL DATA===========
-
-	static const std::list<Achievement *> getAchieved();
-
-	// collections
-	std::list<Player*>* const playerLs; //The C++ Standard forbids containers of const elements, so the obj's pointers are non-const
-	std::list<Entity*>* const enemyLs;
-	std::list<Projectile*>* const enemyProjLs, * playerProjLs;
-	std::list<VisualEffect*>* const effectsLs;
-	std::list<Powerup*>* const powerupLs;
-	std::list<Button*>* const buttons;
+	// ======= GENERAL =======
 
 	// general
 	int fps;
-	int game_state;
+	GAME_STATE game_state;
 
 	// loading
-	float el;
-	const float sps;
-	int curr_img;
-	std::vector<std::string> images;
+	const float sprites_per_second;
+	float elapsed;
+	int curr_img_index;
+	std::vector<std::string> image_names;
 
 	// game
-	float bg_offset, height_perc_per_second;
-	bool isMult = false;
+	bool isMultiplayer;
 
-	// Background (looping and moving downwards)
-	void updateBackground(float ms);
+	// background (looping and moving downwards)
+	void updateBackground(float);
 	void drawBackground(graphics::Brush&);
+	float bg_offset, height_perc_per_second;
+		// image data
 	std::string bg_sprite = std::string(image_path + "background.png");
-	float iw = 400.0f, ih = 1213.0f;
+	float bg_img_width = 400.0f, bg_img_height = 1213.0f;
 
-	// Data used by UI
-	int curr_playing_level;
-	void addScore(int scored);
+	// UI
+	void addScore(int);
 	int getScore() const;
 
 	// buttons
 	void click_buttons();
 
 	// levels
-	Level* current_level;
+	Level* current_level;		// stores the current level so that the map's levels remain constant
 	std::unordered_map<int, Level*> levels;
 	std::unordered_map<std::string, Wave*> _waves;
-	int curr_active_level, curr_selected_level;
+		// used mainly for level selection
+	int _active_level_id, _selected_level_id, _playing_level_id;
 
-	void load_levels();
+	void load_levels();			// loads the levels and waves from the .txt files
+	Level* get_next_level();	// returns the next level; nullptr if the player has won (there are no more levels)
+	void set_next_level();		// sets the next level
+	void update_level(float);	// updates the current level's state
 
-	//Returns the next level. If it's nullptr, the player has won
-	Level* get_next_level();
-
-	//Loads the next level
-	void updateLevel(float ms);
-
-	//Spawns new enemies
-	void spawn();
+	void spawn();	// spawns new enemies
 
 	float level_transition_timer;
 	float set_level_transition_timer(float timer = 5.0f) { return timer; }
-	void next_level();
 
+	// ======= COLLECTIONS =======
 
-	//======COLLECTION FUNCTIONS=========
+	std::list<Player*>* playerLs;
+	std::list<Entity*>* enemyLs;
+	std::list<Projectile*>* enemyProjLs, * playerProjLs;
+	std::list<VisualEffect*>* effectsLs;
+	std::list<Powerup*>* powerupLs;
+	std::list<Button*>* buttonLs;
 
-	//Updates all objects within the list. Template class must be derived from Drawing.
+	// Updates all objects within the list. Template class must be derived from Drawing.
 	template <class T>
 	static void update(float ms, std::list<T*>*);
 
@@ -118,132 +97,74 @@ public:
 	template <class T>
 	static void draw(std::list<T*>* ls);
 
-	//Checks collisions between 2 lists. Template classes must both be derived from GameObject.
+	// Checks collisions between 2 lists. Template classes must both be derived from GameObject.
 	template <class T1, class T2>
 	static void checkCollisions(std::list<T1*>*, std::list<T2*>*);
 
-	//Spawns a projectile for every eligible object in the list. Template class must be derived from Entity.
+	// Spawns a projectile for every eligible object in the list. Template class must be derived from Entity.
 	template <class T>
 	void fire(std::list<T*>*) const;
 
-	//Checks if any object within the list must be destroyed, and deletes it. Template class must be derived from Drawing.
+	// Checks if any object within the list must be destroyed, and deletes it. Template class must be derived from Drawing.
 	template <class T>
 	void checkAndDelete(std::list<T*>*);
 
+private:
+	// Methods used to create levels upon initialization
+	bool _load_level_data_from_file(const std::string& level_path, const std::string& wave_path);
+	bool _load_waves_from_file(const std::string& wave_path);
+	bool _load_levels_from_file(const std::string& level_path);
+	// Failsafe in case reading from file fails
+	void _load_hardcoded_levels();
+
+	void create_buttons();
+
+	// Helper method used to delete all data from the provided list, as well as the list itself
+	template<class T>
+	void static deleteList(std::list<T*>*);
+
+	int score;
 };
 
-//=======INNER CLASSES========
+// ======= INNER CLASSES =======
 
-class GameData::Stats {
-private:
-	std::array<int, 4> shot_down_arr;
-	int find_type(const Entity * const en) const;
-
+/**
+* owo uwu
+*/
+class GameData::Stats 
+{
 public:
+	// Updates internal data based on plane shot
+	void plane_shot(const Entity * const en);
+	int get_shot_number(int type) const;
+	int get_total_shot() const;
+
 	const static int BASIC_PLANE = 0;
 	const static int BLACK_PLANE = 1;
 	const static int AIRSHIP = 2;
 	const static int BALLOON = 3;
 	const static int ALL = 100;
 
-	//Called when an enemy is killed, updates internal data
-	void plane_shot(const Entity * const en);
-	//Get how many planes of a specific type were shot down
-	int get_shot_number(int type) const;
-	//Get the sum of all planes shot down
-	int get_total_shot() const;
+private:
+	std::array<int, 4> shot_down_arr;
+	int find_type(const Entity * const en) const;
 };
 
-struct GameData::Achievement {
+/**
+* owo uwu
+*/
+class GameData::Achievement
+{
+public:
+	Achievement(std::string name, std::string icon, int type, int kills);
+
+	const std::string name, icon;
+	bool is_achieved(GameData*) const;
+
 private:
 	const int TYPE, KILLS;
-public:
-	const std::string name;
-	const std::string icon;
-	//Returns whether the condition was achieved
-	bool is_achieved() const;
-
-	Achievement(std::string name, std::string icon, int type, int kills);
 };
 
-
-//======COLLECTION FUNCTIONS=========
-// Method definitions in the same file as declaration because of compiler constraints on template methods. 
-
-template <class T>
-void GameData::update(float ms, std::list<T*>* ls) {
-	for (Drawing* dr : *ls)
-		dr->update(ms);
-}
-
-template <class T>
-void GameData::draw(std::list<T*>* ls) {
-	for (Drawing* dr : *ls)
-		dr->draw();
-}
-
-template <class T1, class T2>
-void GameData::checkCollisions(std::list<T1*>* ls1, std::list<T2*>* ls2) {
-	for (GameObject* o1 : *ls1)
-		for (GameObject* o2 : *ls2)
-			o1->collides(o2);
-}
-
-template <class T>
-void GameData::fire(std::list<T*>* ls) const {
-	bool isPlayer = false;
-	for (Entity* en : *ls) {
-
-		if (en->hasFired()) {
-			graphics::playSound(sound_path + "fire.mp3", 0.04f, false);
-
-			//check if projectile was launched by a player
-			for (Entity* pl : *playerLs)
-				isPlayer |= pl == en;
-
-			if (isPlayer)
-				playerProjLs->push_back(en->getProjectile());
-			else
-				enemyProjLs->push_back(en->getProjectile());
-
-			effectsLs->push_back(en->getFireVisualEffect());
-		}
-	}
-}
-
-//Workaround as C++ doesn't permit method specialization
-template<class T>
-inline void delete_(const GameData * const gd, T* obj) {
-	delete obj;
-}
-
-template<>
-inline void delete_(const GameData * const gd, Entity* obj) {
-	gd->effectsLs->push_back(obj->getDestructionVisualEffect());
-	GameData::game_stats.plane_shot(obj);
-	delete obj;
-}
-
-template <class T>
-void GameData::checkAndDelete(std::list<T*>* ls) {
-	for (auto iter = ls->begin(); iter != ls->end(); ++iter) {
-		if (!**iter) {
-
-			delete_(this, *iter);
-			iter = ls->erase(iter);
-			// if the last item is deleted, `iter == ls->end()`
-			// so `++iter` increments the end iterator before checking the `for` condition
-			if (iter == ls->end())
-				break;
-		}
-	}
-	if (playerLs->size() == 0)
-		game_state = game_states::GAME_LOSE;
-}
-
-template<class T>
-void GameData::deleteList(std::list<T*>* ls) {
-	for (T* obj : *ls)
-		delete obj;
-	delete ls;
-}
+// template method implementations
+// must be placed after stats/achievement definitions
+#include "game_data.hpp"

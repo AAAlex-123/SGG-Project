@@ -7,65 +7,64 @@
 
 using namespace std;
 
-GameData::Stats GameData::game_stats = Stats();
-
-const array<GameData::Achievement *, 4> GameData::achievements = {
-	new GameData::Achievement("Kill 100 total enemies", icon_path + "achievement_1.png",Stats::ALL,100),
-	new GameData::Achievement("Destroy 20 balloons", icon_path + "achievement_2.png",Stats::BALLOON,20),
-	new GameData::Achievement("Destroy an American airship", icon_path + "achievement_3.png",Stats::AIRSHIP,1),
-	new GameData::Achievement("Destroy 50 british fighters", icon_path + "achievement_4.png",Stats::BLACK_PLANE,50)
-};
-
-const list<GameData::Achievement *> GameData::getAchieved() {
-	list<GameData::Achievement *> ls;
-	for (auto a : achievements)
-		if (a->is_achieved())
-			ls.push_back(a);
-	return ls;
-}
-
-using namespace std;
-
-GameData::GameData()
-	: fps(0), game_state(0),
-	el(0.0f), sps(20.0f), curr_img(0), images(),
+GameData::GameData()	// the most epic initialization list you'll ever see
+	: fps(0), game_state(GAME_STATE::LOAD),
+	elapsed(0.0f), sprites_per_second(20.0f), curr_img_index(0), image_names(),
 	levels(std::unordered_map<int, Level*>()), _waves(std::unordered_map<std::string, Wave*>()),
-	current_level(nullptr), curr_active_level(-1), curr_selected_level(-1),
-	bg_offset(0.0f), height_perc_per_second(0.02f),
-	curr_playing_level(-1), level_transition_timer(set_level_transition_timer()),
+	current_level(nullptr), _active_level_id(-1), _selected_level_id(-1),
+	bg_offset(0.0f), height_perc_per_second(0.02f), isMultiplayer(false),
+	_playing_level_id(-1), level_transition_timer(set_level_transition_timer()),
 	enemyLs(new list<Entity*>), playerLs(new list<Player*>), enemyProjLs(new list<Projectile*>),
-	playerProjLs(new list<Projectile*>), effectsLs(new list<VisualEffect*>), powerupLs(new list<Powerup*>), buttons(new list<Button*>)
+	playerProjLs(new list<Projectile*>), effectsLs(new list<VisualEffect*>), powerupLs(new list<Powerup*>), buttonLs(new list<Button*>),
+	stats(new Stats()), achievements(array<GameData::Achievement*, 4>())
 {
-	// sets all the user-selectable levels to nullptr
-	// to check later if a user-selectable level has been
-	// defined (setting the nullptr to Level*) by calling `levels[id]`
+	// sets all the user-selectable levels to nullptr to check later
+	// if a user-selectable level has been defined (changing the nullptr to Level*) by calling `levels[id]`
 	for (int i = 0; i < 10; ++i)
 		levels[i] = nullptr;
 
 	create_buttons();
+
+	achievements[0] = new GameData::Achievement("Kill 100 total enemies", icon_path + "achievement_1.png", Stats::ALL, 100);
+	achievements[1] = new GameData::Achievement("Destroy 20 balloons", icon_path + "achievement_2.png", Stats::BALLOON, 20);
+	achievements[2] = new GameData::Achievement("Destroy an American airship", icon_path + "achievement_3.png", Stats::AIRSHIP, 1);
+	achievements[3] = new GameData::Achievement("Destroy 50 british fighters", icon_path + "achievement_4.png", Stats::BLACK_PLANE, 50);
 }
 
 void GameData::reset()
 {
 	delete current_level;
 	current_level = nullptr;
-	curr_active_level = -1;
-	curr_selected_level = -1;
-	curr_playing_level = -1;
+	_active_level_id = -1;
+	_selected_level_id = -1;
+	_playing_level_id = -1;
 	score = 0;
+
 	enemyLs = new list<Entity*>;
-	playerLs = new list<Entity*>;
+	playerLs = new list<Player*>;
 	enemyProjLs = new list<Projectile*>;
 	playerProjLs = new list<Projectile*>;
 	effectsLs = new list<VisualEffect*>;
 	powerupLs = new list<Powerup*>;
-	buttons = new list<Button*>;
+	buttonLs = new list<Button*>;
+
 	create_buttons();
+}
+
+const list<const GameData::Achievement*> GameData::getAchieved(GameData* gd) const
+{
+	list<const GameData::Achievement*> ls;
+
+	for (GameData::Achievement* a : achievements)
+		if (a->is_achieved(gd))
+			ls.push_back(a);
+
+	return ls;
 }
 
 void GameData::updateBackground(float ms)
 {
-	bg_offset = (bg_offset < ih / get_canvas_height())
+	bg_offset = (bg_offset < bg_img_height / get_canvas_height())
 		? (bg_offset + (height_perc_per_second * (ms / 1000.0f)))
 		: (0.0f);
 }
@@ -73,61 +72,33 @@ void GameData::updateBackground(float ms)
 void GameData::drawBackground(graphics::Brush& br)
 {
 	br.texture = bg_sprite;
-	setColor(br, new float[3]{ 1.0f, 1.0f, 1.0f });
 	br.outline_opacity = 0.0f;
+	setColor(br, 'W');
 
 	float cw = get_canvas_width(), ch = get_canvas_height();
-	graphics::drawRect(cw / 2, (ch * bg_offset) - ih, iw, ih, br);
-	graphics::drawRect(cw / 2, (ch * bg_offset),      iw, ih, br);
+	graphics::drawRect(cw / 2, (ch * bg_offset) - bg_img_height, bg_img_width, bg_img_height, br);
+	graphics::drawRect(cw / 2, (ch * bg_offset),				 bg_img_width, bg_img_height, br);
 }
 
-void GameData::create_buttons()
+void GameData::addScore(int scored)
 {
-	// menu
-	buttons->push_back(new GameStateChangingButton(this, 30.0f, 30.0f, 30.0f, new string(icon_path + "exit.png"), game_states::MENU, game_states::EXIT));
-	buttons->push_back(new GameStateChangingButton(this, 370.0f, 30.0f, 30.0f, new string(icon_path + "help.png"), game_states::MENU, game_states::HELP));
-	buttons->push_back(new GameStateChangingButton(this, 370.0f, 75.0f, 30.0f, new string(icon_path + "options.png"), game_states::MENU, game_states::OPTIONS));
-	buttons->push_back(new GameStateChangingButton(this, 370.0f, 120.0f, 30.0f, new string(icon_path + "credits.png"), game_states::MENU, game_states::CREDITS));
-	buttons->push_back(new GameStateChangingButton(this, 370.0f, 165.0f, 30.0f, new string(icon_path + "achievements.png"), game_states::MENU, game_states::ACHIEVEMENTS));
-	buttons->push_back(new GameStateChangingButton(this, 370.0f, 210.0f, 30.0f, new string(icon_path + "reload.png"), game_states::MENU, game_states::LOAD_L));
-	// game
-	buttons->push_back(new GameStateChangingButton(this, 370.0f, 30.0f, 30.0f, new string(icon_path + "pause.png"), game_states::GAME, game_states::PAUSE));
-		// game -- pause
-	buttons->push_back(new GameStateChangingButton(this, 370.0f, 30.0f, 30.0f, new string(icon_path + "continue.png"), game_states::PAUSE, game_states::GAME));
-		// game -- lose
-	buttons->push_back(new GameStateChangingButton(this, 30.0f, 30.0f, 30.0f, new string(icon_path + "back.png"), game_states::GAME_LOSE, game_states::RESET));
-		// game -- win
-	buttons->push_back(new GameStateChangingButton(this, 30.0f, 30.0f, 30.0f, new string(icon_path + "back.png"), game_states::GAME_WIN, game_states::RESET));
-	// help
-	buttons->push_back(new GameStateChangingButton(this, 30.0f, 30.0f, 30.0f, new string(icon_path + "back.png"), game_states::HELP, game_states::MENU));
-	// credits
-	buttons->push_back(new GameStateChangingButton(this, 30.0f, 30.0f, 30.0f, new string(icon_path + "back.png"), game_states::CREDITS, game_states::MENU));
-	// options
-	buttons->push_back(new GameStateChangingButton(this, 30.0f, 30.0f, 30.0f, new string(icon_path + "back.png"), game_states::OPTIONS, game_states::MENU));
-	buttons->push_back(new GameStateChangingButton(this, 200.0f, 100.0f, 100.0f, new string(icon_path + "level_select.png"), game_states::OPTIONS, game_states::OP_LEVEL));
-	buttons->push_back(new GameStateChangingButton(this, 200.0f, 350.0f, 100.0f, new string(icon_path + "player_select.png"), game_states::OPTIONS, game_states::OP_PLAYER));
-	// options -- player
-	buttons->push_back(new GameStateChangingButton(this, 30.0f, 30.0f, 30.0f, new string(icon_path + "back.png"), game_states::OP_PLAYER, game_states::OPTIONS));
-	buttons->push_back(new VariableChangingButton<bool>(this, 112.5f, 200.0f, 125.0f, new string(icon_path + "singleplayer.png"), game_states::OP_PLAYER, &this->isMult, false));
-	buttons->push_back(new VariableChangingButton<bool>(this, 287.5f, 200.0f, 125.0f, new string(icon_path + "multiplayer.png"), game_states::OP_PLAYER, &this->isMult, true));
-	// options -- level
-	buttons->push_back(new GameStateChangingButton(this, 30.0f, 30.0f, 30.0f, new string(icon_path + "back.png"), game_states::OP_LEVEL, game_states::OPTIONS));
-	//achievement
-	buttons->push_back(new GameStateChangingButton(this, 30.0f, 30.0f, 30.0f, new string(icon_path + "back.png"), game_states::ACHIEVEMENTS, game_states::MENU));
+	score += scored;
+}
 
+int GameData::getScore() const
+{
+	return score;
 }
 
 void GameData::click_buttons()
 {
-	for (Button* b : *buttons)
-	{
+	for (Button* b : *buttonLs)
 		b->execute();
-	}
 }
 
 void GameData::load_levels()
 {
-	if (!load_level_data_from_file(level_path, wave_path))
+	if (!_load_level_data_from_file(level_file, wave_file))
 	{
 		std::cerr << "Warning: Level loading from files failed, loading hardcoded levels" << std::endl;
 		_load_hardcoded_levels();
@@ -135,31 +106,58 @@ void GameData::load_levels()
 	std::cout << "Levels loaded successfully" << std::endl;
 }
 
-bool GameData::load_level_data_from_file(const std::string& level_path, const std::string& wave_path) {
+Level* GameData::get_next_level()
+{
+	Level* return_val = levels[_playing_level_id + 1];
+	if (!return_val)
+		levels.erase(_playing_level_id + 1);
+	return return_val;
+}
 
+void GameData::set_next_level()
+{
+	current_level = levels[++_playing_level_id]->clone();
+}
+
+void GameData::update_level(float ms)
+{
+	current_level->update(ms);
+}
+
+void GameData::spawn()
+{
+	if (current_level->can_spawn())
+		enemyLs->push_back(current_level->spawn());
+	if (current_level->can_spawn_p())
+		powerupLs->push_back(current_level->spawn_p());
+}
+
+bool GameData::_load_level_data_from_file(const std::string& level_file_path, const std::string& wave_file_path)
+{
 	// first load waves
-	if (!_load_waves_from_file(wave_path))
+	if (!_load_waves_from_file(wave_file_path))
 	{
-		std::cerr << "Warning: Unable to load waves from file: " + level_path << std::endl;
+		std::cerr << "Warning: Unable to load waves from file: " + wave_file_path << std::endl;
 		return false;
 	}
+
 	// then load levels; the levels' waves must have the same name as the waves loaded above
-	if (!_load_levels_from_file(level_path))
+	if (!_load_levels_from_file(level_file_path))
 	{
-		std::cerr << "Warning: Unable to load levels from file: " + level_path << std::endl;
+		std::cerr << "Warning: Unable to load levels from file: " + level_file_path << std::endl;
 		return false;
 	}
 	return true;
 }
 
-bool GameData::_load_waves_from_file(const std::string& wave_path)
+bool GameData::_load_waves_from_file(const std::string& wave_file_path)
 {
-	std::cout << "Loading waves..." << std::endl;
 	// create stream to levels_path
-	std::ifstream in(wave_path);
+	std::ifstream in(wave_file_path);
 
-	if (!in) {
-		std::cerr << "Error opening file '" << wave_path << "'" << std::endl;
+	if (!in)
+	{
+		std::cerr << "Error opening file '" << wave_file_path << "'" << std::endl;
 		return false;
 	}
 
@@ -191,6 +189,7 @@ bool GameData::_load_waves_from_file(const std::string& wave_path)
 			curr_wave = match[1];
 			_waves[curr_wave] = new Wave(curr_wave);
 		}
+
 		// spawnnpoint declaration
 		else if (std::regex_search(contents, match, r2))
 		{
@@ -199,21 +198,61 @@ bool GameData::_load_waves_from_file(const std::string& wave_path)
 				std::cerr << "Error: Attempting to add spawnpoint before declaring a wave at line " << line << std::endl;
 				return false;
 			}
+
+			// SIMPLE_ENEMY = 1,		SIMPLE_ENEMY_F = 7,		ROTATING_ENEMY_D = 2,	ROTATING_ENEMY_CA = 6
+			// ROTATING_ENEMY_C = 8,	ACCELERATING_ENEMY = 3, TANK_ENEMY = 4,			HOMING_ENEMY = 5;
+
+			// arbitrarily match ints to the factory's enum
+
+			GObjFactory::ENEMY type = GObjFactory::ENEMY::SIMPLE_ENEMY;
+			switch (stoi(match[1]))
+			{
+			case 1:
+				type = GObjFactory::ENEMY::SIMPLE_ENEMY;
+				break;
+			case 2:
+				type = GObjFactory::ENEMY::ROTATING_ENEMY_D;
+				break;
+			case 3:
+				type = GObjFactory::ENEMY::ACCELERATING_ENEMY;
+				break;
+			case 4:
+				type = GObjFactory::ENEMY::TANK_ENEMY;
+				break;
+			case 5:
+				type = GObjFactory::ENEMY::HOMING_ENEMY;
+				break;
+			case 6:
+				type = GObjFactory::ENEMY::ROTATING_ENEMY_CA;
+				break;
+			case 7:
+				type = GObjFactory::ENEMY::SIMPLE_ENEMY_F;
+				break;
+			case 8:
+				type = GObjFactory::ENEMY::ROTATING_ENEMY_C;
+				break;
+			default:
+				std::cerr << "GameData::_load_waves_from_file: invalid enemy type from file: " << stoi(match[1])
+					<< ". Creating simple enemy" << std::endl;;
+			}
 			_waves[curr_wave]->add_spawnpoint(new Spawnpoint(
-				stoi(match[1]), stof(match[2]), stof(match[3]), stof(match[4]) / 180 * PI,
+				type, stof(match[2]), stof(match[3]), stof(match[4]) / 180 * PI,
 				stoi(match[5]), stof(match[6]), stof(match[7])
 			));
 		}
+
 		// eof
 		else if (std::regex_search(contents, match, eof))
 		{
 			break;
 		}
+
 		// comment
 		else if (std::regex_search(contents, match, comment))
 		{
 			;
 		}
+
 		// no match and not eof -> invalid line syntax
 		else
 		{
@@ -222,6 +261,7 @@ bool GameData::_load_waves_from_file(const std::string& wave_path)
 		}
 
 		++line;
+		// advance the regex somehow idk ask stackoverflow
 		contents = match.suffix();
 	}
 
@@ -230,14 +270,14 @@ bool GameData::_load_waves_from_file(const std::string& wave_path)
 	return true;
 }
 
-bool GameData::_load_levels_from_file(const std::string& level_path)
+bool GameData::_load_levels_from_file(const std::string& level_file_path)
 {
-	std::cout << "Loading levels..." << std::endl;
 	// create stream to levels_path
-	std::ifstream in(level_path);
+	std::ifstream in(level_file_path);
 
-	if (!in) {
-		std::cerr << "Error opening file '" << level_path << "'" << std::endl;
+	if (!in)
+	{
+		std::cerr << "Error opening file '" << level_file_path << "'" << std::endl;
 		return false;
 	}
 
@@ -253,11 +293,12 @@ bool GameData::_load_levels_from_file(const std::string& level_path)
 	// regex objects
 	std::regex r1, r2, r3, eof, comment;
 
-	int curr_level_id = 0, line = 0;
+	int line = 0;
+	int curr_level_id = 0;
 
 	while (true)
 	{
-		// construct regexes ...
+		// construct regexes
 		r1 = std::regex("^" + std::to_string(line) + "   " + rs1 + "$");
 		r2 = std::regex("^" + std::to_string(line) + "   " + rs2 + "$");
 		r3 = std::regex("^" + std::to_string(line) + "   " + rs3 + "$");
@@ -270,6 +311,7 @@ bool GameData::_load_levels_from_file(const std::string& level_path)
 			curr_level_id = stoi(match[1]);
 			levels[curr_level_id] = new Level(curr_level_id, match[2]);
 		}
+
 		// wave declaration
 		else if (std::regex_search(contents, match, r2))
 		{
@@ -280,6 +322,7 @@ bool GameData::_load_levels_from_file(const std::string& level_path)
 			}
 			levels[curr_level_id]->add_wave(stof(match[2]), new Wave(*_waves[match[1]]));
 		}
+
 		// powerup declaration
 		else if (std::regex_search(contents, match, r3))
 		{
@@ -298,16 +341,19 @@ bool GameData::_load_levels_from_file(const std::string& level_path)
 				return false;
 			}
 		}
+
 		// eof
 		else if (std::regex_search(contents, match, eof))
 		{
 			break;
 		}
+
 		// comment
 		else if (std::regex_search(contents, match, comment))
 		{
 			;
 		}
+
 		// no match and not eof -> invalid line syntax
 		else
 		{
@@ -316,6 +362,7 @@ bool GameData::_load_levels_from_file(const std::string& level_path)
 		}
 
 		++line;
+		// advance the regex somehow idk ask stackoverflow
 		contents = match.suffix();
 	}
 
@@ -324,88 +371,100 @@ bool GameData::_load_levels_from_file(const std::string& level_path)
 	return true;
 }
 
+// wip lmao
 void GameData::_load_hardcoded_levels()
 {
-	Spawnpoint* sp11 = new Spawnpoint(3, 0.0f, 0.5, -PI / 2, 10, 1.0f, 0.0f);
+	Spawnpoint* sp11 = new Spawnpoint(GObjFactory::ENEMY::SIMPLE_ENEMY, 0.0f, 0.5, -PI / 2, 10, 1.0f, 0.0f);
 
 	Wave* w1 = new Wave("line");
 	w1->add_spawnpoint(sp11);
 
-	Spawnpoint* sp21 = new Spawnpoint(2, 0.2f, 0.1f, 0.0f, 2, 1.5f, 1.0f);
-	Spawnpoint* sp22 = new Spawnpoint(2, 0.5f, 0.1f, 0.0f, 2, 3.0f, 1.0f);
-	Spawnpoint* sp23 = new Spawnpoint(2, 0.8f, 0.1f, 0.0f, 2, 5.0f, 1.0f);
-
-	Wave* w2 = new Wave("donuts");
-	w2->add_spawnpoint(sp21);
-	w2->add_spawnpoint(sp22);
-	w2->add_spawnpoint(sp23);
-
 	Level* l1 = new Level(-2, "owo");
-	l1->add_wave(5.0f, w1);
-	l1->add_wave(10.0f, w2);
+	l1->add_wave(0.0f, w1);
 
 	/*	ABOUT LEVEL ID
 		=>	no level can have an id of -1 (because -1 is the default)
 		=>	levels selectable by users must have id 0-9 inclusive
-			(see update::OP_LEVEL case for selectable levels)
 		=>	levels not be selectable by users must have any other id
-			(see above and also l1 and update::TEST case)
-		=>	level id should always match its key in the levels map (see below)
+		=>	level id should always match its key in the levels map like below
 	*/
 	levels[l1->id()] = l1;
-
-	// dummy levels to see the level select screen
-	Level* l4 = new Level(4, "xd");
-	Level* l6 = new Level(6, "uwu");
-
-	levels[l4->id()] = l4;
-	levels[l6->id()] = l6;
 }
 
-void GameData::next_level()
+void GameData::create_buttons()
 {
-	current_level = levels[++curr_playing_level]->clone();
+	// menu
+	buttonLs->push_back(new GameStateChangingButton(this, 30.0f, 30.0f, 30.0f, new string(icon_path + "exit.png"), GAME_STATE::MENU, GAME_STATE::EXIT));
+	buttonLs->push_back(new GameStateChangingButton(this, 370.0f, 30.0f, 30.0f, new string(icon_path + "help.png"), GAME_STATE::MENU, GAME_STATE::HELP));
+	buttonLs->push_back(new GameStateChangingButton(this, 370.0f, 75.0f, 30.0f, new string(icon_path + "options.png"), GAME_STATE::MENU, GAME_STATE::OPTIONS));
+	buttonLs->push_back(new GameStateChangingButton(this, 370.0f, 120.0f, 30.0f, new string(icon_path + "credits.png"), GAME_STATE::MENU, GAME_STATE::CREDITS));
+	buttonLs->push_back(new GameStateChangingButton(this, 370.0f, 165.0f, 30.0f, new string(icon_path + "achievements.png"), GAME_STATE::MENU, GAME_STATE::ACHIEVEMENTS));
+	buttonLs->push_back(new GameStateChangingButton(this, 370.0f, 210.0f, 30.0f, new string(icon_path + "reload.png"), GAME_STATE::MENU, GAME_STATE::LOAD_L));
+	// game
+	buttonLs->push_back(new GameStateChangingButton(this, 370.0f, 30.0f, 30.0f, new string(icon_path + "pause.png"), GAME_STATE::GAME, GAME_STATE::PAUSE));
+	// game -- pause
+	buttonLs->push_back(new GameStateChangingButton(this, 370.0f, 30.0f, 30.0f, new string(icon_path + "continue.png"), GAME_STATE::PAUSE, GAME_STATE::GAME));
+	// game -- lose
+	buttonLs->push_back(new GameStateChangingButton(this, 30.0f, 30.0f, 30.0f, new string(icon_path + "back2.png"), GAME_STATE::GAME_LOSE, GAME_STATE::RESET));
+	// game -- win
+	buttonLs->push_back(new GameStateChangingButton(this, 30.0f, 30.0f, 30.0f, new string(icon_path + "back2.png"), GAME_STATE::GAME_WIN, GAME_STATE::RESET));
+	// help
+	buttonLs->push_back(new GameStateChangingButton(this, 30.0f, 30.0f, 30.0f, new string(icon_path + "back.png"), GAME_STATE::HELP, GAME_STATE::MENU));
+	// credits
+	buttonLs->push_back(new GameStateChangingButton(this, 30.0f, 30.0f, 30.0f, new string(icon_path + "back.png"), GAME_STATE::CREDITS, GAME_STATE::MENU));
+	// options
+	buttonLs->push_back(new GameStateChangingButton(this, 30.0f, 30.0f, 30.0f, new string(icon_path + "back.png"), GAME_STATE::OPTIONS, GAME_STATE::MENU));
+	buttonLs->push_back(new GameStateChangingButton(this, 200.0f, 100.0f, 100.0f, new string(icon_path + "level_select.png"), GAME_STATE::OPTIONS, GAME_STATE::OP_LEVEL));
+	buttonLs->push_back(new GameStateChangingButton(this, 200.0f, 350.0f, 100.0f, new string(icon_path + "player_select.png"), GAME_STATE::OPTIONS, GAME_STATE::OP_PLAYER));
+	// options -- player
+	buttonLs->push_back(new GameStateChangingButton(this, 30.0f, 30.0f, 30.0f, new string(icon_path + "back.png"), GAME_STATE::OP_PLAYER, GAME_STATE::OPTIONS));
+	buttonLs->push_back(new VariableChangingButton<bool>(this, 112.5f, 200.0f, 125.0f, new string(icon_path + "singleplayer.png"), GAME_STATE::OP_PLAYER, &this->isMultiplayer, false));
+	buttonLs->push_back(new VariableChangingButton<bool>(this, 287.5f, 200.0f, 125.0f, new string(icon_path + "multiplayer.png"), GAME_STATE::OP_PLAYER, &this->isMultiplayer, true));
+	// options -- level
+	buttonLs->push_back(new GameStateChangingButton(this, 30.0f, 30.0f, 30.0f, new string(icon_path + "back.png"), GAME_STATE::OP_LEVEL, GAME_STATE::OPTIONS));
+	// achievement
+	buttonLs->push_back(new GameStateChangingButton(this, 30.0f, 30.0f, 30.0f, new string(icon_path + "back.png"), GAME_STATE::ACHIEVEMENTS, GAME_STATE::MENU));
+	// invalid_state
+	buttonLs->push_back(new GameStateChangingButton(this, 30.0f, 30.0f, 30.0f, new string(icon_path + "back.png"), GAME_STATE::INVALID_STATE, GAME_STATE::MENU));
 }
 
-Level* GameData::get_next_level() {
-	Level* return_val = levels[curr_playing_level + 1];
-	if (!return_val)
-		levels.erase(curr_playing_level + 1);
-	return return_val;
-}
-
-void GameData::updateLevel(float ms)
+GameData::~GameData()
 {
-	current_level->update(ms);
-}
-
-void GameData::addScore(int scored) {
-	score += scored;
-}
-
-int GameData::getScore() const {
-	return score;
-}
-
-void GameData::spawn() {
-	if (current_level->can_spawn())
-		enemyLs->push_back(current_level->spawn());
-	if (current_level->can_spawn_p())
-		powerupLs->push_back(current_level->spawn_p());
-}
-
-GameData::~GameData() {
 	deleteList(playerLs);
 	deleteList(enemyLs);
 	deleteList(enemyProjLs);
 	deleteList(playerProjLs);
 	deleteList(effectsLs);
-	deleteList(buttons);
+	deleteList(buttonLs);
 }
 
 //=======INNER CLASSES========
 
-int GameData::Stats::find_type(const Entity * const en) const {
+void GameData::Stats::plane_shot(const Entity * const en)
+{
+	++shot_down_arr[find_type(en)];
+}
+
+int GameData::Stats::get_shot_number(int type) const
+{
+	if (type > shot_down_arr.size() || type < 0)
+	{
+		std::cerr << " Couldn't find enemy type information in get_shot_number, returning 0" << std::endl;
+		return 0;
+	}
+	return shot_down_arr[type];
+}
+
+int GameData::Stats::get_total_shot() const
+{
+	int total_shot = 0;
+	for (int shot_no : shot_down_arr)
+		total_shot += shot_no;
+	return total_shot;
+}
+
+int GameData::Stats::find_type(const Entity* const en) const
+{
 	const std::string name = *en->getSprite();
 	if (name == image_path + "plane1.png")
 		return BASIC_PLANE;
@@ -415,40 +474,20 @@ int GameData::Stats::find_type(const Entity * const en) const {
 		return AIRSHIP;
 	else if (name == image_path + "balloon.png")
 		return BALLOON;
-	else {
+	else
+	{
 		std::cerr << "Entity can't be identified in Stats (sprite name = " << name << ")" << std::endl;
 		return BASIC_PLANE;
 	}
 }
 
-void GameData::Stats::plane_shot(const Entity * const en) {
-	shot_down_arr[find_type(en)] ++;
-}
-
-int GameData::Stats::get_shot_number(int type) const {
-	try {
-		return shot_down_arr[type];
-	}
-	catch (std::out_of_range) {
-		std::cerr << " Couldn't find enemy type information in get_shot_number, returning 0" << std::endl;
-		return 0;
-	}
-}
-
-int GameData::Stats::get_total_shot() const {
-	int total_shot = 0;
-	for (int shot_no : shot_down_arr)
-		total_shot += shot_no;
-	return total_shot;
-}
-
-GameData::Achievement::Achievement(std::string name, std::string icon, int type, int kills) :
-	name(name), icon(icon), TYPE(type), KILLS(kills)
+GameData::Achievement::Achievement(std::string name, std::string icon, int type, int kills)
+	: name(name), icon(icon), TYPE(type), KILLS(kills)
 {}
 
-bool GameData::Achievement::is_achieved() const {
+bool GameData::Achievement::is_achieved(GameData* gd) const
+{
 	if (TYPE == Stats::ALL)
-		return KILLS < game_stats.get_total_shot();
-	else
-		return KILLS < game_stats.get_shot_number(TYPE);
+		return KILLS < gd->stats->get_total_shot();
+	return KILLS < gd->stats->get_shot_number(TYPE);
 }

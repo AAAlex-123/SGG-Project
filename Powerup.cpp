@@ -8,57 +8,64 @@ Powerup::Powerup(float xpos, float ypos, float angle, const std::string* sprite,
 	: GameObject(xpos, ypos, angle, 50.f, 20, 20, sprite, new Path(), 0, 1, score)
 {}
 
-void Powerup::hit(GameObject* o2) {
+void Powerup::hit(GameObject* o2)
+{
 	GameObject::hit(o2);
 	consume(dynamic_cast<Player*> (o2)); //it's guaranteed to be a Player* and the method will be used only a couple times in the game
 }
 
-Powerup::~Powerup() {
-	graphics::playSound(sound_path + "powerup.mp3", 0.2f, false);
+VisualEffect* Powerup::getDestructionVisualEffect() const
+{
+	return GObjFactory::createVisualEffect(GObjFactory::EFFECT::NOEFFECT, x, y, 0.0f, 1.0f, 18.0f);
 }
 
-VisualEffect* Powerup::getDestructionVisualEffect() const  {
-	return GObjFactory::createVisualEffect(GObjFactory::NOEFFECT, x, y, 0.0f, 1.0f, 18.0f); //obviously change this later not
+Powerup::~Powerup()
+{
+	graphics::playSound(sound_path + "powerup.mp3", 0.2f, false);
 }
 
 
 // HealthPowerup
 HealthPowerup::HealthPowerup(float xpos, float ypos, float angle)
-	: Powerup(xpos, ypos, angle, &sprite, score)
+	: Powerup(xpos, ypos, angle, new std::string(image_path + "h_powerup.png"), score)
 {}
 
-void HealthPowerup::consume(Player* target) const {
+void HealthPowerup::consume(Player* target) const
+{
 	target->addHealth(65);
 }
 
-Powerup* HealthPowerup::clone() const {
+Powerup* HealthPowerup::clone() const
+{
 	return new HealthPowerup(x, y, angle);
 }
 
 
 // ProjectilePowerup
 ProjectilePowerup::ProjectilePowerup(float xpos, float ypos, float angle)
-	: Powerup(xpos, ypos, angle, &sprite, score)
+	: Powerup(xpos, ypos, angle, new std::string(image_path + "proj_powerup.png"), score)
 {}
 
-void ProjectilePowerup::consume(Player* target) const {
-	target->incrementProjectile();
+void ProjectilePowerup::consume(Player* target) const
+{
+	target->upgradeProjectile();
 }
 
-Powerup* ProjectilePowerup::clone() const {
+Powerup* ProjectilePowerup::clone() const
+{
 	return new ProjectilePowerup(x, y, angle);
 }
 
 
 // PointsPowerup
 PointsPowerup::PointsPowerup(float xpos, float ypos, float angle)
-	: Powerup(xpos, ypos, angle, &sprite, score)
+	: Powerup(xpos, ypos, angle, new std::string(image_path + "points_powerup.png"), score)
 {}
 
-void PointsPowerup::consume(Player* target) const {
-	;
-}
+void PointsPowerup::consume(Player* target) const
+{}
 
-Powerup* PointsPowerup::clone() const {
+Powerup* PointsPowerup::clone() const
+{
 	return new PointsPowerup(x, y, angle);
 }
