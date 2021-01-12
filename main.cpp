@@ -307,7 +307,7 @@ void draw()
 
 		if (gd->image_names.empty())
 			return;
-		std::string curr_image = image_path + gd->image_names[gd->curr_img_index];
+		std::string curr_image = asset_path + gd->image_names[gd->curr_img_index];
 
 		setColor(br, 'W');
 		br.texture = curr_image;
@@ -560,8 +560,8 @@ void initialize()
 	if (!graphics::setFont(font_file))
 		std::cerr << "Unable to load font from: " << font_file << std::endl;
 
-	if (!load_images_from_file(image_path))
-		std::cerr << "Unable to load images from: " << image_path << std::endl;
+	if (!load_images_from_file(image_path, icon_path))
+		std::cerr << "Unable to load images or icons from: " << image_path << " and " << icon_path << std::endl;
 
 	graphics::playMusic(music_path + "menu_music.mp3", 0.5f, true);
 	curr_music = MUSIC::MENU_MUSIC;
