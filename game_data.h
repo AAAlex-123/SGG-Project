@@ -5,8 +5,6 @@
 #include <unordered_map>
 #include <array>
 
-enum game_states;
-
 class Player;
 class Entity;
 class Projectile;
@@ -38,7 +36,8 @@ public:
 	// ======= GENERAL =======
 
 	// general
-	int fps, game_state;
+	int fps;
+	GAME_STATE game_state;
 
 	// loading
 	const float sprites_per_second;
