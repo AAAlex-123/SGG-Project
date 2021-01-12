@@ -21,7 +21,7 @@ class GameData
 {
 public:
 	class Stats;
-	class Achievement;
+	struct Achievement;
 
 	GameData();
 	~GameData();
@@ -30,7 +30,8 @@ public:
 	// ======= ACHIEVEMENTS =======
 
 	Stats* stats;
-	std::array<Achievement*, 4> achievements;
+	std::array<Achievement*, 4> achievements; //c++ doesn't allow creating a const array as a class member
+	//Returns a list with all achieved achievements
 	const std::list<const Achievement*> getAchieved(GameData*) const;
 
 	// ======= GENERAL =======
@@ -71,7 +72,7 @@ public:
 	int _active_level_id, _selected_level_id, _playing_level_id;
 
 	void load_levels();			// loads the levels and waves from the .txt files
-	Level* get_next_level();	// returns the next level; nullptr if the player has won (there are no more levels)
+	Level* const get_next_level();	// returns the next level; nullptr if the player has won (there are no more levels)
 	void set_next_level();		// sets the next level
 	void update_level(float);	// updates the current level's state
 
@@ -82,6 +83,7 @@ public:
 
 	// ======= COLLECTIONS =======
 
+	//list pointers may change during a reset
 	std::list<Player*>* playerLs;
 	std::list<Entity*>* enemyLs;
 	std::list<Projectile*>* enemyProjLs, * playerProjLs;
@@ -91,23 +93,27 @@ public:
 
 	// Updates all objects within the list. Template class must be derived from Drawing.
 	template <class T>
-	static void update(float ms, std::list<T*>*);
+	static void update(float ms, std::list<T*>* const);
 
 	// Draws all objects within the list. Template class must be derived from Drawing.
 	template <class T>
-	static void draw(std::list<T*>* ls);
+	static void draw(std::list<T*>* const ls);
 
 	// Checks collisions between 2 lists. Template classes must both be derived from GameObject.
 	template <class T1, class T2>
-	static void checkCollisions(std::list<T1*>*, std::list<T2*>*);
+	static void checkCollisions(std::list<T1*>* const, std::list<T2*>* const);
 
 	// Spawns a projectile for every eligible object in the list. Template class must be derived from Entity.
 	template <class T>
-	void fire(std::list<T*>*) const;
+	void fire(std::list<T*>* const) const;
 
 	// Checks if any object within the list must be destroyed, and deletes it. Template class must be derived from Drawing.
 	template <class T>
-	void checkAndDelete(std::list<T*>*);
+	void checkAndDelete(std::list<T*>* const);
+
+	// Deletes all data from the provided list
+	template<class T>
+	void static clearList(std::list<T*>* const);
 
 private:
 	// Methods used to create levels upon initialization
@@ -119,17 +125,13 @@ private:
 
 	void create_buttons();
 
-	// Helper method used to delete all data from the provided list, as well as the list itself
-	template<class T>
-	void static deleteList(std::list<T*>*);
-
 	int score;
 };
 
 // ======= INNER CLASSES =======
 
 /**
-* owo uwu
+* Holds data for the player's performance during the game
 */
 class GameData::Stats 
 {
@@ -151,9 +153,9 @@ private:
 };
 
 /**
-* owo uwu
+* A small collection of publically available data for every achievement
 */
-class GameData::Achievement
+struct GameData::Achievement
 {
 public:
 	Achievement(std::string name, std::string icon, int type, int kills);
