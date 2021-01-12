@@ -3,11 +3,12 @@
 #include "visual_effect.h"
 #include "level.h"
 #include "Powerup.h"
+#include "Player.h"
 #include "button.h"
 
 /**
-* A file containing the template methods' implementations
-*/
+ * A file containing the template methods' implementations
+ */
 
 template <class T>
 void GameData::update(float ms, std::list<T*>* ls)
@@ -71,7 +72,7 @@ void GameData::checkAndDelete(std::list<T*>* ls)
 		}
 	}
 	if (playerLs->size() == 0)
-		game_state = game_states::GAME_LOSE;
+		game_state = GAME_STATE::GAME_LOSE;
 }
 
 // Workaround as C++ doesn't permit method specialization
