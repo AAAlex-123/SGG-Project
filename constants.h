@@ -40,14 +40,15 @@ void close();
 void updateAndSpawn(GameData* starting_gd, float* ms);
 void checkAndFire(GameData* starting_gd);
 
-bool load_images_from_file(const std::string& image_path)
+bool load_images_from_file(const std::string& image_path, const std::string& icon_path)
 {
 	GameData* gd = reinterpret_cast<GameData*> (graphics::getUserData());
 
 	std::string temp_file_name = "_mytemp.txt";
 
-	// create temp file and stream to that temp file
-	system(("dir " + image_path + " > " + temp_file_name).c_str());
+	// create temp file and list there the contents of .\assets\images and .\assets\icons so they can be read line by line
+	// C:\...\1942ripoff>dir .\assets\images .\assets\icons /b /s > _mytemp.txt
+	system(("dir " + image_path + " " + icon_path + "/b /s > " + temp_file_name).c_str());
 	std::ifstream in(temp_file_name);
 
 	if (!in)
@@ -56,10 +57,10 @@ bool load_images_from_file(const std::string& image_path)
 		return false;
 	}
 
-	// get all assets from file
+	// get all assets from the icons and images folders
 	std::string contents((std::istreambuf_iterator<char>(in)), std::istreambuf_iterator<char>());
 	std::smatch match;
-	std::regex r("(\\w+\\.png)");
+	std::regex r = std::regex("\\assets(\\\\(?:icons|images).*?\\.png)");
 
 	while (std::regex_search(contents, match, r))
 	{
