@@ -243,6 +243,11 @@ void update(float ms_)
 
 		GObjFactory::reset();
 		gd->reset();
+		gd->clearList(gd->playerLs);
+		gd->clearList(gd->enemyLs);
+		gd->clearList(gd->enemyProjLs);
+		gd->clearList(gd->playerProjLs);
+		gd->clearList(gd->effectsLs);
 
 		gd->game_state = GAME_STATE::MENU;
 
