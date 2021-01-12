@@ -78,7 +78,7 @@
 77   HealthPowerup(0.3f, 0.1f, -180.0f) 110
 78   HealthPowerup(0.7f, 0.1f, -180.0f) 110
 79//
-80   Level(6, "null")
+80   Level(6, "even more enemies")
 81//
 82//
 83   wave half-circles-u 0
@@ -246,7 +246,6 @@
 245   wave simple-u-e 55
 246   wave tank-u 65
 247
-
 
 --- File parsing stopped at '247' ---
 Available waves:
