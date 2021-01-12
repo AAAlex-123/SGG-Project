@@ -7,6 +7,7 @@
 #include <iostream>
 #include <thread>
 
+// uncomment this to disable threads
 // #define no_threads
 
 // global variables in main
@@ -400,7 +401,7 @@ void draw()
 
 		setColor(br, new float[3]{ 1.0f, 1.0f, 1.0f });
 		graphics::drawText(CANVAS_WIDTH / 7, 2 * CANVAS_HEIGHT / 5, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 10, "You won!", br);
-		graphics::drawText(CANVAS_WIDTH / 12, CANVAS_HEIGHT / 2, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 10, "Final score: " + std::to_string(gd->getScore()), br);
+		graphics::drawText(CANVAS_WIDTH / 11, CANVAS_HEIGHT / 2, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 10, "Final score: " + std::to_string(gd->getScore()), br);
 		
 		break;
 	}
@@ -420,7 +421,7 @@ void draw()
 		setColor(br, new float[3]{ 0.0f, 0.0f, 0.0f });
 		gd->_active_level_id == -1
 			? graphics::drawText(0.18f * CANVAS_WIDTH, 0.15f * CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 20, "Use the numbers to select a track", br)
-			: graphics::drawText(0.05f * CANVAS_WIDTH, 0.15f * CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 20, "Select (S) this track or Deselect (D) all tracks", br);
+			: graphics::drawText(0.05f * CANVAS_WIDTH, 0.15f * CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 20, "Select (S) this level or Deselect (D) all levels", br);
 
 		int display_height_index = -1;	// -1 because ++ prefix is cooler
 		for (int i = 0; i < 10; ++i)
