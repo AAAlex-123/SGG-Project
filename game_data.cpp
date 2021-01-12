@@ -7,8 +7,8 @@
 
 using namespace std;
 
-GameData::GameData()
-	: fps(0), game_state(0),
+GameData::GameData()	// the most epic initialization list you'll ever see
+	: fps(0), game_state(GAME_STATE::LOAD),
 	elapsed(0.0f), sprites_per_second(20.0f), curr_img_index(0), image_names(),
 	levels(std::unordered_map<int, Level*>()), _waves(std::unordered_map<std::string, Wave*>()),
 	current_level(nullptr), _active_level_id(-1), _selected_level_id(-1),
@@ -394,36 +394,38 @@ void GameData::_load_hardcoded_levels()
 void GameData::create_buttons()
 {
 	// menu
-	buttonLs->push_back(new GameStateChangingButton(this, 30.0f, 30.0f, 30.0f, new string(icon_path + "exit.png"), game_states::MENU, game_states::EXIT));
-	buttonLs->push_back(new GameStateChangingButton(this, 370.0f, 30.0f, 30.0f, new string(icon_path + "help.png"), game_states::MENU, game_states::HELP));
-	buttonLs->push_back(new GameStateChangingButton(this, 370.0f, 75.0f, 30.0f, new string(icon_path + "options.png"), game_states::MENU, game_states::OPTIONS));
-	buttonLs->push_back(new GameStateChangingButton(this, 370.0f, 120.0f, 30.0f, new string(icon_path + "credits.png"), game_states::MENU, game_states::CREDITS));
-	buttonLs->push_back(new GameStateChangingButton(this, 370.0f, 165.0f, 30.0f, new string(icon_path + "achievements.png"), game_states::MENU, game_states::ACHIEVEMENTS));
-	buttonLs->push_back(new GameStateChangingButton(this, 370.0f, 210.0f, 30.0f, new string(icon_path + "reload.png"), game_states::MENU, game_states::LOAD_L));
+	buttonLs->push_back(new GameStateChangingButton(this, 30.0f, 30.0f, 30.0f, new string(icon_path + "exit.png"), GAME_STATE::MENU, GAME_STATE::EXIT));
+	buttonLs->push_back(new GameStateChangingButton(this, 370.0f, 30.0f, 30.0f, new string(icon_path + "help.png"), GAME_STATE::MENU, GAME_STATE::HELP));
+	buttonLs->push_back(new GameStateChangingButton(this, 370.0f, 75.0f, 30.0f, new string(icon_path + "options.png"), GAME_STATE::MENU, GAME_STATE::OPTIONS));
+	buttonLs->push_back(new GameStateChangingButton(this, 370.0f, 120.0f, 30.0f, new string(icon_path + "credits.png"), GAME_STATE::MENU, GAME_STATE::CREDITS));
+	buttonLs->push_back(new GameStateChangingButton(this, 370.0f, 165.0f, 30.0f, new string(icon_path + "achievements.png"), GAME_STATE::MENU, GAME_STATE::ACHIEVEMENTS));
+	buttonLs->push_back(new GameStateChangingButton(this, 370.0f, 210.0f, 30.0f, new string(icon_path + "reload.png"), GAME_STATE::MENU, GAME_STATE::LOAD_L));
 	// game
-	buttonLs->push_back(new GameStateChangingButton(this, 370.0f, 30.0f, 30.0f, new string(icon_path + "pause.png"), game_states::GAME, game_states::PAUSE));
+	buttonLs->push_back(new GameStateChangingButton(this, 370.0f, 30.0f, 30.0f, new string(icon_path + "pause.png"), GAME_STATE::GAME, GAME_STATE::PAUSE));
 	// game -- pause
-	buttonLs->push_back(new GameStateChangingButton(this, 370.0f, 30.0f, 30.0f, new string(icon_path + "continue.png"), game_states::PAUSE, game_states::GAME));
+	buttonLs->push_back(new GameStateChangingButton(this, 370.0f, 30.0f, 30.0f, new string(icon_path + "continue.png"), GAME_STATE::PAUSE, GAME_STATE::GAME));
 	// game -- lose
-	buttonLs->push_back(new GameStateChangingButton(this, 30.0f, 30.0f, 30.0f, new string(icon_path + "back.png"), game_states::GAME_LOSE, game_states::RESET));
+	buttonLs->push_back(new GameStateChangingButton(this, 30.0f, 30.0f, 30.0f, new string(icon_path + "back.png"), GAME_STATE::GAME_LOSE, GAME_STATE::RESET));
 	// game -- win
-	buttonLs->push_back(new GameStateChangingButton(this, 30.0f, 30.0f, 30.0f, new string(icon_path + "back.png"), game_states::GAME_WIN, game_states::RESET));
+	buttonLs->push_back(new GameStateChangingButton(this, 30.0f, 30.0f, 30.0f, new string(icon_path + "back.png"), GAME_STATE::GAME_WIN, GAME_STATE::RESET));
 	// help
-	buttonLs->push_back(new GameStateChangingButton(this, 30.0f, 30.0f, 30.0f, new string(icon_path + "back.png"), game_states::HELP, game_states::MENU));
+	buttonLs->push_back(new GameStateChangingButton(this, 30.0f, 30.0f, 30.0f, new string(icon_path + "back.png"), GAME_STATE::HELP, GAME_STATE::MENU));
 	// credits
-	buttonLs->push_back(new GameStateChangingButton(this, 30.0f, 30.0f, 30.0f, new string(icon_path + "back.png"), game_states::CREDITS, game_states::MENU));
+	buttonLs->push_back(new GameStateChangingButton(this, 30.0f, 30.0f, 30.0f, new string(icon_path + "back.png"), GAME_STATE::CREDITS, GAME_STATE::MENU));
 	// options
-	buttonLs->push_back(new GameStateChangingButton(this, 30.0f, 30.0f, 30.0f, new string(icon_path + "back.png"), game_states::OPTIONS, game_states::MENU));
-	buttonLs->push_back(new GameStateChangingButton(this, 200.0f, 100.0f, 100.0f, new string(icon_path + "level_select.png"), game_states::OPTIONS, game_states::OP_LEVEL));
-	buttonLs->push_back(new GameStateChangingButton(this, 200.0f, 350.0f, 100.0f, new string(icon_path + "player_select.png"), game_states::OPTIONS, game_states::OP_PLAYER));
+	buttonLs->push_back(new GameStateChangingButton(this, 30.0f, 30.0f, 30.0f, new string(icon_path + "back.png"), GAME_STATE::OPTIONS, GAME_STATE::MENU));
+	buttonLs->push_back(new GameStateChangingButton(this, 200.0f, 100.0f, 100.0f, new string(icon_path + "level_select.png"), GAME_STATE::OPTIONS, GAME_STATE::OP_LEVEL));
+	buttonLs->push_back(new GameStateChangingButton(this, 200.0f, 350.0f, 100.0f, new string(icon_path + "player_select.png"), GAME_STATE::OPTIONS, GAME_STATE::OP_PLAYER));
 	// options -- player
-	buttonLs->push_back(new GameStateChangingButton(this, 30.0f, 30.0f, 30.0f, new string(icon_path + "back.png"), game_states::OP_PLAYER, game_states::OPTIONS));
-	buttonLs->push_back(new VariableChangingButton<bool>(this, 112.5f, 200.0f, 125.0f, new string(icon_path + "singleplayer.png"), game_states::OP_PLAYER, &this->isMultiplayer, false));
-	buttonLs->push_back(new VariableChangingButton<bool>(this, 287.5f, 200.0f, 125.0f, new string(icon_path + "multiplayer.png"), game_states::OP_PLAYER, &this->isMultiplayer, true));
+	buttonLs->push_back(new GameStateChangingButton(this, 30.0f, 30.0f, 30.0f, new string(icon_path + "back.png"), GAME_STATE::OP_PLAYER, GAME_STATE::OPTIONS));
+	buttonLs->push_back(new VariableChangingButton<bool>(this, 112.5f, 200.0f, 125.0f, new string(icon_path + "singleplayer.png"), GAME_STATE::OP_PLAYER, &this->isMultiplayer, false));
+	buttonLs->push_back(new VariableChangingButton<bool>(this, 287.5f, 200.0f, 125.0f, new string(icon_path + "multiplayer.png"), GAME_STATE::OP_PLAYER, &this->isMultiplayer, true));
 	// options -- level
-	buttonLs->push_back(new GameStateChangingButton(this, 30.0f, 30.0f, 30.0f, new string(icon_path + "back.png"), game_states::OP_LEVEL, game_states::OPTIONS));
+	buttonLs->push_back(new GameStateChangingButton(this, 30.0f, 30.0f, 30.0f, new string(icon_path + "back.png"), GAME_STATE::OP_LEVEL, GAME_STATE::OPTIONS));
 	// achievement
-	buttonLs->push_back(new GameStateChangingButton(this, 30.0f, 30.0f, 30.0f, new string(icon_path + "back.png"), game_states::ACHIEVEMENTS, game_states::MENU));
+	buttonLs->push_back(new GameStateChangingButton(this, 30.0f, 30.0f, 30.0f, new string(icon_path + "back.png"), GAME_STATE::ACHIEVEMENTS, GAME_STATE::MENU));
+	// invalid_state
+	buttonLs->push_back(new GameStateChangingButton(this, 30.0f, 30.0f, 30.0f, new string(icon_path + "back.png"), GAME_STATE::INVALID_STATE, GAME_STATE::MENU));
 }
 
 GameData::~GameData()
