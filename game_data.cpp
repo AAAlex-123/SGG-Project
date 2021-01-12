@@ -7,6 +7,7 @@
 
 using namespace std;
 
+
 GameData::GameData()	// the most epic initialization list you'll ever see
 	: fps(0), game_state(GAME_STATE::LOAD),
 	elapsed(0.0f), sprites_per_second(20.0f), curr_img_index(0), image_names(),
@@ -16,7 +17,7 @@ GameData::GameData()	// the most epic initialization list you'll ever see
 	_playing_level_id(-1), level_transition_timer(set_level_transition_timer()),
 	enemyLs(new list<Entity*>), playerLs(new list<Player*>), enemyProjLs(new list<Projectile*>),
 	playerProjLs(new list<Projectile*>), effectsLs(new list<VisualEffect*>), powerupLs(new list<Powerup*>), buttonLs(new list<Button*>),
-	stats(new Stats()), achievements(array<GameData::Achievement*, 4>())
+	stats(new Stats())
 {
 	// sets all the user-selectable levels to nullptr to check later
 	// if a user-selectable level has been defined (changing the nullptr to Level*) by calling `levels[id]`
@@ -25,10 +26,11 @@ GameData::GameData()	// the most epic initialization list you'll ever see
 
 	create_buttons();
 
-	achievements[0] = new GameData::Achievement("Kill 100 total enemies", icon_path + "achievement_1.png", Stats::ALL, 100);
-	achievements[1] = new GameData::Achievement("Destroy 20 balloons", icon_path + "achievement_2.png", Stats::BALLOON, 20);
-	achievements[2] = new GameData::Achievement("Destroy an American airship", icon_path + "achievement_3.png", Stats::AIRSHIP, 1);
-	achievements[3] = new GameData::Achievement("Destroy 50 british fighters", icon_path + "achievement_4.png", Stats::BLACK_PLANE, 50);
+	achievements = {
+	new GameData::Achievement("Kill 100 total enemies", icon_path + "achievement_1.png",Stats::ALL,100),
+	new GameData::Achievement("Destroy 20 balloons", icon_path + "achievement_2.png",Stats::BALLOON,20),
+	new GameData::Achievement("Destroy an American airship", icon_path + "achievement_3.png",Stats::AIRSHIP,1),
+	new GameData::Achievement("Destroy 50 british fighters", icon_path + "achievement_4.png",Stats::BLACK_PLANE,50)};
 }
 
 void GameData::reset()
@@ -106,9 +108,9 @@ void GameData::load_levels()
 	std::cout << "Levels loaded successfully" << std::endl;
 }
 
-Level* GameData::get_next_level()
+Level* const GameData::get_next_level()
 {
-	Level* return_val = levels[_playing_level_id + 1];
+	Level* const return_val = levels[_playing_level_id + 1];
 	if (!return_val)
 		levels.erase(_playing_level_id + 1);
 	return return_val;
@@ -399,7 +401,6 @@ void GameData::create_buttons()
 	buttonLs->push_back(new GameStateChangingButton(this, 370.0f, 75.0f, 30.0f, new string(icon_path + "options.png"), GAME_STATE::MENU, GAME_STATE::OPTIONS));
 	buttonLs->push_back(new GameStateChangingButton(this, 370.0f, 120.0f, 30.0f, new string(icon_path + "credits.png"), GAME_STATE::MENU, GAME_STATE::CREDITS));
 	buttonLs->push_back(new GameStateChangingButton(this, 370.0f, 165.0f, 30.0f, new string(icon_path + "achievements.png"), GAME_STATE::MENU, GAME_STATE::ACHIEVEMENTS));
-	buttonLs->push_back(new GameStateChangingButton(this, 370.0f, 210.0f, 30.0f, new string(icon_path + "reload.png"), GAME_STATE::MENU, GAME_STATE::LOAD_L));
 	// game
 	buttonLs->push_back(new GameStateChangingButton(this, 370.0f, 30.0f, 30.0f, new string(icon_path + "pause.png"), GAME_STATE::GAME, GAME_STATE::PAUSE));
 	// game -- pause
@@ -430,12 +431,12 @@ void GameData::create_buttons()
 
 GameData::~GameData()
 {
-	deleteList(playerLs);
-	deleteList(enemyLs);
-	deleteList(enemyProjLs);
-	deleteList(playerProjLs);
-	deleteList(effectsLs);
-	deleteList(buttonLs);
+	clearList(playerLs);
+	clearList(enemyLs);
+	clearList(enemyProjLs);
+	clearList(playerProjLs);
+	clearList(effectsLs);
+	clearList(buttonLs);
 }
 
 //=======INNER CLASSES========
