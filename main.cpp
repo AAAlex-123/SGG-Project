@@ -339,9 +339,11 @@ void draw()
 	case GAME_STATE::MENU: {
 
 		setColor(br, 'L');
-		graphics::drawText(0.30f * CANVAS_WIDTH, 0.20f * CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 10, "Welcome!", br);
+		graphics::drawText(0.30f * CANVAS_WIDTH, 0.2f * CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 10, "Welcome!", br);
+		graphics::drawText(0, 0.3f * CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 25, "Make sure you have selected any options you may want", br);
+		graphics::drawText(0, 0.35f * CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 25, "and read how the game functions before playing!", br);
 		setColor(br, 'R');
-		graphics::drawText(0.10f * CANVAS_WIDTH, 0.6f * CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 8, "Press D for demo!", br);
+		graphics::drawText(0.20f * CANVAS_WIDTH, 0.6f * CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 11, "Press D for demo!", br);
 		setColor(br, 'L');
 		graphics::drawText(0.22f * CANVAS_WIDTH, 0.8f * CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 12, "Press S to start!", br);
 		
