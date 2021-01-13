@@ -6,8 +6,8 @@
 #include <regex>
 
 /**
-* A file dedicated to storing numerous constants and functions that main.cpp uses
-*/
+ * A file dedicated to storing numerous constants and functions that main.cpp uses
+ */
 
 // constants
 int WINDOW_WIDTH  = 1200;
