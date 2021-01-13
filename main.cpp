@@ -21,6 +21,7 @@ std::thread updateThread;
 std::thread collisionThread;
 
 bool game_over = false;
+bool paused = false;
 bool terminate_all = false;
 #endif
 
@@ -129,8 +130,8 @@ void update(float ms_)
 		break;
 	}
 	case GAME_STATE::GAME: {
-		std::cout << "g:" << ms << std::endl;
-		//std::cout << "g\n";
+		// unpause here in case the game is unpause with a button, in which case no code can easily be executed
+		paused = false;
 
 		gd->game_state = graphics::getKeyState(key::SCANCODE_P) ? (GAME_STATE::PAUSE) : (gd->game_state);
 
@@ -141,10 +142,6 @@ void update(float ms_)
 			gd->game_state = GAME_STATE::LEVEL_TRANSITION;
 		}
 
-#ifndef no_threads
-		// wait for threads to stop
-		//std::this_thread::sleep_for(std::chrono::milliseconds((int)ms));
-#endif
 #ifdef no_threads
 		//update
 		gd->update(ms, gd->enemyLs);
@@ -169,7 +166,6 @@ void update(float ms_)
 
 		//spawn new enemies
 		gd->spawn();
-
 #endif
 
 		// delete
@@ -271,6 +267,9 @@ void update(float ms_)
 	case GAME_STATE::PAUSE: {
 
 		gd->game_state = (graphics::getKeyState(key::SCANCODE_U)) ? (GAME_STATE::GAME) : (gd->game_state);
+
+		// pause threads; this is unpaused at the beginning of each update cycle in the GAMESTATE::GAME
+		paused = true;
 
 		break;
 	}
@@ -583,8 +582,17 @@ float mouse_x(float mx) { return (mx - ((WINDOW_WIDTH - (CANVAS_WIDTH * c2w)) / 
 float mouse_y(float my) { return (my - ((WINDOW_HEIGHT - (CANVAS_HEIGHT * c2w)) / 2)) * w2c; }
 
 #ifndef no_thread
-// Note: These were originally implemented with flags and condition_variables but this caused a ton of problems with threads 
-// momentarilly blocking each other or completely deadlocking. As such we just give some time for all threads to wait when they finish their caclulations.
+/*	Note on thread implementation:
+	The main thread, after executing the code of the update(float) method, executes
+	code from the library which is responsible for almost all of the processing time.
+	The other two threads execute code that doesn't interact with the library at all
+	therefore their execution time is effectively 0, compared to that of the main thread.
+	As a result these two threads need to wait for approximately the time between two
+	update cycles before executing their code again.
+	Although there is some variance regarding the delta time of two update cycles and
+	the threads wait for the delta time of the previous update cycle, on the long run
+	this doesn't make a difference
+*/
 
 void updateAndSpawn(GameData* const starting_gd, float* ms)
 {
@@ -593,12 +601,8 @@ void updateAndSpawn(GameData* const starting_gd, float* ms)
 
 	while (!terminate_all)
 	{
-
-		if (!game_over)
+		if (!game_over && !paused)
 		{
-			std::cout << "u:" << *ms << std::endl;
-			//std::cout << "u\n";
-
 			gd->spawn();
 			gd->update(*ms, gd->enemyLs);
 			gd->update(*ms, gd->enemyProjLs);
@@ -610,7 +614,7 @@ void updateAndSpawn(GameData* const starting_gd, float* ms)
 			gd->update_level(*ms);
 			gd->updateBackground(*ms);
 		}
-		std::this_thread::sleep_for(std::chrono::milliseconds((int)*ms)); //if it's stupid but it works, it's not stupid
+		std::this_thread::sleep_for(std::chrono::milliseconds((int)*ms));
 	}
 }
 
@@ -621,11 +625,8 @@ void checkAndFire(GameData* const starting_gd, float* ms)
 
 	while (!terminate_all)
 	{
-
-		if (!game_over)
+		if (!game_over && !paused)
 		{
-			//std::cout << "c\n";
-
 			gd->checkCollisions(gd->enemyProjLs, gd->playerLs);
 			gd->checkCollisions(gd->playerProjLs, gd->enemyLs);
 			gd->checkCollisions(gd->enemyLs, gd->playerLs);
