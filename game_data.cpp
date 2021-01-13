@@ -395,6 +395,8 @@ void GameData::_load_hardcoded_levels()
 
 void GameData::create_buttons()
 {
+	// info
+	buttonLs->push_back(new GameStateChangingButton(this, 200.0f, 250.0f, 90.0f, new string(icon_path + "to_menu.png"), GAME_STATE::INFO, GAME_STATE::MENU));
 	// menu
 	buttonLs->push_back(new GameStateChangingButton(this, 30.0f, 30.0f, 30.0f, new string(icon_path + "exit.png"), GAME_STATE::MENU, GAME_STATE::EXIT));
 	buttonLs->push_back(new GameStateChangingButton(this, 370.0f, 30.0f, 30.0f, new string(icon_path + "help.png"), GAME_STATE::MENU, GAME_STATE::HELP));
