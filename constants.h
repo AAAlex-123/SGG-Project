@@ -38,7 +38,7 @@ int main();
 void initialize();
 void close();
 void updateAndSpawn(GameData* starting_gd, float* ms);
-void checkAndFire(GameData* starting_gd);
+void checkAndFire(GameData* starting_gd, float* ms);
 
 bool load_images_from_file(const std::string& image_path, const std::string& icon_path)
 {
