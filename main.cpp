@@ -340,8 +340,11 @@ void draw()
 
 		setColor(br, 'L');
 		graphics::drawText(0.30f * CANVAS_WIDTH, 0.20f * CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 10, "Welcome!", br);
-		graphics::drawText(0.22f * CANVAS_WIDTH, 0.44f * CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 12, "Press S to start!", br);
-		graphics::drawText(0.20f * CANVAS_WIDTH, 0.59f * CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 12, "Press D for demo!", br);
+		setColor(br, 'R');
+		graphics::drawText(0.10f * CANVAS_WIDTH, 0.6f * CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 8, "Press D for demo!", br);
+		setColor(br, 'L');
+		graphics::drawText(0.22f * CANVAS_WIDTH, 0.8f * CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 12, "Press S to start!", br);
+		
 
 		break;
 	}
