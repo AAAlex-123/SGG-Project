@@ -83,8 +83,11 @@ void update(float ms_)
 	case GAME_STATE::LOAD_L: {
 
 		gd->load_levels();
-		gd->game_state = GAME_STATE::MENU;
+		gd->game_state = GAME_STATE::INFO;
 
+		break;
+	}
+	case GAME_STATE::INFO: {
 		break;
 	}
 	case GAME_STATE::MENU: {
@@ -314,6 +317,18 @@ void draw()
 		setColor(br, 'L');
 		graphics::drawText(6 * CANVAS_WIDTH / 100, 9 * CANVAS_HEIGHT / 100, CANVAS_HEIGHT / 25, "Loading levels...", br);
 
+		break;
+	}
+	case GAME_STATE::INFO: {
+		
+		setColor(br, 'L');
+		/*
+		put
+		your
+		text
+		here
+		*/
+		
 		break;
 	}
 	case GAME_STATE::MENU: {
