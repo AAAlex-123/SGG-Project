@@ -521,8 +521,8 @@ void resize(int new_w, int new_h)
 
 int main()
 {
-	graphics::createWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "1942ripoff");
-	//graphics::setFullScreen(true);
+	graphics::createWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "1917");
+	graphics::setFullScreen(true);
 	std::set_terminate(close);
 
 	graphics::setCanvasSize(CANVAS_WIDTH, CANVAS_HEIGHT);
@@ -544,7 +544,7 @@ int main()
 // function definitions
 void initialize()
 {
-	GameData* gd = new GameData();
+	GameData* const gd = new GameData();
 
 	graphics::setUserData((void*)gd);
 
@@ -594,11 +594,8 @@ float mouse_y(float my) { return (my - ((WINDOW_HEIGHT - (CANVAS_HEIGHT * c2w)) 
 	this doesn't make a difference
 */
 
-void updateAndSpawn(GameData* const starting_gd, float* ms)
+void updateAndSpawn(GameData* const gd, float* ms)
 {
-	bool gd_changed = false;
-	GameData* gd = starting_gd;
-
 	while (!terminate_all)
 	{
 		if (!game_over && !paused)
@@ -618,10 +615,8 @@ void updateAndSpawn(GameData* const starting_gd, float* ms)
 	}
 }
 
-void checkAndFire(GameData* const starting_gd, float* ms)
+void checkAndFire(GameData* const gd, float* ms)
 {
-	bool gd_changed = false;
-	GameData* gd = starting_gd;
 
 	while (!terminate_all)
 	{
