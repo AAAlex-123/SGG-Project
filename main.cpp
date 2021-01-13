@@ -20,10 +20,6 @@ MUSIC curr_music;
 std::thread updateThread;
 std::thread collisionThread;
 
-bool th_1_start = false;
-bool th_2_start = false;
-bool th_1_done = false;
-bool th_2_done = false;
 bool game_over = false;
 bool terminate_all = false;
 #endif
@@ -110,7 +106,7 @@ void update(float ms_)
 			// === generate players ===
 
 			GObjFactory::setPlayerData(gd->playerLs);
-				// Due to Factory constraints we are forced to upcast the player pointer.
+			// Due to Factory constraints we are forced to upcast the player pointer.
 			gd->playerLs->push_back(dynamic_cast<Player*>(GObjFactory::createEntity(GObjFactory::ENEMY::PLAYER, get_canvas_width() / 3.0f, get_canvas_height() * 0.7f, 0)));
 			if (gd->isMultiplayer)
 				gd->playerLs->push_back(dynamic_cast<Player*>(GObjFactory::createEntity(GObjFactory::ENEMY::PLAYER, 2 * get_canvas_width() / 3.0f, get_canvas_height() * 0.7f, 0)));
@@ -120,9 +116,9 @@ void update(float ms_)
 			if (!updateThread.joinable())
 				updateThread = std::thread(updateAndSpawn, gd, &ms);
 			if (!collisionThread.joinable())
-				collisionThread = std::thread(checkAndFire, gd);
+				collisionThread = std::thread(checkAndFire, gd, &ms);
 
-				// continue the infinite loop of the thread
+			// continue the infinite loop of the thread
 			game_over = false;
 #endif
 		}
@@ -133,6 +129,8 @@ void update(float ms_)
 		break;
 	}
 	case GAME_STATE::GAME: {
+		std::cout << "g:" << ms << std::endl;
+		//std::cout << "g\n";
 
 		gd->game_state = graphics::getKeyState(key::SCANCODE_P) ? (GAME_STATE::PAUSE) : (gd->game_state);
 
@@ -144,17 +142,8 @@ void update(float ms_)
 		}
 
 #ifndef no_threads
-		// start threads
-		th_1_start = true;
-		th_2_start = true;
-
 		// wait for threads to stop
-		while (!(th_1_done && th_2_done))
-			;
-
-		// reset threads for next cycle
-		th_1_done = false;
-		th_2_done = false;
+		//std::this_thread::sleep_for(std::chrono::milliseconds((int)ms));
 #endif
 #ifdef no_threads
 		//update
@@ -183,9 +172,9 @@ void update(float ms_)
 
 #endif
 
-	// delete
-		// these are kept seperate from the concurrent threads as they may change *all* their data during their execution
-		// so a mutex wouldn't make sense
+		// delete
+			// these are kept seperate from the concurrent threads as they may change *all* their data during their execution
+			// so a mutex wouldn't make sense
 		gd->checkAndDelete(gd->enemyLs);
 		gd->checkAndDelete(gd->enemyProjLs);
 		gd->checkAndDelete(gd->playerLs);
@@ -232,9 +221,6 @@ void update(float ms_)
 	case GAME_STATE::GAME_WIN: {
 
 #ifndef no_threads
-		//stop threads until a new game has started
-		th_1_start = false;
-		th_2_start = false;
 		game_over = true;
 #endif 
 		break;
@@ -389,7 +375,7 @@ void draw()
 		graphics::resetPose();
 		setColor(br, new float[3]{ 0.0f, 0.0f, 0.0f });
 		graphics::drawText(CANVAS_WIDTH * 0.35f, CANVAS_HEIGHT * 0.3f, 20,
-                      "Next Level in: " + std::to_string(gd->level_transition_timer).substr(0, 4), br);
+			"Next Level in: " + std::to_string(gd->level_transition_timer).substr(0, 4), br);
 		ui->draw();
 
 		break;
@@ -399,7 +385,7 @@ void draw()
 		setColor(br, new float[3]{ 1.0f, 1.0f, 1.0f });
 		graphics::drawText(CANVAS_WIDTH / 7, 2 * CANVAS_HEIGHT / 5, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 10, "You lost!", br);
 		graphics::drawText(CANVAS_WIDTH / 12, CANVAS_HEIGHT / 2, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 10, "Final score: " + std::to_string(gd->getScore()), br);
-		
+
 		break;
 	}
 	case GAME_STATE::GAME_WIN: {
@@ -407,7 +393,7 @@ void draw()
 		setColor(br, new float[3]{ 1.0f, 1.0f, 1.0f });
 		graphics::drawText(CANVAS_WIDTH / 7, 2 * CANVAS_HEIGHT / 5, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 10, "You won!", br);
 		graphics::drawText(CANVAS_WIDTH / 11, CANVAS_HEIGHT / 2, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 10, "Final score: " + std::to_string(gd->getScore()), br);
-		
+
 		break;
 	}
 	case GAME_STATE::RESET: {
@@ -537,7 +523,7 @@ void resize(int new_w, int new_h)
 int main()
 {
 	graphics::createWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "1942ripoff");
-	graphics::setFullScreen(true);
+	//graphics::setFullScreen(true);
 	std::set_terminate(close);
 
 	graphics::setCanvasSize(CANVAS_WIDTH, CANVAS_HEIGHT);
@@ -550,7 +536,7 @@ int main()
 	initialize();
 
 	graphics::startMessageLoop();
-	
+
 	// destroyWindow is called in terminate(), whenever the game closes
 
 	return 0;
@@ -590,40 +576,28 @@ void close()
 	exit(0);
 }
 
-inline float get_canvas_width()  { return CANVAS_WIDTH; }
+inline float get_canvas_width() { return CANVAS_WIDTH; }
 inline float get_canvas_height() { return CANVAS_HEIGHT; }
 
-float mouse_x(float mx) { return (mx - ((WINDOW_WIDTH  - (CANVAS_WIDTH  * c2w)) / 2)) * w2c; }
+float mouse_x(float mx) { return (mx - ((WINDOW_WIDTH - (CANVAS_WIDTH * c2w)) / 2)) * w2c; }
 float mouse_y(float my) { return (my - ((WINDOW_HEIGHT - (CANVAS_HEIGHT * c2w)) / 2)) * w2c; }
 
 #ifndef no_thread
-// Note: The thread decisions below could have been implemented with <condition_variable> ( e.g cv.wait(), cv.notify_all())
-// but it's probably overkill for something as simple as starting and stopping 2 threads and is also time consuming because it has to happen at every update cycle
+// Note: These were originally implemented with flags and condition_variables but this caused a ton of problems with threads 
+// momentarilly blocking each other or completely deadlocking. As such we just give some time for all threads to wait when they finish their caclulations.
 
-void updateAndSpawn(GameData* starting_gd, float* ms)
+void updateAndSpawn(GameData* const starting_gd, float* ms)
 {
 	bool gd_changed = false;
 	GameData* gd = starting_gd;
 
-	while (true)
+	while (!terminate_all)
 	{
-		while (!th_1_start)
-		{
-			if (game_over)
-				gd_changed = true;
-			if (terminate_all) //putting this condition on the while loop itself doesn't seem to work for some reason
-				return;
-		}
 
 		if (!game_over)
 		{
-			//std::cout << "updateAndSpawn::ms: " << *ms << std::endl;
-
-			if (gd_changed)
-			{
-				gd = reinterpret_cast<GameData*>(graphics::getUserData());
-				gd_changed = false;
-			}
+			std::cout << "u:" << *ms << std::endl;
+			//std::cout << "u\n";
 
 			gd->spawn();
 			gd->update(*ms, gd->enemyLs);
@@ -635,36 +609,22 @@ void updateAndSpawn(GameData* starting_gd, float* ms)
 
 			gd->update_level(*ms);
 			gd->updateBackground(*ms);
-
-			th_1_done = true;
-			th_1_start = false;
 		}
+		std::this_thread::sleep_for(std::chrono::milliseconds((int)*ms)); //if it's stupid but it works, it's not stupid
 	}
 }
 
-void checkAndFire(GameData* starting_gd)
+void checkAndFire(GameData* const starting_gd, float* ms)
 {
 	bool gd_changed = false;
 	GameData* gd = starting_gd;
 
-	while (true)
+	while (!terminate_all)
 	{
-		while (!th_2_start)
-		{
-			if (game_over)
-				gd_changed = true;
-			if (terminate_all)
-				return;
-		}
 
 		if (!game_over)
 		{
-
-			if (gd_changed)
-			{
-				gd = reinterpret_cast<GameData*>(graphics::getUserData());
-				gd_changed = false;
-			}
+			//std::cout << "c\n";
 
 			gd->checkCollisions(gd->enemyProjLs, gd->playerLs);
 			gd->checkCollisions(gd->playerProjLs, gd->enemyLs);
@@ -672,10 +632,8 @@ void checkAndFire(GameData* starting_gd)
 			gd->checkCollisions(gd->playerLs, gd->powerupLs);
 			gd->fire(gd->playerLs);
 			gd->fire(gd->enemyLs);
-
-			th_2_done = true;
-			th_2_start = false;
 		}
+		std::this_thread::sleep_for(std::chrono::milliseconds((int)*ms));
 	}
 }
 #endif
