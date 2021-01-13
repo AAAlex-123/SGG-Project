@@ -6,8 +6,8 @@
 #include <regex>
 
 /**
-* A file dedicated to storing numerous constants and functions that main.cpp uses
-*/
+ * A file dedicated to storing numerous constants and functions that main.cpp uses
+ */
 
 // constants
 int WINDOW_WIDTH  = 1200;
@@ -37,8 +37,10 @@ void resize(int, int);
 int main();
 void initialize();
 void close();
-void updateAndSpawn(GameData* starting_gd, float* ms);
-void checkAndFire(GameData* starting_gd);
+//A thread function that spawns enemies and updates all objects in the game
+void updateAndSpawn(GameData* const starting_gd, float* ms);
+//A thread function that checks for collisions between objects and creates projectiles when needed
+void checkAndFire(GameData* const starting_gd, float* ms);
 
 bool load_images_from_file(const std::string& image_path, const std::string& icon_path)
 {
