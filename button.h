@@ -10,7 +10,7 @@ class GameData;
 class Button : public Drawing
 {
 public:
-	Button(GameData*, float, float, float, std::string*, GAME_STATE targetGS);
+	Button(GameData* const, float x, float y, float size, std::string*, GAME_STATE targetGS);
 
 	virtual void update(float) override final;
 	virtual void draw() override final;
@@ -22,7 +22,7 @@ public:
 	virtual operator bool() const override;
 
 protected:
-	GameData* gd;
+	GameData* const gd;
 	GAME_STATE targetGS;	// the gamestate where the button will work
 	bool clicked;
 	graphics::MouseState ms;
@@ -34,7 +34,7 @@ protected:
 class GameStateChangingButton : public Button
 {
 public:
-	GameStateChangingButton(GameData*, float, float, float, std::string*, GAME_STATE, GAME_STATE newGS);
+	GameStateChangingButton(GameData* const, float, float, float, std::string*, GAME_STATE, GAME_STATE newGS);
 
 protected:
 	virtual void execute_() const override;
@@ -47,7 +47,7 @@ template<typename T>
 class VariableChangingButton : public Button
 {
 public:
-	VariableChangingButton(GameData* gd, float x, float y, float size, std::string* icon, GAME_STATE targetGS, T* attribute, T value)
+	VariableChangingButton(GameData* const gd, float x, float y, float size, std::string* icon, GAME_STATE targetGS, T* attribute, T value)
 		: Button(gd, x, y, size, icon, targetGS), attr(attribute), val(value)
 	{}
 
@@ -58,6 +58,6 @@ protected:
 	}
 
 private:
-	T* attr;
+	T* const attr;
 	T val;
 };
