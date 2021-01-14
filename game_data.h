@@ -45,6 +45,7 @@ public:
 	float elapsed;
 	int curr_img_index;
 	std::vector<std::string> image_names;
+	bool seen_info;
 
 	// game
 	bool isMultiplayer;
