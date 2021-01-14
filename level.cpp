@@ -12,11 +12,7 @@ Level::Level(int id, const std::string& desc)
 	powerups(new std::unordered_set<std::pair<float, Powerup*>*>), powerup_queue(new std::queue<Powerup*>),
 	_total_time(0.0f)
 {
-	if (id == -1)
-	{
-		std::cerr << "Error: invalid level id: " << id << std::endl;
-	}
-	else if (id < 0 || id > 9)	// concerning level select
+	if (id < 0 || id > 9)	// concerning level select
 	{
 		std::cerr << "Warning: level id '" << id << "' out of bounds; players won't be able to select this level" << std::endl;
 	}
