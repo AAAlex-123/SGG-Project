@@ -1,6 +1,5 @@
 #include "game_data.h"
 #include "GObjFactory.h"
-#include <thread>
 #include <iostream>
 #include <regex>
 #include <fstream>
