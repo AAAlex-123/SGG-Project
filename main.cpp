@@ -6,10 +6,12 @@
 #include "Player.h"
 #include <iostream>
 
-/*READ ME IMPORTANT: THREADS ONLY WORK ON DEBUG MODE (or low/no-optimization compiler option) for some reason.
- It's obvious there is a race condition somewhere but it only appears if the program is running slow enough(???).
- We have tried using mutexes, condition variables, even making all threads asynchronized but the problem persists,
- and since it doesn't happen during debug mode we have no tools with which to find it.
+/*
+ READ ME IMPORTANT: THREADS ONLY WORK ON DEBUG MODE (or low/no-optimization compiler option) for some reason.
+ The most likely cause is that there is a race condition somewhere but it only appears if the program is running fast enough,
+ spesifically inside the #ifndef block at main::161-173 where the main thread writes to the global variables while the threads are reading from them.
+ We have tried using mutexes, condition variables, which crippled the game's performance, and even tried making
+ all threads asynchronized but then similar problems arise when pausing, ending the game and transitioning between levels
  Threads were still used safely to load levels in game_data.cpp though (scrapped because loading times in release mode are miniscule).
  Comment the line below to run with threads.
  */
@@ -92,11 +94,15 @@ void update(float ms_)
 	case GAME_STATE::LOAD_L: {
 
 		gd->load_levels();
-		gd->game_state = GAME_STATE::INFO;
+		if (!gd->seen_info)
+			gd->game_state = GAME_STATE::INFO;
+		else
+			gd->game_state = GAME_STATE::MENU;
 
 		break;
 	}
 	case GAME_STATE::INFO: {
+		gd->seen_info = true;
 		break;
 	}
 	case GAME_STATE::MENU: {
@@ -142,6 +148,16 @@ void update(float ms_)
 		break;
 	}
 	case GAME_STATE::GAME: {
+		
+		gd->game_state = graphics::getKeyState(key::SCANCODE_P) ? (GAME_STATE::PAUSE) : (gd->game_state);
+
+		// level change logic
+		if ((!(*gd->current_level)) && (gd->enemyLs->empty()) && (gd->enemyProjLs->empty()))
+		{
+			gd->level_transition_timer = gd->set_level_transition_timer();
+			gd->game_state = GAME_STATE::LEVEL_TRANSITION;
+		}
+
 #ifndef no_threads
 		//start threads
 		th_1_start = true;
@@ -239,11 +255,6 @@ void update(float ms_)
 
 		GObjFactory::reset();
 		gd->reset();
-		gd->clearList(gd->playerLs);
-		gd->clearList(gd->enemyLs);
-		gd->clearList(gd->enemyProjLs);
-		gd->clearList(gd->playerProjLs);
-		gd->clearList(gd->effectsLs);
 
 		gd->game_state = GAME_STATE::MENU;
 
@@ -269,9 +280,7 @@ void update(float ms_)
 
 		break;
 	}
-	case GAME_STATE::OP_PLAYER: {
-		break;
-	}
+	case GAME_STATE::OP_PLAYER:
 	case GAME_STATE::HELP: {
 		break;
 	}
@@ -329,6 +338,23 @@ void draw()
 	case GAME_STATE::INFO: {
 
 		setColor(br, 'L');
+		graphics::drawText(15, 0.07f * CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 16, "Before you start:", br);
+		graphics::drawText(15, 0.12f * CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 22, "Everythings that looks like a button is a button", br);
+		graphics::drawText(15, 0.16f * CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 22, "that can be clicked with the mouse", br);
+		graphics::drawText(15, 0.21f * CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 25, " - X to exit", br);
+		graphics::drawText(CANVAS_WIDTH / 2, 0.21f * CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 25, " - ? for help (read before playing)", br);
+		graphics::drawText(15, 0.26f * CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 25, " - cog for options", br);
+		graphics::drawText(CANVAS_WIDTH / 2, 0.26f * CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 25, " - C for credits", br);
+		graphics::drawText(15, 0.31f * CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 25, " - trophy for achievements", br);
+		graphics::drawText(CANVAS_WIDTH / 2, 0.31f * CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 25, " - black arrow to go back", br);
+		graphics::drawText(15, 0.36f * CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 25, " - red arrow to reload levels (use after changing the .txt files)", br);
+		graphics::drawText(15, 0.45f * CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 22, "If you have limited time we suggest you play the demo", br);
+		graphics::drawText(15, 0.51f * CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 22, "to see all of the game's features in about 4 minutes", br);
+		graphics::drawText(0.44f * CANVAS_WIDTH, 0.70f * CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 17, "That's it, click the arrow", br);
+		graphics::drawText(0.68f * CANVAS_WIDTH, 0.75f * CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 17, "and have fun!", br);
+		
+		/*
+		setColor(br, 'L');
 		graphics::drawText(0, 0.20f * CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 10, "Before you start:", br);
 		graphics::drawText(0, 0.30f * CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 25, "*You can select levels and toggle Multiplayer", br);
 		graphics::drawText(0, 0.35f * CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 25, "by clicking the cog button on the right of the menu screen", br);
@@ -340,12 +366,18 @@ void draw()
 		graphics::drawText(0, 0.90f * CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 20, "That's all for now, click the arrow button to", br);
 		graphics::drawText(0, 0.95f * CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 20, "continue and have fun!", br);
 		setColor(br, 'L');
+		*/
 
 		break;
 	}
 	case GAME_STATE::MENU: {
 
 		setColor(br, 'L');
+		graphics::drawText(0.30f * CANVAS_WIDTH, 0.20f * CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 10, "Welcome!", br);
+		graphics::drawText(0.22f * CANVAS_WIDTH, 0.44f * CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 12, "Press S to start!", br);
+		graphics::drawText(0.20f * CANVAS_WIDTH, 0.59f * CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 12, "Press D for demo!", br);
+
+		/*
 		graphics::drawText(0.30f * CANVAS_WIDTH, 0.2f * CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 10, "Welcome!", br);
 		graphics::drawText(0, 0.3f * CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 25, "Make sure you have selected any options you may want", br);
 		graphics::drawText(0, 0.35f * CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 25, "and read how the game functions before playing!", br);
@@ -353,7 +385,7 @@ void draw()
 		graphics::drawText(0.20f * CANVAS_WIDTH, 0.6f * CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 11, "Press D for demo!", br);
 		setColor(br, 'L');
 		graphics::drawText(0.22f * CANVAS_WIDTH, 0.8f * CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 12, "Press S to start!", br);
-		
+		*/
 
 		break;
 	}
@@ -477,20 +509,22 @@ void draw()
 	case GAME_STATE::HELP: {
 
 		setColor(br, new float[3]{ 0.0f, 0.0f, 0.0f });
-		graphics::drawText(CANVAS_WIDTH / 10, 2.0f * CANVAS_HEIGHT / 13, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 17, "Player 1:", br);
-		graphics::drawText(CANVAS_WIDTH / 10, 2.7f * CANVAS_HEIGHT / 13, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 28, "WASD to move, X to fire, Q/E to spin", br);
-		graphics::drawText(CANVAS_WIDTH / 10, 5.0f * CANVAS_HEIGHT / 13, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 17, "Player 2:", br);
-		graphics::drawText(CANVAS_WIDTH / 10, 5.7f * CANVAS_HEIGHT / 13, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 28, "Arrow-keys to move, SPACE to fire, '.'/',' to spin", br);
-		graphics::drawText(CANVAS_WIDTH / 10, 7.0f * CANVAS_HEIGHT / 13, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 19, "Pick up powerups by running into them.", br);
-		graphics::drawText(CANVAS_WIDTH / 10, 8.2f * CANVAS_HEIGHT / 13, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 17, "Gain points by killing enemies.", br);
+		graphics::drawText(0.1f * CANVAS_WIDTH, 0.15f * CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 17, "Player 1:", br);
+		graphics::drawText(0.1f * CANVAS_WIDTH, 0.20f * CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 28, "WASD to move, X to fire, Q/E to spin", br);
+		graphics::drawText(0.1f * CANVAS_WIDTH, 0.27f * CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 17, "Player 2:", br);
+		graphics::drawText(0.1f * CANVAS_WIDTH, 0.32f * CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 28, "Arrow-keys to move, SPACE to fire, '.'/',' to spin", br);
+		graphics::drawText(0.1f * CANVAS_WIDTH, 0.41f * CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 19, "Pick up powerups by running into them.", br);
+		graphics::drawText(0.1f * CANVAS_WIDTH, 0.48f * CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 17, "Gain points by killing enemies.", br);
+		graphics::drawText(0.1f * CANVAS_WIDTH, 0.58f * CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 17, "Information about editing the levels", br);
+		graphics::drawText(0.1f * CANVAS_WIDTH, 0.63f * CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 17, "can be found at the .txt files", br);
 
 		setColor(br, new float[3]{ 1.0f, 1.0f, 1.0f });
-		br.outline_opacity = 0.f;
-		br.texture = std::string(image_path + "player1.png");
-		graphics::drawRect(CANVAS_WIDTH / 10, CANVAS_HEIGHT - 80, 40, 80, br);
-		br.texture = std::string(image_path + "player2.png");
+		br.outline_opacity = 0.0f;
+		br.texture = image_path + "player1.png";
+		graphics::drawRect(0.1f * CANVAS_WIDTH, 0.84f * CANVAS_HEIGHT, 40, 80, br);
 
-		graphics::drawRect(CANVAS_WIDTH - (CANVAS_WIDTH / 10), CANVAS_HEIGHT - 80, 40, 80, br);
+		br.texture = image_path + "player2.png";
+		graphics::drawRect(0.9 * CANVAS_WIDTH, 0.84f * CANVAS_HEIGHT, 40, 80, br);
 
 		break;
 	}
@@ -553,7 +587,7 @@ void resize(int new_w, int new_h)
 
 int main()
 {
-	graphics::createWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "1917");
+	graphics::createWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "1942ripoff");
 #ifdef no_threads
 	graphics::setFullScreen(true);
 #endif //Windows can't handle unresponsive full screen windows
