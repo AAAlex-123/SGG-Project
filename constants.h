@@ -9,10 +9,10 @@
  * A file dedicated to storing numerous constants and functions that main.cpp uses
  */
 
-// constants
-int WINDOW_WIDTH  = 1200;
+ // constants
+int WINDOW_WIDTH = 1200;
 int WINDOW_HEIGHT = 600;
-const float CANVAS_WIDTH  = 400.0f;
+const float CANVAS_WIDTH = 400.0f;
 const float CANVAS_HEIGHT = 500.0f;
 
 // constants to match window dimensions to canvas dimensions; used for mouse calculations
@@ -38,9 +38,9 @@ int main();
 void initialize();
 void close();
 //A thread function that spawns enemies and updates all objects in the game
-void updateAndSpawn(GameData* const starting_gd, float* ms);
+void updateAndSpawn(GameData* const starting_gd, float* const ms);
 //A thread function that checks for collisions between objects and creates projectiles when needed
-void checkAndFire(GameData* const starting_gd, float* ms);
+void checkAndFire(GameData* const gd, float* const ms);
 
 bool load_images_from_file(const std::string& image_path, const std::string& icon_path)
 {
