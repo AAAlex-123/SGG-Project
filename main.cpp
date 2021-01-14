@@ -340,53 +340,34 @@ void draw()
 
 		setColor(br, 'L');
 		graphics::drawText(15, 0.07f * CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 16, "Before you start:", br);
-		graphics::drawText(15, 0.12f * CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 22, "Everythings that looks like a button is a button", br);
+		graphics::drawText(15, 0.12f * CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 22, "Any box on the edges of the screen is a button", br);
 		graphics::drawText(15, 0.16f * CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 22, "that can be clicked with the mouse", br);
 		graphics::drawText(15, 0.21f * CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 25, " - X to exit", br);
+		setColor(br, 'R');
 		graphics::drawText(CANVAS_WIDTH / 2, 0.21f * CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 25, " - ? for help (read before playing)", br);
 		graphics::drawText(15, 0.26f * CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 25, " - cog for options", br);
+		setColor(br, 'L');
 		graphics::drawText(CANVAS_WIDTH / 2, 0.26f * CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 25, " - C for credits", br);
 		graphics::drawText(15, 0.31f * CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 25, " - trophy for achievements", br);
 		graphics::drawText(CANVAS_WIDTH / 2, 0.31f * CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 25, " - black arrow to go back", br);
 		graphics::drawText(15, 0.36f * CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 25, " - red arrow to reload levels (use after changing the .txt files)", br);
 		graphics::drawText(15, 0.45f * CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 22, "If you have limited time we suggest you play the demo", br);
 		graphics::drawText(15, 0.51f * CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 22, "to see all of the game's features in about 4 minutes", br);
-		graphics::drawText(0.44f * CANVAS_WIDTH, 0.70f * CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 17, "That's it, click the arrow", br);
-		graphics::drawText(0.68f * CANVAS_WIDTH, 0.75f * CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 17, "and have fun!", br);
-		
-		/*
-		setColor(br, 'L');
-		graphics::drawText(0, 0.20f * CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 10, "Before you start:", br);
-		graphics::drawText(0, 0.30f * CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 25, "*You can select levels and toggle Multiplayer", br);
-		graphics::drawText(0, 0.35f * CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 25, "by clicking the cog button on the right of the menu screen", br);
-		graphics::drawText(0, 0.50f * CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 25, "*Click the question mark button above it for game info", br);
-		graphics::drawText(0, 0.60f * CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 25, "*Navigate back to the menu at any point by clicking", br);
-		graphics::drawText(0, 0.65f * CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 25, "the arrow button to the top left when it appears.", br);
-		graphics::drawText(0, 0.80f * CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 25, "*We highly recommend playing the demo before the main game", br);
 		setColor(br, 'R');
-		graphics::drawText(0, 0.90f * CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 20, "That's all for now, click the arrow button to", br);
-		graphics::drawText(0, 0.95f * CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 20, "continue and have fun!", br);
+		graphics::drawText(0.33f * CANVAS_WIDTH, 0.70f * CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 17, "That's it, click the arrow to", br);
+		graphics::drawText(0.5f * CANVAS_WIDTH, 0.75f * CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 17, "continue and have fun!", br);
 		setColor(br, 'L');
-		*/
-
 		break;
 	}
 	case GAME_STATE::MENU: {
 
 		setColor(br, 'L');
 		graphics::drawText(0.30f * CANVAS_WIDTH, 0.20f * CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 10, "Welcome!", br);
-		graphics::drawText(0.22f * CANVAS_WIDTH, 0.44f * CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 12, "Press S to start!", br);
-		graphics::drawText(0.20f * CANVAS_WIDTH, 0.59f * CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 12, "Press D for demo!", br);
+		graphics::drawText(0, 0.3f * CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 25, "Select level (main game) / play multiplayer ", br);
+		graphics::drawText(0, 0.35f * CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 25, "by clicking the options button!", br);
+		graphics::drawText(0.15f * CANVAS_WIDTH, 0.54f * CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 11, "Press D for demo!", br);
+		graphics::drawText(0.07f * CANVAS_WIDTH, 0.7f * CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 12, "Press S for the main game!", br);
 
-		/*
-		graphics::drawText(0.30f * CANVAS_WIDTH, 0.2f * CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 10, "Welcome!", br);
-		graphics::drawText(0, 0.3f * CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 25, "Make sure you have selected any options you may want", br);
-		graphics::drawText(0, 0.35f * CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 25, "and read how the game functions before playing!", br);
-		setColor(br, 'R');
-		graphics::drawText(0.20f * CANVAS_WIDTH, 0.6f * CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 11, "Press D for demo!", br);
-		setColor(br, 'L');
-		graphics::drawText(0.22f * CANVAS_WIDTH, 0.8f * CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 12, "Press S to start!", br);
-		*/
 
 		break;
 	}
