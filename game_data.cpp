@@ -41,13 +41,13 @@ void GameData::reset()
 	_playing_level_id = -1;
 	score = 0;
 
-	enemyLs = new list<Entity*>;
-	playerLs = new list<Player*>;
-	enemyProjLs = new list<Projectile*>;
-	playerProjLs = new list<Projectile*>;
-	effectsLs = new list<VisualEffect*>;
-	powerupLs = new list<Powerup*>;
-	buttonLs = new list<Button*>;
+	clearList(playerLs);
+	clearList(enemyLs);
+	clearList(enemyProjLs);
+	clearList(playerProjLs);
+	clearList(effectsLs);
+	clearList(powerupLs);
+	clearList(buttonLs);
 
 	create_buttons();
 }
