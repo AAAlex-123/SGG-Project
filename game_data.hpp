@@ -95,4 +95,5 @@ void GameData::clearList(std::list<T*>* const ls)
 {
 	for (T* obj : *ls)
 		delete obj;
+	ls->clear();
 }
