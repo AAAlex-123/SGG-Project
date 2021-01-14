@@ -5,10 +5,15 @@
 #include "UI.h"
 #include "Player.h"
 #include <iostream>
-#include <thread>
 
-// uncomment this to disable threads
-// #define no_threads
+/*READ ME IMPORTANT: THREADS ONLY WORK ON DEBUG MODE (or low/no-optimization compiler option) for some reason.
+ It's obvious there is a race condition somewhere but it only appears if the program is running slow enough(???).
+ We have tried using mutexes, condition variables, even making all threads asynchronized but the problem persists,
+ and since it doesn't happen during debug mode we have no tools with which to find it.
+ Threads were still used safely to load levels in game_data.cpp though (scrapped because loading times in release mode are miniscule).
+ Comment the line below to run with threads.
+ */
+#define no_threads
 
 // global variables in main
 graphics::Brush br;
@@ -17,11 +22,15 @@ UI* ui = nullptr;
 MUSIC curr_music;
 
 #ifndef no_threads
+#include <thread>
 std::thread updateThread;
 std::thread collisionThread;
 
+bool th_1_start = false;
+bool th_2_start = false;
+bool th_1_done = false;
+bool th_2_done = false;
 bool game_over = false;
-bool paused = false;
 bool terminate_all = false;
 #endif
 
@@ -133,18 +142,19 @@ void update(float ms_)
 		break;
 	}
 	case GAME_STATE::GAME: {
-		// unpause here in case the game is unpause with a button, in which case no code can easily be executed
-		paused = false;
+#ifndef no_threads
+		//start threads
+		th_1_start = true;
+		th_2_start = true;
 
-		gd->game_state = graphics::getKeyState(key::SCANCODE_P) ? (GAME_STATE::PAUSE) : (gd->game_state);
+		//wait for threads to stop
+		while (!(th_1_done && th_2_done))
+			;
 
-		// level change logic
-		if ((!(*gd->current_level)) && (gd->enemyLs->empty()) && (gd->enemyProjLs->empty()))
-		{
-			gd->level_transition_timer = gd->set_level_transition_timer();
-			gd->game_state = GAME_STATE::LEVEL_TRANSITION;
-		}
-
+		//reset threads for next cycle
+		th_1_done = false;
+		th_2_done = false;
+#endif
 #ifdef no_threads
 		//update
 		gd->update(ms, gd->enemyLs);
@@ -169,11 +179,12 @@ void update(float ms_)
 
 		//spawn new enemies
 		gd->spawn();
+
 #endif
 
-		// delete
-			// these are kept seperate from the concurrent threads as they may change *all* their data during their execution
-			// so a mutex wouldn't make sense
+		//delete
+			//these are kept seperated from the concurrent threads as they may change *all* their data during their execution
+			//so a mutex wouldn't make sense
 		gd->checkAndDelete(gd->enemyLs);
 		gd->checkAndDelete(gd->enemyProjLs);
 		gd->checkAndDelete(gd->playerLs);
@@ -270,10 +281,6 @@ void update(float ms_)
 	case GAME_STATE::PAUSE: {
 
 		gd->game_state = (graphics::getKeyState(key::SCANCODE_U)) ? (GAME_STATE::GAME) : (gd->game_state);
-
-		// pause threads; this is unpaused at the beginning of each update cycle in the GAMESTATE::GAME
-		paused = true;
-
 		break;
 	}
 	case GAME_STATE::CREDITS:
@@ -289,7 +296,7 @@ void update(float ms_)
 
 void draw()
 {
-	GameData* gd = reinterpret_cast<GameData*> (graphics::getUserData());
+	GameData* const gd = reinterpret_cast<GameData*> (graphics::getUserData());
 	graphics::resetPose();
 
 	if (bg_br.texture != "") 	// if there is a background to draw
@@ -547,7 +554,9 @@ void resize(int new_w, int new_h)
 int main()
 {
 	graphics::createWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "1917");
+#ifdef no_threads
 	graphics::setFullScreen(true);
+#endif //Windows can't handle unresponsive full screen windows
 	std::set_terminate(close);
 
 	graphics::setCanvasSize(CANVAS_WIDTH, CANVAS_HEIGHT);
@@ -592,9 +601,12 @@ void close()
 		delete ui;
 #ifndef no_threads
 		terminate_all = true;
+		th_1_start = true; //break out of the waiting loops
+		th_2_start = true;
 		updateThread.join();
 		collisionThread.join();
 #endif
+		delete reinterpret_cast<GameData *>(graphics::getUserData());
 	}
 	graphics::destroyWindow();
 	exit(0);
@@ -606,25 +618,15 @@ inline float get_canvas_height() { return CANVAS_HEIGHT; }
 float mouse_x(float mx) { return (mx - ((WINDOW_WIDTH - (CANVAS_WIDTH * c2w)) / 2)) * w2c; }
 float mouse_y(float my) { return (my - ((WINDOW_HEIGHT - (CANVAS_HEIGHT * c2w)) / 2)) * w2c; }
 
-#ifndef no_thread
-/*	Note on thread implementation:
-	The main thread, after executing the code of the update(float) method, executes
-	code from the library which is responsible for almost all of the processing time.
-	The other two threads execute code that doesn't interact with the library at all
-	therefore their execution time is effectively 0, compared to that of the main thread.
-	As a result these two threads need to wait for approximately the time between two
-	update cycles before executing their code again.
-	Although there is some variance regarding the delta time of two update cycles and
-	the threads wait for the delta time of the previous update cycle, on the long run
-	this doesn't make a difference
-*/
+#ifndef no_threads
+void updateAndSpawn(GameData*const gd, float* const ms) {
 
-void updateAndSpawn(GameData* const gd, float* ms)
-{
-	while (!terminate_all)
-	{
-		if (!game_over && !paused)
-		{
+	while (!terminate_all) {
+		while (!th_1_start)
+			;
+		
+		if (!game_over) {
+
 			gd->spawn();
 			gd->update(*ms, gd->enemyLs);
 			gd->update(*ms, gd->enemyProjLs);
@@ -635,18 +637,20 @@ void updateAndSpawn(GameData* const gd, float* ms)
 
 			gd->update_level(*ms);
 			gd->updateBackground(*ms);
+
 		}
-		std::this_thread::sleep_for(std::chrono::milliseconds((int)*ms));
+		th_1_done = true;
+		th_1_start = false;
 	}
 }
 
-void checkAndFire(GameData* const gd, float* ms)
-{
+void checkAndFire(GameData* const gd, float* const ms){
 
-	while (!terminate_all)
-	{
-		if (!game_over && !paused)
-		{
+	while (!terminate_all) {
+		while (!th_2_start)
+			;
+
+		if (!game_over) {
 			gd->checkCollisions(gd->enemyProjLs, gd->playerLs);
 			gd->checkCollisions(gd->playerProjLs, gd->enemyLs);
 			gd->checkCollisions(gd->enemyLs, gd->playerLs);
@@ -654,7 +658,8 @@ void checkAndFire(GameData* const gd, float* ms)
 			gd->fire(gd->playerLs);
 			gd->fire(gd->enemyLs);
 		}
-		std::this_thread::sleep_for(std::chrono::milliseconds((int)*ms));
+		th_2_done = true;
+		th_2_start = false;
 	}
 }
 #endif
