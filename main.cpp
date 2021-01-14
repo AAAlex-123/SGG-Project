@@ -12,6 +12,7 @@
  spesifically inside the #ifndef block at main::161-173 where the main thread writes to the global variables while the threads are reading from them.
  We have tried using mutexes, condition variables, which crippled the game's performance, and even tried making
  all threads asynchronized but then similar problems arise when pausing, ending the game and transitioning between levels
+ Since it doesn't happen during debug mode we have no tools with which to find it.
  Threads were still used safely to load levels in game_data.cpp though (scrapped because loading times in release mode are miniscule).
  Comment the line below to run with threads.
  */
