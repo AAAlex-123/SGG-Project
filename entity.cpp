@@ -28,9 +28,10 @@ void Entity::draw()
 	Drawing::draw();
 }
 
-Projectile* Entity::getProjectile() const {
-	float angle = static_cast<FiringPath*>(movement)->getProjAngle(x,y);
-	return GObjFactory::createProjectile(curr_projectile, x - (radius * sin(angle)), y - (radius * cos(angle)), angle);
+Projectile* Entity::getProjectile() const
+{
+	float proj_angle = static_cast<FiringPath*>(movement)->getProjAngle(x, y);
+	return GObjFactory::createProjectile(curr_projectile, x - (radius * sin(proj_angle)), y - (radius * cos(proj_angle)), proj_angle);
 }
 
 VisualEffect* Entity::getFireVisualEffect() const
