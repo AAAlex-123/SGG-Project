@@ -1,5 +1,5 @@
 #include "game_data.h"
-#include "GObjFactory.h"
+#include "Factory.h"
 #include <iostream>
 #include <regex>
 #include <fstream>
