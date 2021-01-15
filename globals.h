@@ -26,6 +26,7 @@ enum class GAME_STATE
 {
 	LOAD,
 	LOAD_L,
+	INFO,
 	MENU,
 	ACHIEVEMENTS,
 	GAME,

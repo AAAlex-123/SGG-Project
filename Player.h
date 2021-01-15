@@ -10,7 +10,7 @@ class Player final : public Entity
 {
 public:
     Player(float xpos, float ypos, float angle, float vel, float width, float height, const std::string* sprite_name, float dangle, float cooldown,
-        Keyset keys, int health, GObjFactory::BULLET proj_type);
+        Keyset keys, int health, Factory::BULLET proj_type);
 
     // Changes the projectile type
     void upgradeProjectile();

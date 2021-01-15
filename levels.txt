@@ -1,11 +1,11 @@
-0// yes every line must start with a number, starting from 0
-1// lines starting with 'line_no//' are comments and are ignored
-2// lines starting with 'line_no   ' (3 spaces) contain data
-3// yes there must be a line with just the line number at the end for better error messages
-4// Level declarations are the same used by the constructor
-5// \line_no\   Level(\id:n\, \desc:str\)
-6// \line_no\   wave \desc:str\ \time:f\
-7//
+0// MORE DETAILS AT THE END OF THE FILE
+1// - every line must start with a number, starting from 0 going up by one
+2// - lines starting with 'line_no//' are comments and are ignored
+3// - lines starting with 'line_no   ' (3 spaces) contain data
+4// - there must be a line with just the line number at the end
+5// Level declarations:		\line_no\   Level(\id:n\, \description:str\)
+6// Wave declarations:		\line_no\   wave \description:str\ \time:f\
+7// Powerup declarations:	\line_no\   [Points|Health|Projectile]Powerup(\perc_x:f\, \perc_y:f\, \angle:f\) \time:f\
 8//
 9//
 10   Level(0, "A new journey begins")
@@ -249,10 +249,39 @@
 248
 
 --- File parsing stopped at '248' ---
-Available waves:
- - wave simple-u/l/r-e/m/h
- - wave accel-v/h-e/h
- - wave balloons-e/m/h
- - wave tank-u/l/r
- - wave donuts
- - wave half-circles-u/s
+  - LOOK AT THE COMMAND LINE FOR ERROR/WARNING MESSAGES DURING FILE PARSING
+  - If anythings fails, the hardcoded levels will load, the same as the presets
+  - See at the top for Level and Wave declaration syntax encoded as \attribute:value_type\ (str = string, n = int, f = float)
+  - To declare a Level simply write `Level(\id\, \"level-name"\)` (with the ", ID CANNOT BE -1, shouldn't be negative or greater than 9)
+	ID is the unique identifier of a level and declaring a level overrides any previous level with the same ID
+	after declaring a level, wave spawnpoint declaration below it will be added to this level
+  - To declare a Wave simply write `wave \name\ \time\` where:
+      - name is the wave's name as declared in the waves.txt file
+	  - time is the time from level start when the wave will start spawning enemies
+  - To declare a Powerup simple write `<TYPE>Powerup(\perc_x\, \perc_y\, \angle\) \time\` where:
+	  - TYPE is Health, Points or Projectile
+	  - perc_x the percentage of screen_width where the powerup will spawn
+	  - perc_y the percentage of screen_height where the powerup will spawn
+	  - angle the angle with which the powerup will spawn
+	  - time is the time from level start when the powerup will spawn
+  - Note that because of the timing both on wave and powerup spawning the ordering of them under a level declaration doesn't matter
+  - About level IDs:
+	  - Levels with ID -1 are not valid
+	  - Levels with ID in range [0, 9] can be manually selected by the player in the level select menu
+	  - All other IDs can't be manually selected but can be indirectly accessed by beating the level with ID one less than this
+	  - At the end of each level the level with ID that is by one greater than that of the previous level is played.
+		If no such level exists, the game ends and the player wins
+  - PAY ATTENTION TO THE FOLLOWING. THE .TXT FILES WILL NOT WORK UNLESS THE FOLLOWING ARE TRUE
+    Every line must start with a line number and that number must be that of the previous line + 1
+	Lines that start with `line_no//` are comments, like the first 6
+	Lines that start with `line_no   ` (3 spaces) contain data, like the rest
+	Lines that are just `line_no` signal the end of file parsing, like the final line, line 248.
+		Don't forget this line and don't accidentally leave empty lines with just the number. Always comment them!
+  - Available waves:
+	 - wave simple-u/l/r-e/m/h
+	 - wave accel-v/h-e/h
+	 - wave balloons-e/m/h
+	 - wave tank-u/l/r
+	 - wave donuts
+	 - wave half-circles-u/s
+	 - whatever you create!

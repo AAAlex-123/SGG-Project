@@ -1,6 +1,6 @@
 #include "Path.h"
 #include "Player.h"
-#include "GObjFactory.h"
+#include "Factory.h"
 #include <cmath>
 
 Path::Path()
@@ -62,14 +62,14 @@ bool RotatingPath::move(float& x, float& y, float& angle, float& vel, float ms)
     return _path->move(x, y, angle, vel, ms);
 }
 
-float FiringPath::getProjAngle(float x, float y)
+float FiringPath::getProjAngle(float x__not_used, float y__not_used)
 {
     return this->curr_angle;
 }
 
 float TargetedFiringPath::getProjAngle(float x, float y)
 {
-    const Player* const pl = find_target(x, y, GObjFactory::getPlayerData());
+    const Player* const pl = find_target(x, y, Factory::getPlayerData());
     return atan2((pl->get_x() - x), (pl->get_y() - y)) + PI;
 }
 
@@ -78,7 +78,7 @@ bool FiringPath::move(float& x, float& y, float& angle, float& vel, float ms)
     this->curr_angle = angle;
     elapsed += (ms / 1000.0f);
     // reset elapsed if elapsed >= period
-    elapsed = (0.0f * (elapsed >= period)) + (elapsed * (elapsed < period));
+    elapsed = (elapsed >= period) ? (0.0f) : (elapsed);
 
     _path->move(x, y, angle, vel, ms);
 
@@ -87,7 +87,7 @@ bool FiringPath::move(float& x, float& y, float& angle, float& vel, float ms)
 
 bool HomingPath::move(float& x, float& y, float& angle, float& vel, float ms)
 {
-    const Player* const followee = find_target(x, y, GObjFactory::getPlayerData());
+    const Player* const followee = find_target(x, y, Factory::getPlayerData());
 
     float slope = atan2((followee->get_x() - x), (followee->get_y() - y));
 
@@ -98,7 +98,7 @@ bool HomingPath::move(float& x, float& y, float& angle, float& vel, float ms)
     return _path->move(x, y, angle, vel, ms);
 }
 
-bool StaticPath::move(float& x, float& y, float& angle, float& vel, float ms)
+bool StaticPath::move(float& x__not_used, float& y__not_used, float& angle__not_used, float& vel__not_used, float ms__not_used)
 {
     return false;
 }

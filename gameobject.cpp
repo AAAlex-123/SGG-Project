@@ -3,7 +3,7 @@
 
 GameObject::GameObject(float xpos, float ypos, float angle, float vel, float width, float height, const std::string* const sprite, Path* p, int damage, int max_health, int score)
 	: Drawing(xpos, ypos, angle, vel, width, height, sprite, p),
-	damage(damage), max_health(max_health), score(score), radius(std::min(width, height) / 2), curr_health(max_health)
+	damage(damage), score(score), max_health(max_health), radius(std::min(width, height) / 2), curr_health(max_health)
 {}
 
 void GameObject::hit(GameObject* o2)

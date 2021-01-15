@@ -1,6 +1,5 @@
 #include "game_data.h"
-#include "GObjFactory.h"
-#include <thread>
+#include "Factory.h"
 #include <iostream>
 #include <regex>
 #include <fstream>
@@ -13,7 +12,7 @@ GameData::GameData()	// the most epic initialization list you'll ever see
 	elapsed(0.0f), sprites_per_second(20.0f), curr_img_index(0), image_names(),
 	levels(std::unordered_map<int, Level*>()), _waves(std::unordered_map<std::string, Wave*>()),
 	current_level(nullptr), _active_level_id(-1), _selected_level_id(-1),
-	bg_offset(0.0f), height_perc_per_second(0.02f), isMultiplayer(false),
+	bg_offset(0.0f), height_perc_per_second(0.02f), seen_info(false), isMultiplayer(false),
 	_playing_level_id(-1), level_transition_timer(set_level_transition_timer()),
 	enemyLs(new list<Entity*>), playerLs(new list<Player*>), enemyProjLs(new list<Projectile*>),
 	playerProjLs(new list<Projectile*>), effectsLs(new list<VisualEffect*>), powerupLs(new list<Powerup*>), buttonLs(new list<Button*>),
@@ -42,13 +41,13 @@ void GameData::reset()
 	_playing_level_id = -1;
 	score = 0;
 
-	enemyLs = new list<Entity*>;
-	playerLs = new list<Player*>;
-	enemyProjLs = new list<Projectile*>;
-	playerProjLs = new list<Projectile*>;
-	effectsLs = new list<VisualEffect*>;
-	powerupLs = new list<Powerup*>;
-	buttonLs = new list<Button*>;
+	clearList(playerLs);
+	clearList(enemyLs);
+	clearList(enemyProjLs);
+	clearList(playerProjLs);
+	clearList(effectsLs);
+	clearList(powerupLs);
+	clearList(buttonLs);
 
 	create_buttons();
 }
@@ -189,6 +188,11 @@ bool GameData::_load_waves_from_file(const std::string& wave_file_path)
 		if (std::regex_search(contents, match, r1))
 		{
 			curr_wave = match[1];
+			/*  couldn't make it work. leave it here for possible future work
+				// create a new wave only if one doesn't already exist
+				// allows to add spawnpoints to existing waves just by re-declaring the wave
+				if (_waves.find(curr_wave) == _waves.end())
+			*/
 			_waves[curr_wave] = new Wave(curr_wave);
 		}
 
@@ -201,40 +205,48 @@ bool GameData::_load_waves_from_file(const std::string& wave_file_path)
 				return false;
 			}
 
-			// SIMPLE_ENEMY = 1,		SIMPLE_ENEMY_F = 7,		ROTATING_ENEMY_D = 2,	ROTATING_ENEMY_CA = 6
-			// ROTATING_ENEMY_C = 8,	ACCELERATING_ENEMY = 3, TANK_ENEMY = 4,			HOMING_ENEMY = 5;
+			/*
+				arbitrarily match ints to the factory's enum
+			
+				SIMPLE_ENEMY = 1
+				SIMPLE_ENEMY_F = 2
+				ACCELERATING_ENEMY = 3
+				TANK_ENEMY = 4
+				HOMING_ENEMY = 5
+				ROTATING_ENEMY_C = 6
+				ROTATING_ENEMY_CA = 7
+				ROTATING_ENEMY_D = 8
+			*/
 
-			// arbitrarily match ints to the factory's enum
-
-			GObjFactory::ENEMY type = GObjFactory::ENEMY::SIMPLE_ENEMY;
+			Factory::ENEMY type = Factory::ENEMY::SIMPLE_ENEMY;
 			switch (stoi(match[1]))
 			{
 			case 1:
-				type = GObjFactory::ENEMY::SIMPLE_ENEMY;
+				type = Factory::ENEMY::SIMPLE_ENEMY;
 				break;
 			case 2:
-				type = GObjFactory::ENEMY::ROTATING_ENEMY_D;
+				type = Factory::ENEMY::SIMPLE_ENEMY_F;
 				break;
 			case 3:
-				type = GObjFactory::ENEMY::ACCELERATING_ENEMY;
+				type = Factory::ENEMY::ACCELERATING_ENEMY;
 				break;
 			case 4:
-				type = GObjFactory::ENEMY::TANK_ENEMY;
+				type = Factory::ENEMY::TANK_ENEMY;
 				break;
 			case 5:
-				type = GObjFactory::ENEMY::HOMING_ENEMY;
+				type = Factory::ENEMY::HOMING_ENEMY;
 				break;
 			case 6:
-				type = GObjFactory::ENEMY::ROTATING_ENEMY_CA;
+				type = Factory::ENEMY::ROTATING_ENEMY_C;
 				break;
 			case 7:
-				type = GObjFactory::ENEMY::SIMPLE_ENEMY_F;
+				type = Factory::ENEMY::ROTATING_ENEMY_CA;
 				break;
 			case 8:
-				type = GObjFactory::ENEMY::ROTATING_ENEMY_C;
+				type = Factory::ENEMY::ROTATING_ENEMY_D;
 				break;
 			default:
-				std::cerr << "GameData::_load_waves_from_file: invalid enemy type from file: " << stoi(match[1])
+				std::cerr << "GameData::_load_waves_from_file: invalid enemy type: " << stoi(match[1])
 					<< ". Creating simple enemy" << std::endl;;
 			}
 			_waves[curr_wave]->add_spawnpoint(new Spawnpoint(
@@ -310,7 +322,17 @@ bool GameData::_load_levels_from_file(const std::string& level_file_path)
 		// level declaration
 		if (std::regex_search(contents, match, r1))
 		{
+			if (curr_level_id == -1)
+			{
+				std::cerr << "Error: ID -1 is not valid" << std::endl;
+				return false;
+			}
 			curr_level_id = stoi(match[1]);
+			/*  couldn't make it work. leave it here for possible future work
+				// create a new level only if one doesn't already exist
+				// allows to add waves to existing levels just by re-declaring the level
+				if (levels.find(curr_level_id) == levels.end())
+			*/
 			levels[curr_level_id] = new Level(curr_level_id, match[2]);
 		}
 
@@ -376,7 +398,7 @@ bool GameData::_load_levels_from_file(const std::string& level_file_path)
 // wip lmao
 void GameData::_load_hardcoded_levels()
 {
-	Spawnpoint* sp11 = new Spawnpoint(GObjFactory::ENEMY::SIMPLE_ENEMY, 0.0f, 0.5, -PI / 2, 10, 1.0f, 0.0f);
+	Spawnpoint* sp11 = new Spawnpoint(Factory::ENEMY::SIMPLE_ENEMY, 0.0f, 0.5, -PI / 2, 10, 1.0f, 0.0f);
 
 	Wave* w1 = new Wave("line");
 	w1->add_spawnpoint(sp11);
@@ -395,12 +417,15 @@ void GameData::_load_hardcoded_levels()
 
 void GameData::create_buttons()
 {
+	// info
+	buttonLs->push_back(new GameStateChangingButton(this, 335.0f, 435.0f, 50.0f, new string(icon_path + "to_menu.png"), GAME_STATE::INFO, GAME_STATE::MENU));
 	// menu
 	buttonLs->push_back(new GameStateChangingButton(this, 30.0f, 30.0f, 30.0f, new string(icon_path + "exit.png"), GAME_STATE::MENU, GAME_STATE::EXIT));
 	buttonLs->push_back(new GameStateChangingButton(this, 370.0f, 30.0f, 30.0f, new string(icon_path + "help.png"), GAME_STATE::MENU, GAME_STATE::HELP));
 	buttonLs->push_back(new GameStateChangingButton(this, 370.0f, 75.0f, 30.0f, new string(icon_path + "options.png"), GAME_STATE::MENU, GAME_STATE::OPTIONS));
 	buttonLs->push_back(new GameStateChangingButton(this, 370.0f, 120.0f, 30.0f, new string(icon_path + "credits.png"), GAME_STATE::MENU, GAME_STATE::CREDITS));
 	buttonLs->push_back(new GameStateChangingButton(this, 370.0f, 165.0f, 30.0f, new string(icon_path + "achievements.png"), GAME_STATE::MENU, GAME_STATE::ACHIEVEMENTS));
+	buttonLs->push_back(new GameStateChangingButton(this, 370.0f, 210.0f, 30.0f, new string(icon_path + "reload.png"), GAME_STATE::MENU, GAME_STATE::LOAD_L));
 	// game
 	buttonLs->push_back(new GameStateChangingButton(this, 370.0f, 30.0f, 30.0f, new string(icon_path + "pause.png"), GAME_STATE::GAME, GAME_STATE::PAUSE));
 	// game -- pause

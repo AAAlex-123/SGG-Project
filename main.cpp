@@ -1,14 +1,22 @@
 #include "globals.h"
 #include "constants.h"
-#include "GObjFactory.h"
+#include "Factory.h"
 #include "game_data.h"
 #include "UI.h"
 #include "Player.h"
 #include <iostream>
-#include <thread>
 
-// uncomment this to disable threads
-// #define no_threads
+/*
+ READ ME IMPORTANT: THREADS ONLY WORK ON DEBUG MODE (or low/no-optimization compiler option) for some reason.
+ The most likely cause is that there is a race condition somewhere but it only appears if the program is running fast enough,
+ spesifically inside the #ifndef block at main::161-173 where the main thread writes to the global variables while the threads are reading from them.
+ We have tried using mutexes, condition variables, which crippled the game's performance, and even tried making
+ all threads asynchronized but then similar problems arise when pausing, ending the game and transitioning between levels
+ Since it doesn't happen during debug mode we have no tools with which to find it.
+ Threads were still used safely to load levels in game_data.cpp though (scrapped because loading times in release mode are miniscule).
+ Comment the line below to run with threads.
+ */
+#define no_threads
 
 // global variables in main
 graphics::Brush br;
@@ -17,11 +25,15 @@ UI* ui = nullptr;
 MUSIC curr_music;
 
 #ifndef no_threads
+#include <thread>
 std::thread updateThread;
 std::thread collisionThread;
 
+bool th_1_start = false;
+bool th_2_start = false;
+bool th_1_done = false;
+bool th_2_done = false;
 bool game_over = false;
-bool paused = false;
 bool terminate_all = false;
 #endif
 
@@ -83,8 +95,15 @@ void update(float ms_)
 	case GAME_STATE::LOAD_L: {
 
 		gd->load_levels();
-		gd->game_state = GAME_STATE::MENU;
+		if (!gd->seen_info)
+			gd->game_state = GAME_STATE::INFO;
+		else
+			gd->game_state = GAME_STATE::MENU;
 
+		break;
+	}
+	case GAME_STATE::INFO: {
+		gd->seen_info = true;
 		break;
 	}
 	case GAME_STATE::MENU: {
@@ -106,11 +125,11 @@ void update(float ms_)
 
 			// === generate players ===
 
-			GObjFactory::setPlayerData(gd->playerLs);
+			Factory::setPlayerData(gd->playerLs);
 			// Due to Factory constraints we are forced to upcast the player pointer.
-			gd->playerLs->push_back(dynamic_cast<Player*>(GObjFactory::createEntity(GObjFactory::ENEMY::PLAYER, get_canvas_width() / 3.0f, get_canvas_height() * 0.7f, 0)));
+			gd->playerLs->push_back(dynamic_cast<Player*>(Factory::createEntity(Factory::ENEMY::PLAYER, get_canvas_width() / 3.0f, get_canvas_height() * 0.7f, 0)));
 			if (gd->isMultiplayer)
-				gd->playerLs->push_back(dynamic_cast<Player*>(GObjFactory::createEntity(GObjFactory::ENEMY::PLAYER, 2 * get_canvas_width() / 3.0f, get_canvas_height() * 0.7f, 0)));
+				gd->playerLs->push_back(dynamic_cast<Player*>(Factory::createEntity(Factory::ENEMY::PLAYER, 2 * get_canvas_width() / 3.0f, get_canvas_height() * 0.7f, 0)));
 
 #ifndef no_threads
 			// === start threads ===	(only the first time the game starts)
@@ -130,9 +149,7 @@ void update(float ms_)
 		break;
 	}
 	case GAME_STATE::GAME: {
-		// unpause here in case the game is unpause with a button, in which case no code can easily be executed
-		paused = false;
-
+		
 		gd->game_state = graphics::getKeyState(key::SCANCODE_P) ? (GAME_STATE::PAUSE) : (gd->game_state);
 
 		// level change logic
@@ -142,6 +159,19 @@ void update(float ms_)
 			gd->game_state = GAME_STATE::LEVEL_TRANSITION;
 		}
 
+#ifndef no_threads
+		//start threads
+		th_1_start = true;
+		th_2_start = true;
+
+		//wait for threads to stop
+		while (!(th_1_done && th_2_done))
+			;
+
+		//reset threads for next cycle
+		th_1_done = false;
+		th_2_done = false;
+#endif
 #ifdef no_threads
 		//update
 		gd->update(ms, gd->enemyLs);
@@ -166,11 +196,12 @@ void update(float ms_)
 
 		//spawn new enemies
 		gd->spawn();
+
 #endif
 
-		// delete
-			// these are kept seperate from the concurrent threads as they may change *all* their data during their execution
-			// so a mutex wouldn't make sense
+		//delete
+			//these are kept seperated from the concurrent threads as they may change *all* their data during their execution
+			//so a mutex wouldn't make sense
 		gd->checkAndDelete(gd->enemyLs);
 		gd->checkAndDelete(gd->enemyProjLs);
 		gd->checkAndDelete(gd->playerLs);
@@ -223,13 +254,8 @@ void update(float ms_)
 	}
 	case GAME_STATE::RESET: {
 
-		GObjFactory::reset();
+		Factory::reset();
 		gd->reset();
-		gd->clearList(gd->playerLs);
-		gd->clearList(gd->enemyLs);
-		gd->clearList(gd->enemyProjLs);
-		gd->clearList(gd->playerProjLs);
-		gd->clearList(gd->effectsLs);
 
 		gd->game_state = GAME_STATE::MENU;
 
@@ -255,9 +281,7 @@ void update(float ms_)
 
 		break;
 	}
-	case GAME_STATE::OP_PLAYER: {
-		break;
-	}
+	case GAME_STATE::OP_PLAYER:
 	case GAME_STATE::HELP: {
 		break;
 	}
@@ -267,10 +291,6 @@ void update(float ms_)
 	case GAME_STATE::PAUSE: {
 
 		gd->game_state = (graphics::getKeyState(key::SCANCODE_U)) ? (GAME_STATE::GAME) : (gd->game_state);
-
-		// pause threads; this is unpaused at the beginning of each update cycle in the GAMESTATE::GAME
-		paused = true;
-
 		break;
 	}
 	case GAME_STATE::CREDITS:
@@ -286,7 +306,7 @@ void update(float ms_)
 
 void draw()
 {
-	GameData* gd = reinterpret_cast<GameData*> (graphics::getUserData());
+	GameData* const gd = reinterpret_cast<GameData*> (graphics::getUserData());
 	graphics::resetPose();
 
 	if (bg_br.texture != "") 	// if there is a background to draw
@@ -316,12 +336,38 @@ void draw()
 
 		break;
 	}
+	case GAME_STATE::INFO: {
+
+		setColor(br, 'L');
+		graphics::drawText(15, 0.07f * CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 16, "Before you start:", br);
+		graphics::drawText(15, 0.12f * CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 22, "Any box on the edges of the screen is a button", br);
+		graphics::drawText(15, 0.16f * CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 22, "that can be clicked with the mouse", br);
+		graphics::drawText(15, 0.21f * CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 25, " - X to exit", br);
+		setColor(br, 'R');
+		graphics::drawText(CANVAS_WIDTH / 2, 0.21f * CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 25, " - ? for help (read before playing)", br);
+		graphics::drawText(15, 0.26f * CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 25, " - cog for options", br);
+		setColor(br, 'L');
+		graphics::drawText(CANVAS_WIDTH / 2, 0.26f * CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 25, " - C for credits", br);
+		graphics::drawText(15, 0.31f * CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 25, " - trophy for achievements", br);
+		graphics::drawText(CANVAS_WIDTH / 2, 0.31f * CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 25, " - black arrow to go back", br);
+		graphics::drawText(15, 0.36f * CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 25, " - red arrow to reload levels (use after changing the .txt files)", br);
+		graphics::drawText(15, 0.45f * CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 22, "If you have limited time we suggest you play the demo", br);
+		graphics::drawText(15, 0.51f * CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 22, "to see all of the game's features in about 4 minutes", br);
+		setColor(br, 'R');
+		graphics::drawText(0.33f * CANVAS_WIDTH, 0.70f * CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 17, "That's it, click the arrow to", br);
+		graphics::drawText(0.5f * CANVAS_WIDTH, 0.75f * CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 17, "continue and have fun!", br);
+		setColor(br, 'L');
+		break;
+	}
 	case GAME_STATE::MENU: {
 
 		setColor(br, 'L');
 		graphics::drawText(0.30f * CANVAS_WIDTH, 0.20f * CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 10, "Welcome!", br);
-		graphics::drawText(0.22f * CANVAS_WIDTH, 0.44f * CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 12, "Press S to start!", br);
-		graphics::drawText(0.20f * CANVAS_WIDTH, 0.59f * CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 12, "Press D for demo!", br);
+		graphics::drawText(0, 0.3f * CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 25, "Select level (main game) / play multiplayer ", br);
+		graphics::drawText(0, 0.35f * CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 25, "by clicking the options button!", br);
+		graphics::drawText(0.15f * CANVAS_WIDTH, 0.54f * CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 11, "Press D for demo!", br);
+		graphics::drawText(0.07f * CANVAS_WIDTH, 0.7f * CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 12, "Press S for the main game!", br);
+
 
 		break;
 	}
@@ -445,20 +491,22 @@ void draw()
 	case GAME_STATE::HELP: {
 
 		setColor(br, new float[3]{ 0.0f, 0.0f, 0.0f });
-		graphics::drawText(CANVAS_WIDTH / 10, 2.0f * CANVAS_HEIGHT / 13, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 17, "Player 1:", br);
-		graphics::drawText(CANVAS_WIDTH / 10, 2.7f * CANVAS_HEIGHT / 13, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 28, "WASD to move, X to fire, Q/E to spin", br);
-		graphics::drawText(CANVAS_WIDTH / 10, 5.0f * CANVAS_HEIGHT / 13, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 17, "Player 2:", br);
-		graphics::drawText(CANVAS_WIDTH / 10, 5.7f * CANVAS_HEIGHT / 13, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 28, "Arrow-keys to move, SPACE to fire, '.'/',' to spin", br);
-		graphics::drawText(CANVAS_WIDTH / 10, 7.0f * CANVAS_HEIGHT / 13, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 19, "Pick up powerups by running into them.", br);
-		graphics::drawText(CANVAS_WIDTH / 10, 8.2f * CANVAS_HEIGHT / 13, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 17, "Gain points by killing enemies.", br);
+		graphics::drawText(0.1f * CANVAS_WIDTH, 0.15f * CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 17, "Player 1:", br);
+		graphics::drawText(0.1f * CANVAS_WIDTH, 0.20f * CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 28, "WASD to move, SPACE to fire, Q and E to spin", br);
+		graphics::drawText(0.1f * CANVAS_WIDTH, 0.27f * CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 17, "Player 2:", br);
+		graphics::drawText(0.1f * CANVAS_WIDTH, 0.32f * CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 28, "Arrows to move, '.' to fire, ',' and '/' to spin", br);
+		graphics::drawText(0.1f * CANVAS_WIDTH, 0.41f * CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 19, "Pick up powerups by running into them.", br);
+		graphics::drawText(0.1f * CANVAS_WIDTH, 0.48f * CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 17, "Gain points by killing enemies.", br);
+		graphics::drawText(0.1f * CANVAS_WIDTH, 0.58f * CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 17, "Information about editing the levels", br);
+		graphics::drawText(0.1f * CANVAS_WIDTH, 0.63f * CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 17, "can be found at the .txt files", br);
 
 		setColor(br, new float[3]{ 1.0f, 1.0f, 1.0f });
-		br.outline_opacity = 0.f;
-		br.texture = std::string(image_path + "player1.png");
-		graphics::drawRect(CANVAS_WIDTH / 10, CANVAS_HEIGHT - 80, 40, 80, br);
-		br.texture = std::string(image_path + "player2.png");
+		br.outline_opacity = 0.0f;
+		br.texture = image_path + "player1.png";
+		graphics::drawRect(0.1f * CANVAS_WIDTH, 0.84f * CANVAS_HEIGHT, 40, 80, br);
 
-		graphics::drawRect(CANVAS_WIDTH - (CANVAS_WIDTH / 10), CANVAS_HEIGHT - 80, 40, 80, br);
+		br.texture = image_path + "player2.png";
+		graphics::drawRect(0.9 * CANVAS_WIDTH, 0.84f * CANVAS_HEIGHT, 40, 80, br);
 
 		break;
 	}
@@ -521,8 +569,10 @@ void resize(int new_w, int new_h)
 
 int main()
 {
-	graphics::createWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "1917");
+	graphics::createWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "1942ripoff");
+#ifdef no_threads
 	graphics::setFullScreen(true);
+#endif //Windows can't handle unresponsive full screen windows
 	std::set_terminate(close);
 
 	graphics::setCanvasSize(CANVAS_WIDTH, CANVAS_HEIGHT);
@@ -567,9 +617,12 @@ void close()
 		delete ui;
 #ifndef no_threads
 		terminate_all = true;
+		th_1_start = true; //break out of the waiting loops
+		th_2_start = true;
 		updateThread.join();
 		collisionThread.join();
 #endif
+		delete reinterpret_cast<GameData *>(graphics::getUserData());
 	}
 	graphics::destroyWindow();
 	exit(0);
@@ -581,25 +634,15 @@ inline float get_canvas_height() { return CANVAS_HEIGHT; }
 float mouse_x(float mx) { return (mx - ((WINDOW_WIDTH - (CANVAS_WIDTH * c2w)) / 2)) * w2c; }
 float mouse_y(float my) { return (my - ((WINDOW_HEIGHT - (CANVAS_HEIGHT * c2w)) / 2)) * w2c; }
 
-#ifndef no_thread
-/*	Note on thread implementation:
-	The main thread, after executing the code of the update(float) method, executes
-	code from the library which is responsible for almost all of the processing time.
-	The other two threads execute code that doesn't interact with the library at all
-	therefore their execution time is effectively 0, compared to that of the main thread.
-	As a result these two threads need to wait for approximately the time between two
-	update cycles before executing their code again.
-	Although there is some variance regarding the delta time of two update cycles and
-	the threads wait for the delta time of the previous update cycle, on the long run
-	this doesn't make a difference
-*/
+#ifndef no_threads
+void updateAndSpawn(GameData*const gd, float* const ms) {
 
-void updateAndSpawn(GameData* const gd, float* ms)
-{
-	while (!terminate_all)
-	{
-		if (!game_over && !paused)
-		{
+	while (!terminate_all) {
+		while (!th_1_start)
+			;
+		
+		if (!game_over) {
+
 			gd->spawn();
 			gd->update(*ms, gd->enemyLs);
 			gd->update(*ms, gd->enemyProjLs);
@@ -610,18 +653,20 @@ void updateAndSpawn(GameData* const gd, float* ms)
 
 			gd->update_level(*ms);
 			gd->updateBackground(*ms);
+
 		}
-		std::this_thread::sleep_for(std::chrono::milliseconds((int)*ms));
+		th_1_done = true;
+		th_1_start = false;
 	}
 }
 
-void checkAndFire(GameData* const gd, float* ms)
-{
+void checkAndFire(GameData* const gd, float* const ms){
 
-	while (!terminate_all)
-	{
-		if (!game_over && !paused)
-		{
+	while (!terminate_all) {
+		while (!th_2_start)
+			;
+
+		if (!game_over) {
 			gd->checkCollisions(gd->enemyProjLs, gd->playerLs);
 			gd->checkCollisions(gd->playerProjLs, gd->enemyLs);
 			gd->checkCollisions(gd->enemyLs, gd->playerLs);
@@ -629,7 +674,8 @@ void checkAndFire(GameData* const gd, float* ms)
 			gd->fire(gd->playerLs);
 			gd->fire(gd->enemyLs);
 		}
-		std::this_thread::sleep_for(std::chrono::milliseconds((int)*ms));
+		th_2_done = true;
+		th_2_start = false;
 	}
 }
 #endif

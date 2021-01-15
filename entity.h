@@ -1,6 +1,6 @@
 #pragma once
 #include "gameobject.h"
-#include "GObjFactory.h"
+#include "Factory.h"
 
 class Projectile;
 
@@ -21,7 +21,7 @@ public:
 	// override draw() to add shadows
 	virtual void draw() override;
 
-	// Returns a projectile of type `curr_projectile` using the friend GObjFactory class
+	// Returns a projectile of type `curr_projectile` using the friend Factory class
 	Projectile* getProjectile() const;
 	VisualEffect* getFireVisualEffect() const;
 	VisualEffect* getDestructionVisualEffect() const override;
@@ -29,13 +29,13 @@ public:
 	virtual ~Entity();
 
 protected:
-	GObjFactory::BULLET curr_projectile;
+	Factory::BULLET curr_projectile;
 	bool _hasFired;
 
 	Entity(float xpos, float ypos, float angle, float vel, float width, float height, const std::string* const, Path*,
-		int damage, int health, int score, GObjFactory::BULLET proj_type);
+		int damage, int health, int score, Factory::BULLET proj_type);
 
-	friend class GObjFactory; // allow creation of entities only to the factory
+	friend class Factory; // allow creation of entities only to the factory
 
 	std::string shadow;
 };
