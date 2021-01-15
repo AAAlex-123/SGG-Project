@@ -1,4 +1,3 @@
-#pragma once
 #include "Powerup.h"
 #include "Player.h"
 #include "GObjFactory.h"
@@ -11,7 +10,7 @@ Powerup::Powerup(float xpos, float ypos, float angle, const std::string* sprite,
 void Powerup::hit(GameObject* o2)
 {
 	GameObject::hit(o2);
-	consume(dynamic_cast<Player*> (o2)); //it's guaranteed to be a Player* and the method will be used only a couple times in the game
+	consume(dynamic_cast<Player*> (o2)); // it's guaranteed to be a Player* and the method will be used only a couple times in the game
 }
 
 VisualEffect* Powerup::getDestructionVisualEffect() const
@@ -62,7 +61,7 @@ PointsPowerup::PointsPowerup(float xpos, float ypos, float angle)
 	: Powerup(xpos, ypos, angle, new std::string(image_path + "points_powerup.png"), score)
 {}
 
-void PointsPowerup::consume(Player* target) const
+void PointsPowerup::consume(Player* target_not_used) const
 {}
 
 Powerup* PointsPowerup::clone() const
