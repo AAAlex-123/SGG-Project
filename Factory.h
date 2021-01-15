@@ -14,7 +14,7 @@ class Player;
 /**
  * A Factory class that is used to assemble and produce all game objects in the game.
  */
-class GObjFactory
+class Factory
 {
 public:
 	enum class ENEMY
@@ -42,9 +42,9 @@ public:
 		SMOKE,
 	};
 
-	static Entity* createEntity(GObjFactory::ENEMY type, float x, float y, float angle);
-	static Projectile* createProjectile(GObjFactory::BULLET type, float x, float y, float angle);
-	static VisualEffect* createVisualEffect(GObjFactory::EFFECT type, float x, float y, float angle, float duration, float fps = 0.0f);
+	static Entity* createEntity(Factory::ENEMY type, float x, float y, float angle);
+	static Projectile* createProjectile(Factory::BULLET type, float x, float y, float angle);
+	static VisualEffect* createVisualEffect(Factory::EFFECT type, float x, float y, float angle, float duration, float fps = 0.0f);
 	
 	static void reset();
 
