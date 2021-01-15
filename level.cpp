@@ -1,7 +1,6 @@
 #include "level.h"
 #include "entity.h"
 #include "Powerup.h"
-#include "GObjFactory.h"
 #include <iostream>
 
 // ===== LEVEL =====
