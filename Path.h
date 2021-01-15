@@ -18,6 +18,8 @@ public:
 	// Updates the position based on angle and velocity
 	// Returns bool if the object should fire (only used by Entities, other classes dismiss this value)
 	virtual bool move(float& x, float& y, float& angle, float& vel, float ms);
+
+	virtual ~Path() = default;
 };
 
 // Decorator that increases the object's velocity
@@ -26,6 +28,8 @@ class AcceleratingPath : public Path
 public:
 	AcceleratingPath(float dvel, Path* p);
 	virtual bool move(float& x, float& y, float& angle, float& vel, float ms) override;
+
+	virtual ~AcceleratingPath() = default;
 
 private:
 	// raw velocity change per second
@@ -39,6 +43,8 @@ class RotatingPath : public Path
 public:
 	RotatingPath(float dangle, Path* p);
 	virtual bool move(float& x, float& y, float& angle, float& vel, float ms) override;
+
+	virtual ~RotatingPath() = default;
 
 private:
 	// % of a full rotation per second
@@ -55,6 +61,8 @@ public:
 
 	virtual float getProjAngle(float x, float y);
 
+	virtual ~FiringPath() = default;
+
 protected:
 	const float period;
 	float elapsed;
@@ -70,6 +78,8 @@ public:
 	TargetedFiringPath(float period, Path* p);
 
 	virtual float getProjAngle(float x, float y) override;
+
+	virtual ~TargetedFiringPath() = default;
 };
 
 // Decorator that changes angle to follow the closest player
@@ -78,6 +88,8 @@ class HomingPath : public Path
 public:
 	HomingPath(float perc, Path* p);
 	virtual bool move(float& x, float& y, float& angle, float& vel, float ms) override;
+
+	virtual ~HomingPath() = default;
 
 private:
 	// percentage of angle turn relative to target every update cycle, 0-1
@@ -91,4 +103,6 @@ class StaticPath : public Path
 public:
 	StaticPath();
 	virtual bool move(float& x, float& y, float& angle, float& vel, float ms) override;
+
+	virtual ~StaticPath() = default;
 };
