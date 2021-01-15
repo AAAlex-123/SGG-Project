@@ -26,7 +26,7 @@ VisualEffect::operator bool() const
 
 VisualEffect* VisualEffect::getDestructionVisualEffect() const
 {
-	return GObjFactory::createVisualEffect(GObjFactory::EFFECT::NOEFFECT, 0, 0, 0, 0, 0);
+	return Factory::createVisualEffect(Factory::EFFECT::NOEFFECT, 0, 0, 0, 0, 0);
 }
 
 VisualEffect::~VisualEffect()
