@@ -1,4 +1,4 @@
-#include "GObjFactory.h"
+#include "Factory.h"
 #include "Path.h"
 #include "Player.h"
 #include "drawing.h"
