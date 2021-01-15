@@ -1,5 +1,5 @@
 #include "visual_effect.h"
-#include "GObjFactory.h"
+#include "Factory.h"
 
 VisualEffect::VisualEffect(float xpos, float ypos, float angle, float vel, float size, std::string* sprites,
 	int sprite_no, float duration, float fps) :

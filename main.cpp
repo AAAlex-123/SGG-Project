@@ -1,6 +1,6 @@
 #include "globals.h"
 #include "constants.h"
-#include "GObjFactory.h"
+#include "Factory.h"
 #include "game_data.h"
 #include "UI.h"
 #include "Player.h"

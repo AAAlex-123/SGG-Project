@@ -1,6 +1,6 @@
 #include "Powerup.h"
 #include "Player.h"
-#include "GObjFactory.h"
+#include "Factory.h"
 
 // Powerup
 Powerup::Powerup(float xpos, float ypos, float angle, const std::string* sprite, int score)

@@ -1,6 +1,6 @@
 #pragma once
 #include "gameobject.h"
-#include "GObjFactory.h"
+#include "Factory.h"
 
 class Projectile;
 

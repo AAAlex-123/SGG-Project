@@ -1,6 +1,6 @@
 #pragma once
 #include "globals.h"
-#include "GObjFactory.h"
+#include "Factory.h"
 #include <unordered_set>
 #include <queue>
 
