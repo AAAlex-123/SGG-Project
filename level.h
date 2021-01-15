@@ -104,7 +104,7 @@ private:
 class Spawnpoint
 {
 public:
-	Spawnpoint(GObjFactory::ENEMY type, float perc_x, float perc_y, float angle, int amount, float spawn_delta, float initial_delay);
+	Spawnpoint(Factory::ENEMY type, float perc_x, float perc_y, float angle, int amount, float spawn_delta, float initial_delay);
 	Spawnpoint* clone();
 
 	void update(float);
@@ -118,7 +118,7 @@ public:
 
 private:
 	// enemy parameters
-	const GObjFactory::ENEMY type;
+	const Factory::ENEMY type;
 	const float perc_x, perc_y, angle;
 
 	// spawnpoint parameters
