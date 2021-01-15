@@ -492,9 +492,9 @@ void draw()
 
 		setColor(br, new float[3]{ 0.0f, 0.0f, 0.0f });
 		graphics::drawText(0.1f * CANVAS_WIDTH, 0.15f * CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 17, "Player 1:", br);
-		graphics::drawText(0.1f * CANVAS_WIDTH, 0.20f * CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 28, "WASD to move, X to fire, Q/E to spin", br);
+		graphics::drawText(0.1f * CANVAS_WIDTH, 0.20f * CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 28, "WASD to move, SPACE to fire, Q and E to spin", br);
 		graphics::drawText(0.1f * CANVAS_WIDTH, 0.27f * CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 17, "Player 2:", br);
-		graphics::drawText(0.1f * CANVAS_WIDTH, 0.32f * CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 28, "Arrow-keys to move, SPACE to fire, '.'/',' to spin", br);
+		graphics::drawText(0.1f * CANVAS_WIDTH, 0.32f * CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 28, "Arrows to move, '.' to fire, ',' and '/' to spin", br);
 		graphics::drawText(0.1f * CANVAS_WIDTH, 0.41f * CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 19, "Pick up powerups by running into them.", br);
 		graphics::drawText(0.1f * CANVAS_WIDTH, 0.48f * CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 17, "Gain points by killing enemies.", br);
 		graphics::drawText(0.1f * CANVAS_WIDTH, 0.58f * CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 17, "Information about editing the levels", br);
