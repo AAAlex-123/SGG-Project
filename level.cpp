@@ -222,7 +222,7 @@ Wave::~Wave()
 
 // ===== SPAWNPOINT =====
 
-Spawnpoint::Spawnpoint(GObjFactory::ENEMY type, float perc_x, float perc_y, float angle, int amount, float spawn_delta, float initial_delay)
+Spawnpoint::Spawnpoint(Factory::ENEMY type, float perc_x, float perc_y, float angle, int amount, float spawn_delta, float initial_delay)
 	: type(type), perc_x(perc_x), perc_y(perc_y), angle(angle), _spawn_delta(spawn_delta), _amount(amount), _initial_delay(initial_delay), _elapsed_time(spawn_delta - 0.1f)
 {}
 
@@ -252,7 +252,7 @@ bool Spawnpoint::can_spawn() const
 Entity* Spawnpoint::spawn()
 {
 	--_amount;
-	return GObjFactory::createEntity(type, get_canvas_width() * perc_x, get_canvas_height() * perc_y, angle);
+	return Factory::createEntity(type, get_canvas_width() * perc_x, get_canvas_height() * perc_y, angle);
 }
 
 Spawnpoint::operator bool() const

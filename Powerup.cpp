@@ -15,7 +15,7 @@ void Powerup::hit(GameObject* o2)
 
 VisualEffect* Powerup::getDestructionVisualEffect() const
 {
-	return GObjFactory::createVisualEffect(GObjFactory::EFFECT::NOEFFECT, x, y, 0.0f, 1.0f, 18.0f);
+	return Factory::createVisualEffect(Factory::EFFECT::NOEFFECT, x, y, 0.0f, 1.0f, 18.0f);
 }
 
 Powerup::~Powerup()
