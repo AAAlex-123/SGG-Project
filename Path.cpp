@@ -1,6 +1,6 @@
 #include "Path.h"
 #include "Player.h"
-#include "GObjFactory.h"
+#include "Factory.h"
 #include <cmath>
 
 Path::Path()
