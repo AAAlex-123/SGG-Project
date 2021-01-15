@@ -5,7 +5,7 @@ Button::Button(GameData* const gd, float x, float y, float size, std::string* co
 	: Drawing(x, y, 0, 0, size, size, icon), gd(gd), targetGS(targetGS), clicked(false), ms(graphics::MouseState())
 {}
 
-void Button::update(float not_used_lmao)
+void Button::update(float ms__not_used)
 {
 	clicked = false;
 	if (gd->game_state == targetGS)
