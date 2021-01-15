@@ -12,9 +12,9 @@ class Powerup;
 class Player;
 
 /**
-* A Factory class that is used to assemble and produce all game objects in the game.
-*/
-class GObjFactory
+ * A Factory class that is used to assemble and produce all game objects in the game.
+ */
+class Factory
 {
 public:
 	enum class ENEMY
@@ -42,9 +42,9 @@ public:
 		SMOKE,
 	};
 
-	static Entity* createEntity(GObjFactory::ENEMY type, float x, float y, float angle);
-	static Projectile* createProjectile(GObjFactory::BULLET type, float x, float y, float angle);
-	static VisualEffect* createVisualEffect(GObjFactory::EFFECT type, float x, float y, float angle, float duration, float fps = 0.0f);
+	static Entity* createEntity(Factory::ENEMY type, float x, float y, float angle);
+	static Projectile* createProjectile(Factory::BULLET type, float x, float y, float angle);
+	static VisualEffect* createVisualEffect(Factory::EFFECT type, float x, float y, float angle, float duration, float fps = 0.0f);
 	
 	static void reset();
 
@@ -59,9 +59,10 @@ private:
 	// player data in order to supply created objects with necessary information. look at Path.h/cpp, specifically Homing- and TargetedFiring-Paths
 	static const std::list<Player*>* playerLs;
 
-	const static float player_speed, player_w, player_h, player_hp, player_dangle;
-	const static float b_plane_speed, b_plane_size, b_plane_dmg, b_plane_hp, b_plane_score;
-	const static float b_proj_speed, b_proj_size, b_proj_dmg;
+	const static int player_speed, player_w, player_h, player_hp;
+	const static float player_dangle;
+	const static int b_plane_speed, b_plane_size, b_plane_dmg, b_plane_hp, b_plane_score;
+	const static int b_proj_speed, b_proj_size, b_proj_dmg;
 
 	const static Keyset pl1_kset, pl2_kset;
 

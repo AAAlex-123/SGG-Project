@@ -5,9 +5,9 @@
 class VisualEffect;
 
 /**
-* Superclass for all interactive objects in the game
-* Includes methods for hitting other objects, reacting to being hit and placing special effects on death.
-*/
+ * Superclass for all interactive objects in the game
+ * Includes methods for hitting other objects, reacting to being hit and placing special effects on death.
+ */
 class GameObject : public Drawing
 {
 public:

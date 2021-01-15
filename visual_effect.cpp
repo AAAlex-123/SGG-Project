@@ -1,10 +1,10 @@
 #include "visual_effect.h"
-#include "GObjFactory.h"
+#include "Factory.h"
 
 VisualEffect::VisualEffect(float xpos, float ypos, float angle, float vel, float size, std::string* sprites,
 	int sprite_no, float duration, float fps) :
 	Drawing(xpos, ypos, angle, vel, size, size, sprites, new StaticPath),
-	sprite_no(sprite_no), duration(duration), sprites_per_second(1 / fps), elapsed(0), total_elapsed(0)
+	duration(duration), sprites_per_second(1 / fps), elapsed(0), total_elapsed(0), sprite_no(sprite_no)
 {}
 
 // Moved the effect and changes the current sprite based on the elapsed time
@@ -26,7 +26,7 @@ VisualEffect::operator bool() const
 
 VisualEffect* VisualEffect::getDestructionVisualEffect() const
 {
-	return GObjFactory::createVisualEffect(GObjFactory::EFFECT::NOEFFECT, 0, 0, 0, 0, 0);
+	return Factory::createVisualEffect(Factory::EFFECT::NOEFFECT, 0, 0, 0, 0, 0);
 }
 
 VisualEffect::~VisualEffect()

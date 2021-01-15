@@ -1,5 +1,5 @@
 #include "game_data.h"
-#include "GObjFactory.h"
+#include "Factory.h"
 #include <iostream>
 #include <regex>
 #include <fstream>
@@ -218,32 +218,32 @@ bool GameData::_load_waves_from_file(const std::string& wave_file_path)
 				ROTATING_ENEMY_D = 8
 			*/
 
-			GObjFactory::ENEMY type = GObjFactory::ENEMY::SIMPLE_ENEMY;
+			Factory::ENEMY type = Factory::ENEMY::SIMPLE_ENEMY;
 			switch (stoi(match[1]))
 			{
 			case 1:
-				type = GObjFactory::ENEMY::SIMPLE_ENEMY;
+				type = Factory::ENEMY::SIMPLE_ENEMY;
 				break;
 			case 2:
-				type = GObjFactory::ENEMY::SIMPLE_ENEMY_F;
+				type = Factory::ENEMY::SIMPLE_ENEMY_F;
 				break;
 			case 3:
-				type = GObjFactory::ENEMY::ACCELERATING_ENEMY;
+				type = Factory::ENEMY::ACCELERATING_ENEMY;
 				break;
 			case 4:
-				type = GObjFactory::ENEMY::TANK_ENEMY;
+				type = Factory::ENEMY::TANK_ENEMY;
 				break;
 			case 5:
-				type = GObjFactory::ENEMY::HOMING_ENEMY;
+				type = Factory::ENEMY::HOMING_ENEMY;
 				break;
 			case 6:
-				type = GObjFactory::ENEMY::ROTATING_ENEMY_C;
+				type = Factory::ENEMY::ROTATING_ENEMY_C;
 				break;
 			case 7:
-				type = GObjFactory::ENEMY::ROTATING_ENEMY_CA;
+				type = Factory::ENEMY::ROTATING_ENEMY_CA;
 				break;
 			case 8:
-				type = GObjFactory::ENEMY::ROTATING_ENEMY_D;
+				type = Factory::ENEMY::ROTATING_ENEMY_D;
 				break;
 			default:
 				std::cerr << "GameData::_load_waves_from_file: invalid enemy type: " << stoi(match[1])
@@ -398,7 +398,7 @@ bool GameData::_load_levels_from_file(const std::string& level_file_path)
 // wip lmao
 void GameData::_load_hardcoded_levels()
 {
-	Spawnpoint* sp11 = new Spawnpoint(GObjFactory::ENEMY::SIMPLE_ENEMY, 0.0f, 0.5, -PI / 2, 10, 1.0f, 0.0f);
+	Spawnpoint* sp11 = new Spawnpoint(Factory::ENEMY::SIMPLE_ENEMY, 0.0f, 0.5, -PI / 2, 10, 1.0f, 0.0f);
 
 	Wave* w1 = new Wave("line");
 	w1->add_spawnpoint(sp11);

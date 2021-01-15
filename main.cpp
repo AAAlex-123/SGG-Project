@@ -1,6 +1,6 @@
 #include "globals.h"
 #include "constants.h"
-#include "GObjFactory.h"
+#include "Factory.h"
 #include "game_data.h"
 #include "UI.h"
 #include "Player.h"
@@ -125,11 +125,11 @@ void update(float ms_)
 
 			// === generate players ===
 
-			GObjFactory::setPlayerData(gd->playerLs);
+			Factory::setPlayerData(gd->playerLs);
 			// Due to Factory constraints we are forced to upcast the player pointer.
-			gd->playerLs->push_back(dynamic_cast<Player*>(GObjFactory::createEntity(GObjFactory::ENEMY::PLAYER, get_canvas_width() / 3.0f, get_canvas_height() * 0.7f, 0)));
+			gd->playerLs->push_back(dynamic_cast<Player*>(Factory::createEntity(Factory::ENEMY::PLAYER, get_canvas_width() / 3.0f, get_canvas_height() * 0.7f, 0)));
 			if (gd->isMultiplayer)
-				gd->playerLs->push_back(dynamic_cast<Player*>(GObjFactory::createEntity(GObjFactory::ENEMY::PLAYER, 2 * get_canvas_width() / 3.0f, get_canvas_height() * 0.7f, 0)));
+				gd->playerLs->push_back(dynamic_cast<Player*>(Factory::createEntity(Factory::ENEMY::PLAYER, 2 * get_canvas_width() / 3.0f, get_canvas_height() * 0.7f, 0)));
 
 #ifndef no_threads
 			// === start threads ===	(only the first time the game starts)
@@ -254,7 +254,7 @@ void update(float ms_)
 	}
 	case GAME_STATE::RESET: {
 
-		GObjFactory::reset();
+		Factory::reset();
 		gd->reset();
 
 		gd->game_state = GAME_STATE::MENU;

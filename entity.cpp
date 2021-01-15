@@ -2,7 +2,7 @@
 #include <cmath>
 
 Entity::Entity(float xpos, float ypos, float angle, float vel, float width, float height, const std::string* const sprite_name, Path* path,
-	int damage, int health, int score, GObjFactory::BULLET proj_type)
+	int damage, int health, int score, Factory::BULLET proj_type)
 	: GameObject(xpos, ypos, angle, vel, width, height, new std::string((*sprite_name) + ".png"), path, damage, health, score),
 	curr_projectile(proj_type), _hasFired(false), shadow(std::string(*sprite_name + "_shadow.png"))
 {}
@@ -28,19 +28,20 @@ void Entity::draw()
 	Drawing::draw();
 }
 
-Projectile* Entity::getProjectile() const {
-	float angle = static_cast<FiringPath*>(movement)->getProjAngle(x,y);
-	return GObjFactory::createProjectile(curr_projectile, x - (radius * sin(angle)), y - (radius * cos(angle)), angle);
+Projectile* Entity::getProjectile() const
+{
+	float proj_angle = static_cast<FiringPath*>(movement)->getProjAngle(x, y);
+	return Factory::createProjectile(curr_projectile, x - (radius * sin(proj_angle)), y - (radius * cos(proj_angle)), proj_angle);
 }
 
 VisualEffect* Entity::getFireVisualEffect() const
 {
-	return GObjFactory::createVisualEffect(GObjFactory::EFFECT::SMOKE, x - (radius * sin(angle)), y - (radius * cos(angle)), angle, 0.06f);
+	return Factory::createVisualEffect(Factory::EFFECT::SMOKE, x - (radius * sin(angle)), y - (radius * cos(angle)), angle, 0.06f);
 }
 
 VisualEffect* Entity::getDestructionVisualEffect() const
 {
-	return GObjFactory::createVisualEffect(GObjFactory::EFFECT::EXPLOSION, x, y, 0.0f, 1.0f, 18.0f);
+	return Factory::createVisualEffect(Factory::EFFECT::EXPLOSION, x, y, 0.0f, 1.0f, 18.0f);
 }
 
 Entity::~Entity()
