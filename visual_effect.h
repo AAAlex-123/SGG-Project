@@ -19,5 +19,5 @@ private:
 	VisualEffect(float xpos, float ypos, float angle, float vel, float size, std::string* sprites,
 		int sprite_no, float duration, float fps);
 
-	friend class GObjFactory;	//allow creation of entities only to the factory
+	friend class Factory;	//allow creation of entities only to the factory
 };

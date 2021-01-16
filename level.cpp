@@ -110,6 +110,18 @@ void Level::add_powerup(float time, Powerup* p)
 	powerups->insert(new std::pair<float, Powerup*>(time, p));
 }
 
+std::unordered_set<Powerup*>* Level::get_powerups() const
+{
+	std::unordered_set<Powerup*>* powerups_to_return = new std::unordered_set<Powerup*>();
+
+	for (std::pair<float, Powerup*>* p : *powerups)
+	{
+		powerups_to_return->insert(p->second->clone());
+	}
+
+	return powerups_to_return;
+}
+
 Level::operator bool() const
 {
 	return !(waves->empty() && enemy_queue->empty() && powerups->empty() && powerup_queue->empty());

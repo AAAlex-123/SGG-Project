@@ -123,6 +123,23 @@ void update(float ms_)
 
 			gd->current_level = gd->levels[gd->_playing_level_id]->clone();
 
+			// === spawn powerups of previous levels ===
+			if (gd->_playing_level_id != 0 && gd->_playing_level_id != -10)
+			{
+				int health_powerup_count = 0;
+				for (int i = 0; i < gd->_playing_level_id; ++i)
+				{
+					for (Powerup* p : *gd->levels[i]->get_powerups())
+					{
+						// add all the powerups but only half of the health powerups
+						if ((*p->getSprite() != image_path + "h_powerup.png") || ((++health_powerup_count % 2 == 1) && (*p->getSprite() == image_path + "h_powerup.png")))
+						{
+							gd->powerupLs->push_back(p);
+						}
+					}
+				}
+			}
+
 			// === generate players ===
 
 			Factory::setPlayerData(gd->playerLs);
@@ -337,7 +354,29 @@ void draw()
 		break;
 	}
 	case GAME_STATE::INFO: {
+		setColor(br, 'L');
+		graphics::drawText(15, 0.07f * CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 16, "Before you start:", br);
+		graphics::drawText(15, 0.13f * CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 20, "All icons are clickable buttons:", br);
+		graphics::drawText(15, 0.18f * CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 25, " - X to exit", br);
+		setColor(br, 'R');
+		graphics::drawText(CANVAS_WIDTH / 2, 0.18f * CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 25, " - ? for help  (read before playing)", br);
+		graphics::drawText(CANVAS_WIDTH / 2, 0.23f * CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 25, " - cog for options", br);
+		setColor(br, 'L');
+		graphics::drawText(15, 0.23f * CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 25, " - c for credits", br);
+		graphics::drawText(15, 0.28f * CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 25, " - trophy for achievements", br);
+		graphics::drawText(CANVAS_WIDTH / 2, 0.28f * CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 25, " - black arrow to go back", br);
+		graphics::drawText(15, 0.33f * CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 25, " - red arrow to reload levels  (use after changing the .txt files)", br);
+		// the following 3 lines are not included in the other version
+		setColor(br, 'R');
+		graphics::drawText(15, 0.40f * CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 25, "Options include level select and single- and multi-player modes", br);
+		setColor(br, 'L');
+		graphics::drawText(15, 0.46f * CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 22, "If you have limited time we suggest you play the demo", br);
+		graphics::drawText(15, 0.52f * CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 22, "to see all of the game's features in about 4 minutes", br);
 
+		graphics::drawText(0.57f * CANVAS_WIDTH, 0.67f * CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 17, "That's it! Click the", br);
+		graphics::drawText(0.57f * CANVAS_WIDTH, 0.72f * CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 17, "arrow to continue", br);
+		graphics::drawText(0.67f * CANVAS_WIDTH, 0.77f * CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 17, "and have fun!", br);
+		/*
 		setColor(br, 'L');
 		graphics::drawText(15, 0.07f * CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 16, "Before you start:", br);
 		graphics::drawText(15, 0.12f * CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 22, "Any box on the edges of the screen is a button", br);
@@ -356,18 +395,19 @@ void draw()
 		setColor(br, 'R');
 		graphics::drawText(0.33f * CANVAS_WIDTH, 0.70f * CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 17, "That's it, click the arrow to", br);
 		graphics::drawText(0.5f * CANVAS_WIDTH, 0.75f * CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 17, "continue and have fun!", br);
-		setColor(br, 'L');
+		*/
 		break;
 	}
 	case GAME_STATE::MENU: {
 
 		setColor(br, 'L');
 		graphics::drawText(0.30f * CANVAS_WIDTH, 0.20f * CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 10, "Welcome!", br);
-		graphics::drawText(0, 0.3f * CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 25, "Select level (main game) / play multiplayer ", br);
-		graphics::drawText(0, 0.35f * CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 25, "by clicking the options button!", br);
+		//graphics::drawText(0, 0.3f * CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 25, "Select level (main game) / play multiplayer ", br);
+		//graphics::drawText(0, 0.35f * CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 25, "by clicking the options button!", br);
+		graphics::drawText(0.2f * CANVAS_WIDTH, 0.31f * CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 19, "Select level / play multiplayer", br);
+		graphics::drawText(0.2f * CANVAS_WIDTH, 0.36f * CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 19, "by clicking the options button!", br);
 		graphics::drawText(0.15f * CANVAS_WIDTH, 0.54f * CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 11, "Press D for demo!", br);
 		graphics::drawText(0.07f * CANVAS_WIDTH, 0.7f * CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 12, "Press S for the main game!", br);
-
 
 		break;
 	}
@@ -380,9 +420,9 @@ void draw()
 		{
 			br.texture = a->icon;
 			setColor(br, 'W');
-			graphics::drawRect(60, 75 + i * 100, 75, 75, br);
+			graphics::drawRect(0.15f * CANVAS_WIDTH, 75.0f + i * 100, 75.0f, 75.0f, br);
 			setColor(br, 'L');
-			graphics::drawText(0, 75 + i * 100 + 50, 10, a->name, br);
+			graphics::drawText(0.15f * CANVAS_WIDTH, 75.0f + i * 100 + 50, 10.0f, a->name, br);
 			++i;
 		}
 
@@ -447,8 +487,9 @@ void draw()
 	case GAME_STATE::OPTIONS: {
 
 		setColor(br, new float[3]{ 0.0f, 0.0f, 0.0f });
-		graphics::drawText(CANVAS_WIDTH / 3, 4.0f * CANVAS_HEIGHT / 10, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 15, "Select Level", br);
-		graphics::drawText(CANVAS_WIDTH / 3, 9.0f * CANVAS_HEIGHT / 10, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 15, "Select Players", br);
+		graphics::drawText(0.35f * CANVAS_WIDTH, 0.40f * CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 15, "Select Level", br);
+		graphics::drawText(0.36f * CANVAS_WIDTH, 0.44f * CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 28, "(only for main game)", br);
+		graphics::drawText(0.33f * CANVAS_WIDTH, 0.90f * CANVAS_HEIGHT, ((CANVAS_WIDTH + CANVAS_HEIGHT) / 2) / 15, "Select Players", br);
 
 		break;
 	}
@@ -572,7 +613,7 @@ int main()
 	graphics::createWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "1942ripoff");
 #ifdef no_threads
 	graphics::setFullScreen(true);
-#endif //Windows can't handle unresponsive full screen windows
+#endif // Windows can't handle unresponsive full screen windows
 	std::set_terminate(close);
 
 	graphics::setCanvasSize(CANVAS_WIDTH, CANVAS_HEIGHT);
@@ -635,14 +676,15 @@ float mouse_x(float mx) { return (mx - ((WINDOW_WIDTH - (CANVAS_WIDTH * c2w)) / 
 float mouse_y(float my) { return (my - ((WINDOW_HEIGHT - (CANVAS_HEIGHT * c2w)) / 2)) * w2c; }
 
 #ifndef no_threads
-void updateAndSpawn(GameData*const gd, float* const ms) {
-
-	while (!terminate_all) {
+void updateAndSpawn(GameData*const gd, float* const ms)
+{
+	while (!terminate_all)
+	{
 		while (!th_1_start)
 			;
 		
-		if (!game_over) {
-
+		if (!game_over)
+		{
 			gd->spawn();
 			gd->update(*ms, gd->enemyLs);
 			gd->update(*ms, gd->enemyProjLs);
@@ -653,20 +695,22 @@ void updateAndSpawn(GameData*const gd, float* const ms) {
 
 			gd->update_level(*ms);
 			gd->updateBackground(*ms);
-
 		}
+
 		th_1_done = true;
 		th_1_start = false;
 	}
 }
 
-void checkAndFire(GameData* const gd, float* const ms){
-
-	while (!terminate_all) {
+void checkAndFire(GameData* const gd, float* const ms)
+{
+	while (!terminate_all)
+	{
 		while (!th_2_start)
 			;
 
-		if (!game_over) {
+		if (!game_over)
+		{
 			gd->checkCollisions(gd->enemyProjLs, gd->playerLs);
 			gd->checkCollisions(gd->playerProjLs, gd->enemyLs);
 			gd->checkCollisions(gd->enemyLs, gd->playerLs);
@@ -674,6 +718,7 @@ void checkAndFire(GameData* const gd, float* const ms){
 			gd->fire(gd->playerLs);
 			gd->fire(gd->enemyLs);
 		}
+
 		th_2_done = true;
 		th_2_start = false;
 	}

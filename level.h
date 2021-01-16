@@ -47,6 +47,8 @@ public:
 	void add_wave(float, Wave*);
 	void add_powerup(float, Powerup*);
 
+	std::unordered_set<Powerup*>* get_powerups() const;
+
 	int id() const { return _id; }
 	std::string info() const { return "level " + std::to_string(id()) + ": " + _desc; }
 
