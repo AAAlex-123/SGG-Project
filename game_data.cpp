@@ -102,7 +102,11 @@ void GameData::load_levels()
 	if (!_load_level_data_from_file(level_file, wave_file))
 	{
 		std::cerr << "Warning: Level loading from files failed, loading hardcoded levels" << std::endl;
-		_load_hardcoded_levels();
+		if (!_load_level_data_from_file(hardcoded_level_file, hardcoded_wave_file))
+		{
+			std::cerr << "Error: Hardcoded level loading failed. Good luck playing with no levels :D" << std::endl;
+			return;
+		}
 	}
 	std::cout << "Levels loaded successfully" << std::endl;
 }
@@ -393,26 +397,6 @@ bool GameData::_load_levels_from_file(const std::string& level_file_path)
 	// close stream
 	in.close();
 	return true;
-}
-
-// wip lmao
-void GameData::_load_hardcoded_levels()
-{
-	Spawnpoint* sp11 = new Spawnpoint(Factory::ENEMY::SIMPLE_ENEMY, 0.0f, 0.5, -PI / 2, 10, 1.0f, 0.0f);
-
-	Wave* w1 = new Wave("line");
-	w1->add_spawnpoint(sp11);
-
-	Level* l1 = new Level(-2, "owo");
-	l1->add_wave(0.0f, w1);
-
-	/*	ABOUT LEVEL ID
-		=>	no level can have an id of -1 (because -1 is the default)
-		=>	levels selectable by users must have id 0-9 inclusive
-		=>	levels not be selectable by users must have any other id
-		=>	level id should always match its key in the levels map like below
-	*/
-	levels[l1->id()] = l1;
 }
 
 void GameData::create_buttons()
