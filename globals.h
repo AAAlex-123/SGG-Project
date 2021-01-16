@@ -4,8 +4,8 @@
 #include <string>
 
 /**
-* Functions and data that should be accessible by every class
-*/
+ * Functions and data that should be accessible by every class
+ */
 
 typedef graphics::scancode_t key;
 
@@ -20,6 +20,8 @@ const std::string music_path = asset_path + "\\music\\";
 const std::string font_file = asset_path + "\\standard_font.ttf";
 const std::string level_file = ".\\levels.txt";
 const std::string wave_file = ".\\waves.txt";
+const std::string hardcoded_level_file = asset_path + "\\hardcoded_levels.txt";
+const std::string hardcoded_wave_file = asset_path + "\\hardcoded_waves.txt";
 
 // enum
 enum class GAME_STATE
