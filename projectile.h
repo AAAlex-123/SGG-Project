@@ -18,5 +18,5 @@ public:
 private:
 	Projectile(float xpos, float ypos, float angle, float vel, float radius, std::string* sprites, Path*, int damage);
 	
-	friend class GObjFactory;	// allow creation of projectiles only to the factory
+	friend class Factory;	// allow creation of projectiles only to the factory
 };
