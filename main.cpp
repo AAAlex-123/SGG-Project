@@ -123,6 +123,23 @@ void update(float ms_)
 
 			gd->current_level = gd->levels[gd->_playing_level_id]->clone();
 
+			// === spawn powerups of previous levels ===
+			if (gd->_playing_level_id != 0 && gd->_playing_level_id != -10)
+			{
+				int health_powerup_count = 0;
+				for (int i = 0; i < gd->_playing_level_id; ++i)
+				{
+					for (Powerup* p : *gd->levels[i]->get_powerups())
+					{
+						// add all the powerups but only half of the health powerups
+						if ((*p->getSprite() != image_path + "h_powerup.png") || ((++health_powerup_count % 2 == 1) && (*p->getSprite() == image_path + "h_powerup.png")))
+						{
+							gd->powerupLs->push_back(p);
+						}
+					}
+				}
+			}
+
 			// === generate players ===
 
 			Factory::setPlayerData(gd->playerLs);
@@ -572,7 +589,7 @@ int main()
 	graphics::createWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "1942ripoff");
 #ifdef no_threads
 	graphics::setFullScreen(true);
-#endif //Windows can't handle unresponsive full screen windows
+#endif // Windows can't handle unresponsive full screen windows
 	std::set_terminate(close);
 
 	graphics::setCanvasSize(CANVAS_WIDTH, CANVAS_HEIGHT);
