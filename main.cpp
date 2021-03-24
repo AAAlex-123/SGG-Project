@@ -6,17 +6,7 @@
 #include "Player.h"
 #include <iostream>
 
-/*
- READ ME IMPORTANT: THREADS ONLY WORK ON DEBUG MODE (or low/no-optimization compiler option) for some reason.
- The most likely cause is that there is a race condition somewhere but it only appears if the program is running fast enough,
- spesifically inside the #ifndef block at main::161-173 where the main thread writes to the global variables while the threads are reading from them.
- We have tried using mutexes, condition variables, which crippled the game's performance, and even tried making
- all threads asynchronized but then similar problems arise when pausing, ending the game and transitioning between levels
- Since it doesn't happen during debug mode we have no tools with which to find it.
- Threads were still used safely to load levels in game_data.cpp though (scrapped because loading times in release mode are miniscule).
- Comment the line below to run with threads.
- */
-#define no_threads
+//#define no_threads
 
 // global variables in main
 graphics::Brush br;
@@ -29,12 +19,12 @@ MUSIC curr_music;
 std::thread updateThread;
 std::thread collisionThread;
 
-bool th_1_start = false;
-bool th_2_start = false;
-bool th_1_done = false;
-bool th_2_done = false;
-bool game_over = false;
-bool terminate_all = false;
+volatile bool th_1_start = false;
+volatile bool th_2_start = false;
+volatile bool th_1_done = false;
+volatile bool th_2_done = false;
+volatile bool game_over = false;
+volatile bool terminate_all = false;
 #endif
 
 // ========== SGG FUNCTIONS ==========
